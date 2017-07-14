@@ -18,8 +18,8 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void HandlerConstructorShouldThrowWhenAnAllowedAudienceIsNotSpecified()
         {
-            Should.Throw<ArgumentNullException>(() => new JwtFormat((string)null, (IIssuerSecurityTokenProvider)null));
-            Should.Throw<ArgumentNullException>(() => new JwtFormat((TokenValidationParameters)null, (IIssuerSecurityTokenProvider)null));
+            Should.Throw<ArgumentNullException>(() => new JwtFormat((string)null, (IIssuerSecurityKeyProvider)null));
+            Should.Throw<ArgumentNullException>(() => new JwtFormat((TokenValidationParameters)null, (IIssuerSecurityKeyProvider)null));
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void HandlerConstructorShouldThrowWhenTheIssuerSecurityTokenProviderEnumerableIsEmpty()
         {
-            Should.Throw<ArgumentOutOfRangeException>(() => new JwtFormat(new[] { "urn:issuer" }, new List<IIssuerSecurityTokenProvider>()));
+            Should.Throw<ArgumentOutOfRangeException>(() => new JwtFormat(new[] { "urn:issuer" }, new List<IIssuerSecurityKeyProvider>()));
         }
 
         [Fact]
@@ -62,7 +62,7 @@ namespace Microsoft.Owin.Security.Tests
             Should.Throw<NotSupportedException>(() => instance.Protect(null));
         }
 
-        private class TestIssuerSecurityTokenProvider : IIssuerSecurityTokenProvider
+        private class TestIssuerSecurityTokenProvider : IIssuerSecurityKeyProvider
         {
             public TestIssuerSecurityTokenProvider(string issuer)
             {

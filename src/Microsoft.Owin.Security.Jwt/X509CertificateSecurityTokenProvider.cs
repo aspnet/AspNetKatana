@@ -9,14 +9,14 @@ using System.Security.Cryptography.X509Certificates;
 namespace Microsoft.Owin.Security.Jwt
 {
     /// <summary>
-    /// Implements an <see cref="IIssuerSecurityTokenProvider"/> for X509 JWTs.
+    /// Implements an <see cref="IIssuerSecurityKeyProvider"/> for X509 JWTs.
     /// </summary>
-    public class X509CertificateSecurityTokenProvider : IIssuerSecurityTokenProvider
+    public class X509CertificateSecurityKeyProvider : IIssuerSecurityKeyProvider
     {
-        private readonly List<SecurityToken> _tokens = new List<SecurityToken>();
+        private readonly List<SecurityKey> _keys = new List<SecurityKey>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="X509CertificateSecurityTokenProvider"/> class.
+        /// Initializes a new instance of the <see cref="X509CertificateSecurityKeyProvider"/> class.
         /// </summary>
         /// <param name="issuer">The issuer.</param>
         /// <param name="certificate">The certificate.</param>
@@ -25,7 +25,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// or
         /// certificate
         /// </exception>
-        public X509CertificateSecurityTokenProvider(string issuer, X509Certificate2 certificate)
+        public X509CertificateSecurityKeyProvider(string issuer, X509Certificate2 certificate)
         {
             if (string.IsNullOrWhiteSpace(issuer))
             {
@@ -39,7 +39,7 @@ namespace Microsoft.Owin.Security.Jwt
 
             Issuer = issuer;
 
-            _tokens.Add(new X509SecurityToken(certificate));
+            _keys.Add(new X509SecurityKey(certificate));
         }
 
         /// <summary>
@@ -56,9 +56,9 @@ namespace Microsoft.Owin.Security.Jwt
         /// <value>
         /// All known security tokens.
         /// </value>
-        public IEnumerable<SecurityToken> SecurityTokens
+        public IEnumerable<SecurityKey> SecurityKeys
         {
-            get { return _tokens.AsReadOnly(); }
+            get { return _keys.AsReadOnly(); }
         }
     }
 }

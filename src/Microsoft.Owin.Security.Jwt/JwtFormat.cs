@@ -8,10 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.ServiceModel.Security.Tokens;
 using Microsoft.IdentityModel.Tokens;
-
-using SecurityToken = System.IdentityModel.Tokens.SecurityToken;
 
 namespace Microsoft.Owin.Security.Jwt
 {
@@ -21,7 +18,7 @@ namespace Microsoft.Owin.Security.Jwt
     public class JwtFormat : ISecureDataFormat<AuthenticationTicket>
     {
         private readonly TokenValidationParameters _validationParameters;
-        private readonly IEnumerable<IIssuerSecurityTokenProvider> _issuerCredentialProviders;
+        private readonly IEnumerable<IIssuerSecurityKeyProvider> _issuerCredentialProviders;
         private JwtSecurityTokenHandler _tokenHandler;
 
         /// <summary>
@@ -39,7 +36,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <param name="allowedAudience">The allowed audience for JWTs.</param>
         /// <param name="issuerCredentialProvider">The issuer credential provider.</param>
         /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="issuerCredentialProvider"/> is null.</exception>
-        public JwtFormat(string allowedAudience, IIssuerSecurityTokenProvider issuerCredentialProvider)
+        public JwtFormat(string allowedAudience, IIssuerSecurityKeyProvider issuerCredentialProvider)
             : this()
         {
             if (string.IsNullOrWhiteSpace(allowedAudience))
@@ -65,7 +62,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <param name="allowedAudiences">The allowed audience for JWTs.</param>
         /// <param name="issuerCredentialProviders">The issuer credential provider.</param>
         /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="issuerCredentialProviders"/> is null.</exception>
-        public JwtFormat(IEnumerable<string> allowedAudiences, IEnumerable<IIssuerSecurityTokenProvider> issuerCredentialProviders)
+        public JwtFormat(IEnumerable<string> allowedAudiences, IEnumerable<IIssuerSecurityKeyProvider> issuerCredentialProviders)
             : this()
         {
             if (allowedAudiences == null)
@@ -82,7 +79,7 @@ namespace Microsoft.Owin.Security.Jwt
             {
                 throw new ArgumentNullException("issuerCredentialProviders");
             }
-            var credentialProviders = new List<IIssuerSecurityTokenProvider>(issuerCredentialProviders);
+            var credentialProviders = new List<IIssuerSecurityKeyProvider>(issuerCredentialProviders);
             if (!credentialProviders.Any())
             {
                 throw new ArgumentOutOfRangeException("issuerCredentialProviders", Properties.Resources.Exception_IssuerCredentialProvidersMustBeSpecified);
@@ -117,7 +114,7 @@ namespace Microsoft.Owin.Security.Jwt
             }
         }
 
-        public JwtFormat(TokenValidationParameters validationParameters, IIssuerSecurityTokenProvider issuerCredentialProvider)
+        public JwtFormat(TokenValidationParameters validationParameters, IIssuerSecurityKeyProvider issuerCredentialProvider)
             : this(validationParameters)
         {
             if (issuerCredentialProvider == null)
@@ -210,8 +207,8 @@ namespace Microsoft.Owin.Security.Jwt
                     validationParameters.ValidIssuers = validationParameters.ValidIssuers.Concat(issuers);
                 }
 
-                var tokens = _issuerCredentialProviders.Select(provider => provider.SecurityTokens).Aggregate((left, right) => left.Concat(right));
-                Collection<IdentityModel.Tokens.SecurityKey> keys = GetKeys(tokens);
+                var tokens = _issuerCredentialProviders.Select(provider => provider.SecurityKeys).Aggregate((left, right) => left.Concat(right));
+                Collection<SecurityKey> keys = GetKeys(tokens);
 
                 if (validationParameters.IssuerSigningKeys == null)
                 {
@@ -250,34 +247,14 @@ namespace Microsoft.Owin.Security.Jwt
             return new AuthenticationTicket(claimsIdentity, authenticationProperties);
         }
 
-        private static Collection<IdentityModel.Tokens.SecurityKey> GetKeys(IEnumerable<SecurityToken> tokens)
+        private static Collection<SecurityKey> GetKeys(IEnumerable<SecurityKey> keys)
         {
-            var keys = new Collection<Microsoft.IdentityModel.Tokens.SecurityKey>();
+            var keyCollection = new Collection<SecurityKey>();
 
-            foreach (var item in tokens)
-            {
-                //// BinarySecretSecurityToken, x509SecurityToken, RSASecurityToken
-                var x509token = item as X509SecurityToken;
-                if (x509token != null)
-                {
-                    keys.Add(new X509SecurityKey(x509token.Certificate));
-                }
+            foreach (var item in keys)
+                keyCollection.Add(item);
 
-                var binaryToken = item as BinarySecretSecurityToken;
-                if (binaryToken != null)
-                {
-                    foreach (var keyItem in binaryToken.SecurityKeys)
-                    {
-                        var symmetricKey = keyItem as System.IdentityModel.Tokens.SymmetricSecurityKey;
-                        if (symmetricKey != null)
-                        {
-                            keys.Add(new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(symmetricKey.GetSymmetricKey()));
-                        }
-                    }
-                }
-            }
-
-            return keys;
+            return keyCollection;
         }
     }
 }

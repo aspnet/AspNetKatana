@@ -4,35 +4,34 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.IdentityModel.Tokens;
-using System.ServiceModel.Security.Tokens;
 
 namespace Microsoft.Owin.Security.Jwt
 {
     /// <summary>
-    /// Implements an <see cref="IIssuerSecurityTokenProvider"/> for symmetric key signed JWTs.
+    /// Implements an <see cref="IIssuerSecurityKeyProvider"/> for symmetric key signed JWTs.
     /// </summary>
-    public class SymmetricKeyIssuerSecurityTokenProvider : IIssuerSecurityTokenProvider
+    public class SymmetricKeyIssuerSecurityKeyProvider : IIssuerSecurityKeyProvider
     {
-        private readonly List<SecurityToken> _tokens = new List<SecurityToken>();
+        private readonly List<SecurityKey> _keys = new List<SecurityKey>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SymmetricKeyIssuerSecurityTokenProvider"/> class.
+        /// Initializes a new instance of the <see cref="SymmetricKeyIssuerSecurityKeyProvider"/> class.
         /// </summary>
         /// <param name="issuer">The issuer of a JWT token.</param>
         /// <param name="key">The symmetric key a JWT is signed with.</param>
         /// <exception cref="System.ArgumentNullException">Thrown when the issuer is null.</exception>
-        public SymmetricKeyIssuerSecurityTokenProvider(string issuer, byte[] key)
+        public SymmetricKeyIssuerSecurityKeyProvider(string issuer, byte[] key)
             : this(issuer, new[] { key })
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SymmetricKeyIssuerSecurityTokenProvider"/> class.
+        /// Initializes a new instance of the <see cref="SymmetricKeyIssuerSecurityKeyProvider"/> class.
         /// </summary>
         /// <param name="issuer">The issuer of a JWT token.</param>
         /// <param name="keys">Symmetric keys a JWT could be signed with.</param>
         /// <exception cref="System.ArgumentNullException">Thrown when the issuer is null.</exception>
-        public SymmetricKeyIssuerSecurityTokenProvider(string issuer, IEnumerable<byte[]> keys)
+        public SymmetricKeyIssuerSecurityKeyProvider(string issuer, IEnumerable<byte[]> keys)
         {
             if (string.IsNullOrWhiteSpace(issuer))
             {
@@ -46,27 +45,27 @@ namespace Microsoft.Owin.Security.Jwt
             Issuer = issuer;
             foreach (var key in keys)
             {
-                _tokens.Add(new BinarySecretSecurityToken(key));
+                _keys.Add(new SymmetricSecurityKey(key));
             }
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SymmetricKeyIssuerSecurityTokenProvider"/> class.
+        /// Initializes a new instance of the <see cref="SymmetricKeyIssuerSecurityKeyProvider"/> class.
         /// </summary>
         /// <param name="issuer">The issuer of a JWT token.</param>
         /// <param name="base64Key">The base64 encoded symmetric key a JWT is signed with.</param>
         /// <exception cref="System.ArgumentNullException">Thrown when the issuer is null.</exception>
-        public SymmetricKeyIssuerSecurityTokenProvider(string issuer, string base64Key)
+        public SymmetricKeyIssuerSecurityKeyProvider(string issuer, string base64Key)
             : this(issuer, new[] { base64Key })
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SymmetricKeyIssuerSecurityTokenProvider"/> class.
+        /// Initializes a new instance of the <see cref="SymmetricKeyIssuerSecurityKeyProvider"/> class.
         /// </summary>
         /// <param name="issuer">The issuer of a JWT token.</param>
         /// <param name="base64Keys">The base64 encoded symmetric keys a JWT could be signed with.</param>
-        public SymmetricKeyIssuerSecurityTokenProvider(string issuer, IEnumerable<string> base64Keys)
+        public SymmetricKeyIssuerSecurityKeyProvider(string issuer, IEnumerable<string> base64Keys)
         {
             if (string.IsNullOrWhiteSpace(issuer))
             {
@@ -80,7 +79,7 @@ namespace Microsoft.Owin.Security.Jwt
             Issuer = issuer;
             foreach (var key in base64Keys)
             {
-                _tokens.Add(new BinarySecretSecurityToken(Convert.FromBase64String(key)));
+                _keys.Add(new SymmetricSecurityKey(Convert.FromBase64String(key)));
             }
         }
 
@@ -98,9 +97,9 @@ namespace Microsoft.Owin.Security.Jwt
         /// <returns>
         /// All known security tokens.
         /// </returns>
-        public IEnumerable<SecurityToken> SecurityTokens
+        public IEnumerable<SecurityKey> SecurityKeys
         {
-            get { return _tokens.AsReadOnly(); }
+            get { return _keys.AsReadOnly(); }
         }
     }
 }

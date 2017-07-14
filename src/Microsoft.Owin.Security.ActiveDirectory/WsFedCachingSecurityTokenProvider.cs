@@ -15,7 +15,7 @@ namespace Microsoft.Owin.Security.ActiveDirectory
     /// A security token provider which retrieves the issuer and signing tokens from a WSFed metadata endpoint.
     /// </summary>
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Justification = "This type is only controlled through the interface, which is not disposable.")]
-    internal class WsFedCachingSecurityTokenProvider : IIssuerSecurityTokenProvider
+    internal class WsFedCachingSecurityTokenProvider : IIssuerSecurityKeyProvider
     {
         private readonly TimeSpan _refreshInterval = new TimeSpan(1, 0, 0, 0);
 

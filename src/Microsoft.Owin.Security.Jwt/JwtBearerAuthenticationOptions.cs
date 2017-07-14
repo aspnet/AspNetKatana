@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Security.Jwt
         /// <value>
         /// The issuer security token providers.
         /// </value>
-        public IEnumerable<IIssuerSecurityTokenProvider> IssuerSecurityTokenProviders { get; set; }
+        public IEnumerable<IIssuerSecurityKeyProvider> IssuerSecurityKeyProviders { get; set; }
 
         /// <summary>
         /// Gets or sets the authentication provider.

@@ -32,7 +32,7 @@ namespace FunctionalTests.Facts.Security.Jwt
             var signingAlgorithm = new AesManaged();
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(signingAlgorithm.Key), SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest);
             var tokenValidationParameters = new TokenValidationParameters() { ValidAudience = issuer, SaveSigninToken = true, AuthenticationType = sentIdentity.AuthenticationType };
-            var formatter = new JwtFormat(tokenValidationParameters, new SymmetricKeyIssuerSecurityTokenProvider(issuer, signingAlgorithm.Key));
+            var formatter = new JwtFormat(tokenValidationParameters, new SymmetricKeyIssuerSecurityKeyProvider(issuer, signingAlgorithm.Key));
             formatter.TokenHandler = new JwtSecurityTokenHandler();
 
             var protectedtext = SecurityUtils.CreateJwtToken(sentTicket, issuer, signingCredentials);

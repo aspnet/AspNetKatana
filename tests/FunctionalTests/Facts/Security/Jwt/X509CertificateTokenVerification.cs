@@ -34,7 +34,7 @@ namespace FunctionalTests.Facts.Security.Jwt
             var signingCertificate = GetACertificateWithPrivateKey();
             var signingCredentials = new SigningCredentials(new X509SecurityKey(signingCertificate), SecurityAlgorithms.RsaSha256);
             var tokenValidationParameters = new TokenValidationParameters() { ValidAudience = issuer, SaveSigninToken = true, AuthenticationType = sentIdentity.AuthenticationType };
-            var formatter = new JwtFormat(tokenValidationParameters, new X509CertificateSecurityTokenProvider(issuer, signingCertificate));
+            var formatter = new JwtFormat(tokenValidationParameters, new X509CertificateSecurityKeyProvider(issuer, signingCertificate));
             formatter.TokenHandler = new JwtSecurityTokenHandler();
 
             var protectedtext = SecurityUtils.CreateJwtToken(sentTicket, issuer, signingCredentials);

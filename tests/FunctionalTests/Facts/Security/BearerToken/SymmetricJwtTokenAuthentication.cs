@@ -69,7 +69,7 @@ namespace FunctionalTests.Facts.Security.BearerToken
             var SymmetricJwtOptions = new JwtBearerAuthenticationOptions()
             {
                 AllowedAudiences = new string[] { issuer },
-                IssuerSecurityTokenProviders = new IIssuerSecurityTokenProvider[] { new SymmetricKeyIssuerSecurityTokenProvider(issuer, signingAlgorithm.Key) },
+                IssuerSecurityKeyProviders = new IIssuerSecurityKeyProvider[] { new SymmetricKeyIssuerSecurityKeyProvider(issuer, signingAlgorithm.Key) },
                 Provider = new OAuthBearerAuthenticationProvider()
                 {
                     OnRequestToken = context =>

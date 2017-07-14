@@ -36,7 +36,7 @@ namespace Owin
             }
             else
             {
-                jwtFormat = new JwtFormat(options.AllowedAudiences, options.IssuerSecurityTokenProviders);
+                jwtFormat = new JwtFormat(options.AllowedAudiences, options.IssuerSecurityKeyProviders);
             }
             if (options.TokenHandler != null)
             {
