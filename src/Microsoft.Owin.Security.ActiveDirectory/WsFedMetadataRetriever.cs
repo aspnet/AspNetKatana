@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.ObjectModel;
-using Microsoft.IdentityModel.Tokens;
 using System.IO;
 using System.Net.Http;
 using System.Xml;
