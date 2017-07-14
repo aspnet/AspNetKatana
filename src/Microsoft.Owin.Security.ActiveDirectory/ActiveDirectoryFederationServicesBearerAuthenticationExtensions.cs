@@ -27,7 +27,7 @@ namespace Owin
                 throw new ArgumentNullException("options");
             }
 
-            var cachingSecurityTokenProvider = new WsFedCachingSecurityTokenProvider(options.MetadataEndpoint,
+            var cachingSecurityTokenProvider = new WsFedCachingSecurityKeyProvider(options.MetadataEndpoint,
                     options.BackchannelCertificateValidator, options.BackchannelTimeout, options.BackchannelHttpHandler);
 
 #pragma warning disable 618

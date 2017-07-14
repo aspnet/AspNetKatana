@@ -32,22 +32,17 @@ namespace Microsoft.Owin.Security.ActiveDirectory
                     {
                         var serializer = new WsFederationMetadataSerializer();
                         var wsFederationConfiguration = serializer.ReadMetadata(metaDataReader);
-                        var x509SecurityTokens = new Collection<X509SecurityToken>();
+                        var keys = new Collection<SecurityKey>();
 
                         var issuerSigningKeys = new IssuerSigningKeys();
                         issuerSigningKeys.Issuer = wsFederationConfiguration.Issuer;
 
                         foreach (var key in wsFederationConfiguration.SigningKeys)
                         {
-                            var x509SecurityKey = key as X509SecurityKey;
-
-                            if (x509SecurityKey != null)
-                            {
-                                x509SecurityTokens.Add(new SecurityToken(x509SecurityKey.Certificate));
-                            }
+                            keys.Add(key);
                         }
 
-                        return new IssuerSigningKeys { Issuer = wsFederationConfiguration.Issuer, Tokens = x509SecurityTokens };
+                        return new IssuerSigningKeys { Issuer = wsFederationConfiguration.Issuer, Keys = keys };
                     }
                 }
             }

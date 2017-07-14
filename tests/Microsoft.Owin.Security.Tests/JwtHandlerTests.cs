@@ -4,12 +4,9 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Security.Jwt;
 using Shouldly;
 using Xunit;
-
-using SecurityToken = System.IdentityModel.Tokens.SecurityToken;
 
 namespace Microsoft.Owin.Security.Tests
 {
@@ -49,7 +46,7 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void HandlerConstructorShouldNotThrowWithValidValues()
         {
-            var instance = new JwtFormat("http://audience/", new TestIssuerSecurityTokenProvider("urn:issuer"));
+            var instance = new JwtFormat("http://audience/", new TestIssuerSecurityKeyProvider("urn:issuer"));
 
             instance.ShouldNotBe(null);
         }
@@ -57,23 +54,23 @@ namespace Microsoft.Owin.Security.Tests
         [Fact]
         public void ProtectShouldThrowNotImplementedException()
         {
-            var instance = new JwtFormat("http://contoso.com", new TestIssuerSecurityTokenProvider("urn:issuer"));
+            var instance = new JwtFormat("http://contoso.com", new TestIssuerSecurityKeyProvider("urn:issuer"));
 
             Should.Throw<NotSupportedException>(() => instance.Protect(null));
         }
 
-        private class TestIssuerSecurityTokenProvider : IIssuerSecurityKeyProvider
+        private class TestIssuerSecurityKeyProvider : IIssuerSecurityKeyProvider
         {
-            public TestIssuerSecurityTokenProvider(string issuer)
+            public TestIssuerSecurityKeyProvider(string issuer)
             {
                 Issuer = issuer;
             }
 
             public virtual string Issuer { get; private set; }
 
-            public virtual IEnumerable<SecurityToken> SecurityTokens
+            public virtual IEnumerable<SecurityKey> SecurityKeys
             {
-                get { return new SecurityToken[0]; }
+                get { return new SecurityKey[0]; }
             }
         }
     }

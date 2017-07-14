@@ -19,6 +19,6 @@ namespace Microsoft.Owin.Security.ActiveDirectory
         /// <summary>
         /// Signing tokens.
         /// </summary>
-        public IEnumerable<SecurityToken> Tokens { get; set; }
+        public IEnumerable<SecurityKey> Keys { get; set; }
     }
 }

@@ -40,7 +40,7 @@ namespace Owin
                 options.MetadataAddress = string.Format(CultureInfo.InvariantCulture, SecurityTokenServiceAddressFormat, options.Tenant);
             }
 
-            var cachingSecurityTokenProvider = new WsFedCachingSecurityTokenProvider(options.MetadataAddress,
+            var cachingSecurityTokenProvider = new WsFedCachingSecurityKeyProvider(options.MetadataAddress,
                         options.BackchannelCertificateValidator, options.BackchannelTimeout, options.BackchannelHttpHandler);
 
 #pragma warning disable 618
