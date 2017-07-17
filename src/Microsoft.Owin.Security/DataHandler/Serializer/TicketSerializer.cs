@@ -70,17 +70,17 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
                 WriteWithDefault(writer, claim.OriginalIssuer, claim.Issuer);
             }
 
-            ////// TODO
-            ////BootstrapContext bc = identity.BootstrapContext as BootstrapContext;
-            ////if (bc == null || string.IsNullOrWhiteSpace(bc.Token))
-            ////{
-            ////    writer.Write(0);
-            ////}
-            ////else
-            ////{
-            ////    writer.Write(bc.Token.Length);
-            ////    writer.Write(bc.Token);
-            ////}
+            var token = identity.BootstrapContext as string;
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                writer.Write(0);
+            }
+            else
+            {
+                writer.Write(token.Length);
+                writer.Write(token);
+            }
+
             PropertiesSerializer.Write(writer, model.Properties);
         }
 
@@ -111,12 +111,7 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
                 claims[index] = new Claim(type, value, valueType, issuer, originalIssuer);
             }
             var identity = new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType);
-            ////// TODO
-            //////int bootstrapContextSize = reader.ReadInt32();
-            ////if (bootstrapContextSize > 0)
-            ////{
-            ////    identity.BootstrapContext = new BootstrapContext(reader.ReadString());
-            ////}
+            identity.BootstrapContext = reader.ReadString();
 
             AuthenticationProperties properties = PropertiesSerializer.Read(reader);
             return new AuthenticationTicket(identity, properties);
