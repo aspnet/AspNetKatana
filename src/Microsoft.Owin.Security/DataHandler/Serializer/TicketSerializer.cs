@@ -111,7 +111,11 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
                 claims[index] = new Claim(type, value, valueType, issuer, originalIssuer);
             }
             var identity = new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType);
-            identity.BootstrapContext = reader.ReadString();
+            int bootstrapContextSize = reader.ReadInt32();
+            if (bootstrapContextSize > 0)
+            {
+                identity.BootstrapContext = reader.ReadString();
+            }
 
             AuthenticationProperties properties = PropertiesSerializer.Read(reader);
             return new AuthenticationTicket(identity, properties);
