@@ -342,6 +342,41 @@ namespace Microsoft.Owin.Security.Tests
         }
 
         [Fact]
+        public async Task CookieIsRejectedAtTheSameTimeAsSlidingExpirationRenewal()
+        {
+            var clock = new TestClock();
+            TestServer server = CreateServer(new CookieAuthenticationOptions
+            {
+                SystemClock = clock,
+                ExpireTimeSpan = TimeSpan.FromMinutes(10),
+                SlidingExpiration = true,
+                Provider = new CookieAuthenticationProvider()
+                {
+                    OnValidateIdentity = context => { context.RejectIdentity(); return Task.FromResult(0); }
+                }
+            }, SignInAsAlice);
+
+            Transaction transaction1 = await SendAsync(server, "http://example.com/testpath");
+
+            transaction1.SetCookie.ShouldNotBe(null);
+            transaction1.SetCookie.ShouldNotContain("Expires");
+
+            clock.Add(TimeSpan.FromMinutes(6));
+
+            Transaction transaction2 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            transaction2.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction2, ClaimTypes.Name).ShouldBe(null);
+
+            clock.Add(TimeSpan.FromMinutes(5));
+
+            Transaction transaction3 = await SendAsync(server, "http://example.com/me/Cookies", transaction1.CookieNameValue);
+
+            transaction3.SetCookie.ShouldBe(null);
+            FindClaimValue(transaction3, ClaimTypes.Name).ShouldBe(null);
+        }
+
+        [Fact]
         public async Task PersistentCookieIsRenewedWithSlidingExpiration()
         {
             var clock = new TestClock();

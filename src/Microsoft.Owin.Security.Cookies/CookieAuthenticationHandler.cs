@@ -105,6 +105,13 @@ namespace Microsoft.Owin.Security.Cookies
 
                 await Options.Provider.ValidateIdentity(context);
 
+                if (context.Identity == null)
+                {
+                    // Rejected
+                    _shouldRenew = false;
+                    return null;
+                }
+
                 return new AuthenticationTicket(context.Identity, context.Properties);
             }
             catch (Exception exception)
