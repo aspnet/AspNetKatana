@@ -102,7 +102,7 @@ namespace Microsoft.Owin.Security.Tests.Twitter
             var transaction = await SendAsync(server, "http://example.com/challenge");
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
             var location = transaction.Response.Headers.Location.AbsoluteUri;
-            location.ShouldContain("https://twitter.com/oauth/authenticate?oauth_token=");
+            location.ShouldContain("https://api.twitter.com/oauth/authenticate?oauth_token=");
         }
 
         private static TestServer CreateServer(Action<IAppBuilder> configure, Func<IOwinContext, bool> handler)
