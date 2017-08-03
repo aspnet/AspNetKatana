@@ -60,7 +60,7 @@ namespace Microsoft.Owin.Security.Cookies
                     Claim claim = ticket.Identity.Claims.FirstOrDefault(c => c.Type.Equals(SessionIdClaim));
                     if (claim == null)
                     {
-                        _logger.WriteWarning(@"SessoinId missing");
+                        _logger.WriteWarning(@"SessionId missing");
                         return null;
                     }
                     _sessionKey = claim.Value;
