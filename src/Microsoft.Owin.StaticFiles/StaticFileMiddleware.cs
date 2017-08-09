@@ -61,7 +61,7 @@ namespace Microsoft.Owin.StaticFiles
             if (fileContext.ValidateMethod()
                 && fileContext.ValidatePath()
                 && fileContext.LookupContentType()
-                && fileContext.LookupFileInfo())
+                && fileContext.LookupFileInfo(_options.CustomEtagProvider))
             {
                 fileContext.ComprehendRequestHeaders();
 

@@ -53,5 +53,10 @@ namespace Microsoft.Owin.StaticFiles
         /// This can be used to add or change the response headers.
         /// </summary>
         public Action<StaticFileResponseContext> OnPrepareResponse { get; set; }
+
+        /// <summary>
+        /// Allows to calculate ETag hash using custom algorithm.
+        /// </summary>
+        public ICustomEtagProvider CustomEtagProvider { get; set; }
     }
 }
