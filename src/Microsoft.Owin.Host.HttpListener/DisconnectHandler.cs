@@ -112,7 +112,6 @@ namespace Microsoft.Owin.Host.HttpListener
                 _connectionCancellationTokens.TryRemove(connectionId, out cancellation);
                 LogHelper.LogException(_logger, "HttpWaitForDisconnectEx", new Win32Exception((int)hr));
                 cts.Cancel();
-                cts.Dispose();
             }
 
             return returnToken;
@@ -129,7 +128,6 @@ namespace Microsoft.Owin.Host.HttpListener
             {
                 LogHelper.LogException(_logger, "App errors on disconnect notification.", age);
             }
-            cts.Dispose();
         }
 
         private class ConnectionCancellation
