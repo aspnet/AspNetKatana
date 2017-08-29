@@ -82,6 +82,7 @@
     <Compile Include="Cookies\CookieMiddlewareTests.cs" />
     <Compile Include="DataHandler\Base64UrlTextEncoderTests.cs" />
     <Compile Include="Facebook\FacebookMiddlewareTests.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Google\GoogleOAuth2MiddlewareTests.cs" />
     <Compile Include="MicrosoftAccount\MicrosoftAccountMiddlewareTests.cs" />
     <Compile Include="OAuth\OAuth2AuthorizationCustomGrantTests.cs" />

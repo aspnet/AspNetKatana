@@ -103,7 +103,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
             if (Options.ConfigurationManager == null)
             {
-                throw new InvalidOperationException(string.Format("Provide Authority, MetadataAddress, Configuration, or ConfigurationManager to OpenIdConnectAuthenticationOptions"));
+                throw new InvalidOperationException("Provide Authority, MetadataAddress, Configuration, or ConfigurationManager to OpenIdConnectAuthenticationOptions");
             }
         }
 
