@@ -5,7 +5,7 @@ var SHIP='${Version(4, 0, 0, "alpha1")}'
 var DEV='${Version(0, 31, 0, "pre")}'
 set FINAL_MILESTONE='${false}'
 var AZUREAD_VERSION='5.2.0'
-var AZUREAD_SUFFIX='.407281058-pre'
+var AZUREAD_SUFFIX='-preview1-408290725'
 var VERSION='${SHIP.VERSION}'
 var FULL_VERSION='${SHIP.FULL_VERSION}'
 var EULA='https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm'
@@ -24,7 +24,8 @@ var PACKAGE_DIR='${Path.Combine(TARGET_DIR, "package")}'
 
 var NUGET_GALLERY_SOURCE='https://api.nuget.org/v3/index.json'
 var NUGET_ASPNET_SOURCE='https://dotnet.myget.org/F/katana-dev/api/v3/index.json'
-var NUGET_AZUREAD_SOURCE='https://www.myget.org/F/azureadwebstacknightly/'
+-// var NUGET_AZUREAD_SOURCE='https://www.myget.org/F/azureadwebstacknightly/'
+var NUGET_AZUREAD_SOURCE=''
 
 var NUGET_DEPLOY='https://dotnet.myget.org/F/katana-dev/'
 
