@@ -13,6 +13,7 @@ using Microsoft.Owin.Hosting.Services;
 using Microsoft.Owin.Hosting.Starter;
 using Microsoft.Owin.Hosting.Utilities;
 using OwinHost.Options;
+using System.Threading;
 
 namespace OwinHost
 {
@@ -82,18 +83,41 @@ namespace OwinHost
 
             WriteLine("Starting with " + GetDisplayUrl(options));
 
+            var done = new ManualResetEventSlim(false);
+            AttachCtrlcSigtermShutdown(done);
+
             IServiceProvider services = ServicesFactory.Create();
             var starter = services.GetService<IHostingStarter>();
             IDisposable server = starter.Start(options);
 
             WriteLine("Started successfully");
 
-            WriteLine("Press Enter to exit");
-            Console.ReadLine();
+            WriteLine("Press Ctrl+C to exit");
+            done.Wait();
 
             WriteLine("Terminating.");
 
             server.Dispose();
+        }
+
+        private static void AttachCtrlcSigtermShutdown(ManualResetEventSlim resetEvent, string shutdownMessage = null)
+        {
+            Action shutdown = () =>
+            {
+                if (!string.IsNullOrEmpty(shutdownMessage))
+                {
+                    WriteLine(shutdownMessage);
+                }
+                resetEvent.Set();
+            };
+
+            AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) => shutdown();
+            Console.CancelKeyPress += (sender, eventArgs) =>
+            {
+                shutdown();
+                // Don't terminate the process immediately, wait for the Main thread to exit gracefully.
+                eventArgs.Cancel = true;
+            };
         }
 
         private static string GetDisplayUrl(StartOptions options)
