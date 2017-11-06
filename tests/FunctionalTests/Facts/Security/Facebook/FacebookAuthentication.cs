@@ -40,7 +40,7 @@ namespace FunctionalTests.Facts.Security.Facebook
                 Assert.Equal<string>("code", queryItems["response_type"]);
                 Assert.Equal<string>("550624398330273", queryItems["client_id"]);
                 Assert.Equal<string>(applicationUrl + "signin-facebook", queryItems["redirect_uri"]);
-                Assert.Equal<string>("email,read_friendlists,user_checkins", queryItems["scope"]);
+                Assert.Equal<string>("public_profile,email,read_friendlists,user_checkins", queryItems["scope"]);
                 Assert.Equal<string>("ValidStateData", queryItems["state"]);
                 Assert.Equal<string>("custom", queryItems["custom_redirect_uri"]);
 
@@ -166,7 +166,6 @@ namespace FunctionalTests.Facts.Security.Facebook
                 StateDataFormat = new CustomStateDataFormat()
             };
 
-            option.Scope.Add("email");
             option.Scope.Add("read_friendlists");
             option.Scope.Add("user_checkins");
 
