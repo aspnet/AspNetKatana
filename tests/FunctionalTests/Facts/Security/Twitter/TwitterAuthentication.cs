@@ -40,7 +40,7 @@ namespace FunctionalTests.Facts.Security.Twitter
 
                 // Unauthenticated request - verify Redirect url
                 var response = await httpClient.GetAsync(applicationUrl);
-                Assert.Equal<string>("https://twitter.com/oauth/authenticate", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
+                Assert.Equal<string>("https://api.twitter.com/oauth/authenticate", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
                 var queryItems = response.Headers.Location.ParseQueryString();
                 Assert.Equal<string>("custom", queryItems["custom_redirect_uri"]);
                 Assert.NotNull(queryItems["oauth_token"]);
