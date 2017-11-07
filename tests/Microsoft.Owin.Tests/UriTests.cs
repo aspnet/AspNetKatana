@@ -20,10 +20,10 @@ namespace Microsoft.Owin.Tests
         [InlineData("", "/", "a#b", "http://host:1/?a%23b")]
         // System.Uri would trim trailing spaces, escape them if you want them.
         [InlineData("", "/ ", " ", "http://host:1/%20")]
-        [InlineData("/a%.+#?", "/z", "a#b", "http://host:1/a%25.%2B%23%3F/z?a%23b")]
+        [InlineData("/a%.+#?", "/z", "a#b", "http://host:1/a%25.+%23%3F/z?a%23b")]
         // Note: Http.Sys will not accept any characters in the path that it cannot un-escape,
         // so this double escaping is not a problem in production.
-        [InlineData("", "/%20", "%20", "http://host:1/%2520?%20")]
+        [InlineData("", "/%20", "%20", "http://host:1/%20?%20")]
         public void UriReconstruction(string pathBase, string path, string query, string expected)
         {
             IOwinRequest request = CreateRequest(pathBase, path, query);

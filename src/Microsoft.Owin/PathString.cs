@@ -4,6 +4,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text;
+using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin
 {
@@ -12,8 +14,6 @@ namespace Microsoft.Owin
     /// </summary>
     public struct PathString : IEquatable<PathString>
     {
-        private static Func<string, string> EscapeDataString = Uri.EscapeDataString;
-
         /// <summary>
         /// Represents the empty path. This field is read-only.
         /// </summary>
@@ -67,36 +67,96 @@ namespace Microsoft.Owin
         [SuppressMessage("Microsoft.Design", "CA1055:UriReturnValuesShouldNotBeStrings", Justification = "Purpose of the method is to return a string")]
         public string ToUriComponent()
         {
-            if (HasValue)
+            if (!HasValue)
             {
-                if (RequiresEscaping(_value))
+                return string.Empty;
+            }
+
+            StringBuilder buffer = null;
+
+            var start = 0;
+            var count = 0;
+            var requiresEscaping = false;
+            var i = 0;
+
+            while (i < _value.Length)
+            {
+                var isPercentEncodedChar = PathStringHelper.IsPercentEncodedChar(_value, i);
+                if (PathStringHelper.IsValidPathChar(_value[i]) || isPercentEncodedChar)
                 {
-                    // TODO: Measure the cost of this escaping and consider optimizing.
-                    return String.Join("/", _value.Split('/').Select(EscapeDataString));
+                    if (requiresEscaping)
+                    {
+                        // the current segment requires escape
+                        if (buffer == null)
+                        {
+                            buffer = new StringBuilder(_value.Length * 3);
+                        }
+
+                        buffer.Append(Uri.EscapeDataString(_value.Substring(start, count)));
+
+                        requiresEscaping = false;
+                        start = i;
+                        count = 0;
+                    }
+
+                    if (isPercentEncodedChar)
+                    {
+                        count += 3;
+                        i += 3;
+                    }
+                    else
+                    {
+                        count++;
+                        i++;
+                    }
                 }
+                else
+                {
+                    if (!requiresEscaping)
+                    {
+                        // the current segument doesn't require escape
+                        if (buffer == null)
+                        {
+                            buffer = new StringBuilder(_value.Length * 3);
+                        }
+
+                        buffer.Append(_value, start, count);
+
+                        requiresEscaping = true;
+                        start = i;
+                        count = 0;
+                    }
+
+                    count++;
+                    i++;
+                }
+            }
+
+            if (count == _value.Length && !requiresEscaping)
+            {
                 return _value;
             }
-            return String.Empty;
-        }
-
-        // Very conservative, these characters do not need to be escaped in a path.
-        private static bool RequiresEscaping(string value)
-        {
-            for (int i = 0; i < value.Length; i++)
+            else
             {
-                char c = value[i];
-                // Check conservatively for safe characters. See http://www.ietf.org/rfc/rfc3986.txt
-                bool safeChar =
-                    (('a' <= c && c <= 'z')
-                    || ('A' <= c && c <= 'Z')
-                    || ('0' <= c && c <= '9')
-                    || c == '/' || c == '-' || c == '_');
-                if (!safeChar)
+                if (count > 0)
                 {
-                    return true;
+                    if (buffer == null)
+                    {
+                        buffer = new StringBuilder(_value.Length * 3);
+                    }
+
+                    if (requiresEscaping)
+                    {
+                        buffer.Append(Uri.EscapeDataString(_value.Substring(start, count)));
+                    }
+                    else
+                    {
+                        buffer.Append(_value, start, count);
+                    }
                 }
+
+                return buffer.ToString();
             }
-            return false;
         }
 
         /// <summary>

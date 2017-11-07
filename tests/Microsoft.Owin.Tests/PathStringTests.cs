@@ -32,6 +32,8 @@ namespace Microsoft.Owin.Tests
         [InlineData("/path/two", "/path/two")]
         [InlineData("/path?two", "/path%3Ftwo")]
         [InlineData("/path#two", "/path%23two")]
+        // pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
+        [InlineData("/abcd1234%-._~!$&'()*+,;=:@?#[]", "/abcd1234%25-._~!$&'()*+,;=:@%3F%23%5B%5D")]
         public void ToUriComponentWillEscapeAsAppropriate(string value, string uriComponent)
         {
             var path = new PathString(value);
@@ -168,11 +170,11 @@ namespace Microsoft.Owin.Tests
             singleEscapedPath.Value.ShouldBe("/one%2Ftwo");
 
             var doubleEscapedString = singleEscapedPath.ToUriComponent();
-            doubleEscapedString.ShouldBe("/one%252Ftwo");
+            doubleEscapedString.ShouldBe("/one%2Ftwo");
 
             var recreatedPath = PathString.FromUriComponent(doubleEscapedString);
-            recreatedPath.Value.ShouldBe("/one%2Ftwo");
-            recreatedPath.ToUriComponent().ShouldBe("/one%252Ftwo");
+            recreatedPath.Value.ShouldBe("/one/two");
+            recreatedPath.ToUriComponent().ShouldBe("/one/two");
         }
 
         [Theory]

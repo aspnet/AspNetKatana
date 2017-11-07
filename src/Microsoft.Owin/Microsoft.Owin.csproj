@@ -61,6 +61,7 @@
     <Compile Include="Infrastructure\CookieManager.cs" />
     <Compile Include="Infrastructure\ChunkingCookieManager.cs" />
     <Compile Include="Infrastructure\ICookieManager.cs" />
+    <Compile Include="Infrastructure\PathStringHelper.cs" />
     <Compile Include="IOwinContext.cs" />
     <Compile Include="IOwinRequest.cs" />
     <Compile Include="IOwinResponse.cs" />
