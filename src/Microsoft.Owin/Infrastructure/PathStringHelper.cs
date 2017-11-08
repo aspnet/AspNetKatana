@@ -5,7 +5,8 @@ namespace Microsoft.Owin.Infrastructure
 {
     internal static class PathStringHelper
     {
-        private static bool[] ValidPathChars = {
+        private static bool[] ValidPathChars =
+        {
             false, false, false, false, false, false, false, false,     // 0x00 - 0x07
             false, false, false, false, false, false, false, false,     // 0x08 - 0x0F
             false, false, false, false, false, false, false, false,     // 0x10 - 0x17
