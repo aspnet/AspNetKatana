@@ -11,7 +11,7 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
 {
     public class TicketSerializer : IDataSerializer<AuthenticationTicket>
     {
-        private const int FormatVersion = 3;
+        private const int FormatVersion = 4;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
         public virtual byte[] Serialize(AuthenticationTicket model)
@@ -68,6 +68,12 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
                 WriteWithDefault(writer, claim.ValueType, DefaultValues.StringValueType);
                 WriteWithDefault(writer, claim.Issuer, DefaultValues.LocalAuthority);
                 WriteWithDefault(writer, claim.OriginalIssuer, claim.Issuer);
+                writer.Write(claim.Properties.Count);
+                foreach (var property in claim.Properties)
+                {
+                    writer.Write(property.Key);
+                    writer.Write(property.Value);
+                }
             }
 
             var bc = identity.BootstrapContext as string;
@@ -108,6 +114,13 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
                 string issuer = ReadWithDefault(reader, DefaultValues.LocalAuthority);
                 string originalIssuer = ReadWithDefault(reader, issuer);
                 claims[index] = new Claim(type, value, valueType, issuer, originalIssuer);
+                int propertyCount = reader.ReadInt32();
+                for (int i = 0; i < propertyCount; i++)
+                {
+                    string propertyKey = reader.ReadString();
+                    string propertyValue = reader.ReadString();
+                    claims[index].Properties[propertyKey]=propertyValue;
+                }
             }
             var identity = new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType);
             int bootstrapContextSize = reader.ReadInt32();
