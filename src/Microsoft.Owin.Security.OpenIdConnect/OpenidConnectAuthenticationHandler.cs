@@ -150,6 +150,18 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     Scope = Options.Scope,
                     State = OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
                 };
+                if (properties.Dictionary.ContainsKey("display"))
+                {
+                    openIdConnectMessage.Display = properties.Dictionary["display"];
+                }
+                if (properties.Dictionary.ContainsKey("login_hint"))
+                {
+                    openIdConnectMessage.LoginHint = properties.Dictionary["login_hint"];
+                }
+                if (properties.Dictionary.ContainsKey("prompt"))
+                {
+                    openIdConnectMessage.Prompt = properties.Dictionary["prompt"];
+                }
 
                 if (Options.ProtocolValidator.RequireNonce)
                 {
