@@ -12,6 +12,7 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
     public class TicketSerializer : IDataSerializer<AuthenticationTicket>
     {
         private const int FormatVersion = 4;
+        private const int PreviousFormatVersion = 3;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Dispose is idempotent")]
         public virtual byte[] Serialize(AuthenticationTicket model)
@@ -96,7 +97,8 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
                 throw new ArgumentNullException("reader");
             }
 
-            if (reader.ReadInt32() != FormatVersion)
+            var documentVersion = reader.ReadInt32();
+            if (documentVersion != FormatVersion && documentVersion != PreviousFormatVersion)
             {
                 return null;
             }
@@ -114,12 +116,15 @@ namespace Microsoft.Owin.Security.DataHandler.Serializer
                 string issuer = ReadWithDefault(reader, DefaultValues.LocalAuthority);
                 string originalIssuer = ReadWithDefault(reader, issuer);
                 claims[index] = new Claim(type, value, valueType, issuer, originalIssuer);
-                int propertyCount = reader.ReadInt32();
-                for (int i = 0; i < propertyCount; i++)
+                if (documentVersion == FormatVersion)
                 {
-                    string propertyKey = reader.ReadString();
-                    string propertyValue = reader.ReadString();
-                    claims[index].Properties[propertyKey]=propertyValue;
+                    int propertyCount = reader.ReadInt32();
+                    for (int i = 0; i < propertyCount; i++)
+                    {
+                        string propertyKey = reader.ReadString();
+                        string propertyValue = reader.ReadString();
+                        claims[index].Properties[propertyKey] = propertyValue;
+                    }
                 }
             }
             var identity = new ClaimsIdentity(claims, authenticationType, nameClaimType, roleClaimType);
