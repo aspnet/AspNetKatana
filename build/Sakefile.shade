@@ -84,7 +84,7 @@ test if='IsMono'
 use-standard-lifecycle
 
 -// include sets of standard work targets. features include 'nuget,xunit,nunit'
-use-standard-goals features='nuget,xunit,stylecop'
+use-standard-goals features='nuget,xunit'
 
 -// additional work targets are defined below
 
