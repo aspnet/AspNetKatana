@@ -387,7 +387,7 @@ functions
 		  {
 			return "";
 		  }
-		  // -MILESTONE-ymmdd-BUILD_NUMBER-BUILD_SUFFIX
+		  // -MILESTONE-BUILD_NUMBER-BUILD_SUFFIX
           var pre = "";
           if (!String.IsNullOrEmpty(MILESTONE))
           {
@@ -397,7 +397,7 @@ functions
           {
             var buildNumber = "000" + Environment.GetEnvironmentVariable("BUILD_NUMBER");
             buildNumber = buildNumber.Substring(buildNumber.Length - 3);
-            pre += "-" + BuildDate() + "-" + buildNumber;
+            pre += "-" + buildNumber;
 
 		    if (!String.IsNullOrEmpty(BranchSuffix()))
 		    {

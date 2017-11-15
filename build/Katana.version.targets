@@ -3,13 +3,13 @@
   <PropertyGroup>
     <ShipVersion>4.0.0</ShipVersion>
     <ShipStrongNameVersion>4.0.0.0</ShipStrongNameVersion>
-    <ShipFullVersion>4.0.0-preview1-61108-000</ShipFullVersion>
-    <ShipFileVersion>4.0.61108.0</ShipFileVersion>
+    <ShipFullVersion>4.0.0-preview1-000</ShipFullVersion>
+    <ShipFileVersion>4.0.61115.0</ShipFileVersion>
     <MajorVersion>4</MajorVersion>
     <MinorVersion>0</MinorVersion>
     <PatchVersion>0</PatchVersion>
     <BuildQuality>preview1</BuildQuality>
-    <BuildDate>61108</BuildDate>
+    <BuildDate>61115</BuildDate>
     <BranchSuffix></BranchSuffix>
     <Eula>https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</Eula>
     <ProjectUrl>https://github.com/aspnet/AspNetKatana/</ProjectUrl>
