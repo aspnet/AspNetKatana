@@ -150,14 +150,6 @@ namespace Microsoft.Owin.Security.Tests.Twitter
             return transaction;
         }
 
-        private static async Task<HttpResponseMessage> ReturnJsonResponse(object content)
-        {
-            var res = new HttpResponseMessage(HttpStatusCode.OK);
-            var text = await JsonConvert.SerializeObjectAsync(content);
-            res.Content = new StringContent(text, Encoding.UTF8, "application/json");
-            return res;
-        }
-
         private class TestHttpMessageHandler : HttpMessageHandler
         {
             public Func<HttpRequestMessage, Task<HttpResponseMessage>> Sender { get; set; }
