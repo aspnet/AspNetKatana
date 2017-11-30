@@ -121,9 +121,9 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
                     context.Identity.AddClaim(new Claim(ClaimTypes.Email, context.Email, "http://www.w3.org/2001/XMLSchema#string", Options.AuthenticationType));
                 }
 
-                await Options.Provider.Authenticated(context);
-
                 context.Properties = properties;
+
+                await Options.Provider.Authenticated(context);
 
                 return new AuthenticationTicket(context.Identity, context.Properties);
             }
