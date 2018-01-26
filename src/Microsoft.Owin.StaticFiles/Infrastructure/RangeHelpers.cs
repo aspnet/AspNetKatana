@@ -82,9 +82,9 @@ namespace Microsoft.Owin.StaticFiles.Infrastructure
 
         private static bool TryParseLong(string input, out long? result)
         {
-            int temp;
+            long temp;
             if (!string.IsNullOrWhiteSpace(input)
-                && int.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out temp))
+                && long.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out temp))
             {
                 result = temp;
                 return true;

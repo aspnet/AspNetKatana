@@ -226,6 +226,8 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("-26", "36-61", 26, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")] // Last 26
         [InlineData("0-", "0-61", 62, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")]
         [InlineData("-1001", "0-61", 62, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")]
+        [InlineData("-123456789123", "0-61", 62, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")]
+        [InlineData("36-123456789123", "36-61", 26, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")]
         public async Task SingleValidRangeShouldServePartialContent(string range, string expectedRange, int length, string expectedData)
         {
             TestServer server = TestServer.Create(app => app.UseFileServer());
