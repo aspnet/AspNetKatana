@@ -342,6 +342,46 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             }
         }
 
+        [Fact]
+        public void Disconnect_ClientDisconnects_Before_CancellationToken_Created()
+        {
+            var requestReceived = new ManualResetEvent(false);
+            var requestCanceled = new ManualResetEvent(false);
+
+            var clientDisposed = new ManualResetEvent(false);
+
+            OwinHttpListener listener = CreateServer(
+                env =>
+                {
+                    requestReceived.Set();
+
+                    // lets wait for client to be gone
+                    Assert.True(clientDisposed.WaitOne(1000));
+
+                    // the most important part is not to observe CancellationToken before client disconnects
+
+                    GetCallCancelled(env).Register(() => requestCanceled.Set());
+                    return Task.FromResult(0);
+                },
+                HttpServerAddress);
+
+            using (listener)
+            {
+                using (var client = new HttpClient())
+                {
+                    var requestTask = client.GetAsync(HttpClientAddress);
+                    Assert.True(requestReceived.WaitOne(1000));
+                    client.CancelPendingRequests();
+
+                    Assert.Throws<AggregateException>(() => requestTask.Result);
+                }
+
+                clientDisposed.Set();
+
+                Assert.True(requestCanceled.WaitOne(1000));
+            }
+        }
+
         private static CancellationToken GetCallCancelled(IDictionary<string, object> env)
         {
             return env.Get<CancellationToken>("owin.CallCancelled");
