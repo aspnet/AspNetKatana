@@ -8,7 +8,7 @@ var AZUREAD_VERSION='5.2.0'
 var AZUREAD_SUFFIX=''
 var VERSION='${SHIP.VERSION}'
 var FULL_VERSION='${SHIP.FULL_VERSION}'
-var EULA='https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm'
+var EULA='https://www.microsoft.com/en-us/web/webpi/eula/net_library_eula_ENU.htm'
 var PROJECT_URL='https://github.com/aspnet/AspNetKatana/'
 var TAGS='Microsoft OWIN Katana'
 
