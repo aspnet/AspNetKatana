@@ -7,6 +7,8 @@ These products are developed by the ASP.NET team at Microsoft in collaboration w
 
 See the list of [Packages](https://github.com/aspnet/AspNetKatana/wiki/Packages) for information about individual components.
 
+Documentation is available in the [Wiki](https://github.com/aspnet/AspNetKatana/wiki) and overview of [OWIN and Katana](https://docs.microsoft.com/en-us/aspnet/aspnet/overview/owin-and-katana/).
+
 ## Source Code
 To build and run the tests from a command prompt, run `build.cmd` (found in the root directory). Note: As part of building you may need to obtain NuGet packages from the NuGet.org public feed.
 
