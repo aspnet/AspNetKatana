@@ -72,12 +72,19 @@ namespace Microsoft.Owin.FileSystems
 
         private string GetFullPath(string path)
         {
-            var fullPath = Path.GetFullPath(Path.Combine(Root, path));
-            if (!fullPath.StartsWith(Root, StringComparison.OrdinalIgnoreCase))
+            try
+            {
+                var fullPath = Path.GetFullPath(Path.Combine(Root, path));
+                if (!fullPath.StartsWith(Root, StringComparison.OrdinalIgnoreCase))
+                {
+                    return null;
+                }
+                return fullPath;
+            }
+            catch
             {
                 return null;
             }
-            return fullPath;
         }
 
         /// <summary>

@@ -59,5 +59,14 @@ namespace Microsoft.Owin.FileSystems.Tests
             info.ShouldNotBe(null);
             info.PhysicalPath.ShouldBe(file2);
         }
+
+        [Fact]
+        public void NotSupportedCharactersInPathReturnFalse()
+        {
+            var provider = new PhysicalFileSystem("sub");
+            IFileInfo info;
+            provider.TryGetFileInfo("(DefaultRouterOutlet:type)", out info).ShouldBe(false);
+            info.ShouldBe(null);
+        }
     }
 }
