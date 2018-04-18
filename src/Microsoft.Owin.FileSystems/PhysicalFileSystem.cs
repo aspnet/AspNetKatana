@@ -81,17 +81,10 @@ namespace Microsoft.Owin.FileSystems
                 }
                 return fullPath;
             }
-            catch (ArgumentException)
+            catch
             {
+                return null;
             }
-            catch (NotSupportedException)
-            {
-            }
-            catch (PathTooLongException)
-            {
-            }
-
-            return null;
         }
 
         /// <summary>
