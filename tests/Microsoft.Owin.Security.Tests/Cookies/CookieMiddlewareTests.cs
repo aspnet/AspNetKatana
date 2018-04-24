@@ -530,6 +530,32 @@ namespace Microsoft.Owin.Security.Tests
             responded.Single().ShouldContain("\"location\"");
         }
 
+        [Fact]
+        public void CookieReplaceIdentityWithClaimsIdentity()
+        {
+            var ticket = new AuthenticationTicket(null, null);
+            var context = new CookieValidateIdentityContext(null, ticket, null);
+            var newIdentity = new TestClaimsIdentityDerived();
+
+            context.ReplaceIdentity(newIdentity);
+
+            Assert.IsType<TestClaimsIdentityDerived>(context.Identity);
+            Assert.Same(newIdentity, context.Identity);
+        }
+
+        [Fact]
+        public void CookieReplaceIdentityWithNonClaimsIdentity()
+        {
+            var ticket = new AuthenticationTicket(null, null);
+            var context = new CookieValidateIdentityContext(null, ticket, null);
+            var newIdentity = new TestNonClaimsIdentity();
+
+            context.ReplaceIdentity(newIdentity);
+
+            Assert.IsType<ClaimsIdentity>(context.Identity);
+            Assert.NotSame(newIdentity, context.Identity);
+        }
+
         private static string FindClaimValue(Transaction transaction, string claimType)
         {
             XElement claim = transaction.ResponseElement.Elements("claim").SingleOrDefault(elt => elt.Attribute("type").Value == claimType);
@@ -698,5 +724,20 @@ namespace Microsoft.Owin.Security.Tests
                 return Task.FromResult(key);
             }
         }
+
+        private class TestNonClaimsIdentity : IIdentity
+        {
+            public string Name { get { return "NonClaimsIdentity"; } }
+
+            public string AuthenticationType { get { return string.Empty; } }
+
+            public bool IsAuthenticated { get { return false; } }
+        }
+
+        private class TestClaimsIdentityDerived : ClaimsIdentity
+        {
+        }
+
     }
+
 }

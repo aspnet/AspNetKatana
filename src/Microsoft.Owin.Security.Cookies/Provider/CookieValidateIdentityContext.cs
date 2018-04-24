@@ -49,7 +49,7 @@ namespace Microsoft.Owin.Security.Cookies
         /// <param name="identity">The identity used as the replacement</param>
         public void ReplaceIdentity(IIdentity identity)
         {
-            Identity = new ClaimsIdentity(identity);
+            Identity = identity as ClaimsIdentity ?? new ClaimsIdentity(identity);
         }
 
         /// <summary>
