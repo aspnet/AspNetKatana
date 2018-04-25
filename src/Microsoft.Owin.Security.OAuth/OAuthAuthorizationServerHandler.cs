@@ -762,6 +762,7 @@ namespace Microsoft.Owin.Security.OAuth
             string error = validatingContext.HasError ? validatingContext.Error : Constants.Errors.InvalidRequest;
             string errorDescription = validatingContext.HasError ? validatingContext.ErrorDescription : null;
             string errorUri = validatingContext.HasError ? validatingContext.ErrorUri : null;
+            string clientState = clientContext.Request.Query["state"];
 
             if (!clientContext.IsValidated)
             {
@@ -778,6 +779,10 @@ namespace Microsoft.Owin.Security.OAuth
             if (!string.IsNullOrEmpty(errorUri))
             {
                 location = WebUtilities.AddQueryString(location, Constants.Parameters.ErrorUri, errorUri);
+            }
+            if (!string.IsNullOrEmpty(clientState))
+            {
+                location = WebUtilities.AddQueryString(location, Constants.Parameters.State, clientState);
             }
             Response.Redirect(location);
             // request is handled, does not pass on to application
