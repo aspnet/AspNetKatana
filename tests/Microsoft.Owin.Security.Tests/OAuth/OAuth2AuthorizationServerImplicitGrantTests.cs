@@ -73,6 +73,26 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         }
 
         [Fact]
+        public async Task StateMustBePassedBackOnError()
+        {
+            var server = new OAuth2TestServer();
+
+            OAuth2TestServer.Transaction transaction1 = await server.SendAsync("https://example.com/authorize?response_type=token&client_id=unauthorized&state=123&redirect_uri=" + Uri.EscapeDataString("https://gamma.com/return"));
+
+            NameValueCollection queryStringWithState = transaction1.ParseRedirectQueryString();
+            queryStringWithState.Get("access_token").ShouldBe(null);
+            queryStringWithState.Get("error").ShouldBe("unauthorized_client");
+            queryStringWithState.Get("state").ShouldBe("123");
+
+            OAuth2TestServer.Transaction transaction2 = await server.SendAsync("https://example.com/authorize?response_type=token&client_id=unauthorized&redirect_uri=" + Uri.EscapeDataString("https://gamma.com/return"));
+
+            NameValueCollection queryStringNoState = transaction2.ParseRedirectQueryString();
+            queryStringNoState.Get("access_token").ShouldBe(null);
+            queryStringNoState.Get("error").ShouldBe("unauthorized_client");
+            queryStringNoState.Get("state").ShouldBe(null);
+        }
+
+        [Fact]
         public async Task AccessTokenMayBeUsed()
         {
             var server = new OAuth2TestServer(s => { s.OnAuthorizeEndpoint = SignInEpsilon; });
@@ -101,7 +121,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             string userName = await GetUserName(server, fragment.Get("access_token"));
             userName.ShouldBe("epsilon");
         }
-
+        
         private Task SignInEpsilon(IOwinContext ctx)
         {
             ctx.Authentication.SignIn(new AuthenticationProperties(), CreateIdentity("epsilon"));

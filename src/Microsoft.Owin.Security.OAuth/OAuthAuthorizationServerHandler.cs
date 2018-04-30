@@ -779,6 +779,12 @@ namespace Microsoft.Owin.Security.OAuth
             {
                 location = WebUtilities.AddQueryString(location, Constants.Parameters.ErrorUri, errorUri);
             }
+            // if a state parameter was provided, include it in the redirect location
+            IList<string> stateValues = clientContext.Request.Query.GetValues(Constants.Parameters.State);
+            if (stateValues != null && stateValues.Count == 1)
+            {
+                location = WebUtilities.AddQueryString(location, Constants.Parameters.State, stateValues[0]);
+            }
             Response.Redirect(location);
             // request is handled, does not pass on to application
             return Task.FromResult(true);

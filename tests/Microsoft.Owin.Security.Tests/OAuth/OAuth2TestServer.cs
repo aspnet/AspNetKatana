@@ -61,6 +61,10 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                         {
                             ctx.Validated("https://gamma3.com/return");
                         }
+                        else if (ctx.ClientId == "unauthorized")
+                        {
+                            ctx.Validated("https://gamma.com/return");
+                        }
                         return Task.FromResult(0);
                     },
                     OnValidateClientAuthentication = ctx =>
@@ -82,6 +86,18 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                             {
                                 ctx.Validated();
                             }
+                        }
+                        return Task.FromResult(0);
+                    },
+                    OnValidateAuthorizeRequest = ctx =>
+                    {
+                        if (ctx.AuthorizeRequest.ClientId == "unauthorized")
+                        {
+                            ctx.SetError("unauthorized_client", "Unknown client", "https://owintestoauth.com/error/unknown_client");
+                        }
+                        else
+                        {
+                            ctx.Validated();
                         }
                         return Task.FromResult(0);
                     }
