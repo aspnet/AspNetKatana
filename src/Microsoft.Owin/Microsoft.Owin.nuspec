@@ -16,9 +16,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.dll" target="lib\net451" />
-    <file src="Microsoft.Owin.pdb" target="lib\net451" />
-    <file src="Microsoft.Owin.xml" target="lib\net451" />
+    <file src="Microsoft.Owin.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.pdb" target="lib\net45" />
+    <file src="Microsoft.Owin.xml" target="lib\net45" />
     <file src="src\**" target="src" />
   </files>
 </package>

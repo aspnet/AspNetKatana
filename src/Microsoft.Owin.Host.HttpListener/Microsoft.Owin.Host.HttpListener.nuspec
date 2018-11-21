@@ -13,9 +13,9 @@
     <tags>$tags$</tags>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.Host.HttpListener.dll" target="lib\net451" />
-    <file src="Microsoft.Owin.Host.HttpListener.xml" target="lib\net451" />
-    <file src="Microsoft.Owin.Host.HttpListener.pdb" target="lib\net451" />
+    <file src="Microsoft.Owin.Host.HttpListener.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.Host.HttpListener.xml" target="lib\net45" />
+    <file src="Microsoft.Owin.Host.HttpListener.pdb" target="lib\net45" />
     <file src="src\**" target="src" />
   </files>
 </package>

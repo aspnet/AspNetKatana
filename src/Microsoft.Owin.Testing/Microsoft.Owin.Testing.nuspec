@@ -20,9 +20,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.Owin.Testing.dll" target="lib\net451" />
-    <file src="Microsoft.Owin.Testing.pdb" target="lib\net451" />
-    <file src="Microsoft.Owin.Testing.xml" target="lib\net451" />
+    <file src="Microsoft.Owin.Testing.dll" target="lib\net45" />
+    <file src="Microsoft.Owin.Testing.pdb" target="lib\net45" />
+    <file src="Microsoft.Owin.Testing.xml" target="lib\net45" />
     <file src="src\**" target="src" />
     <file src="readme.txt" target="" />
   </files>
