@@ -207,7 +207,7 @@ var signing='${new List<string>()}'
           File.Copy(initialFile, inputFile, true);
           copySigned = and(copySigned, ()=>File.Copy(outputFile, finalFile, true));
         }
-    build projectFile='BuildServer.targets' configuration='Release' extra='/t:DoSignBinaries "/p:Sign=Sign;BranchName=Dev"'
+    build projectFile='BuildServer.targets' configuration='Release' extra='/t:SignArtifacts "/p:Sign=Sign;BranchName=Dev"'
 
   directory delete='${PACKAGE_DIR}'
   copy sourceDir='${BUILD_DIR}' outputDir='${PACKAGE_DIR}'
