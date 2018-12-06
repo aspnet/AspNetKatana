@@ -7,5 +7,5 @@ echo Downloading latest version of NuGet.exe...
 
 :part2
 set EnableNuGetPackageRestore=true
-.nuget\NuGet.exe install Sake -version 0.2 -o packages
+.nuget\NuGet.exe install Sake -version 0.2 -o packages -source https://api.nuget.org/v3/index.json
 packages\Sake.0.2\tools\Sake.exe -I build -f Sakefile.shade %*
