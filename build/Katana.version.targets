@@ -11,7 +11,7 @@
     <BuildQuality>rtm</BuildQuality>
     <BuildDate>70129</BuildDate>
     <BranchSuffix></BranchSuffix>
-    <Eula>https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</Eula>
+    <Eula>https://raw.githubusercontent.com/aspnet/AspNetKatana/v4.0.1/LICENSE.txt</Eula>
     <ProjectUrl>https://github.com/aspnet/AspNetKatana/</ProjectUrl>
     <Tags>Microsoft OWIN Katana</Tags>
   </PropertyGroup>
