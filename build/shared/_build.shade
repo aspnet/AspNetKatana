@@ -37,6 +37,11 @@ var buildProgram=''
     buildProgram = ToolLocationHelper.GetPathToDotNetFrameworkFile("msbuild.exe",TargetDotNetFrameworkVersion.Version40);
   }
 }
+log info="Build"
+log info="  configuration: ${configuration}"
+log info="  outputDir: ${outputDir}"
+log info="  extra: ${extra}"
+log info="  vsPath: ${vsPath}"
 
 var OutDirProperty=''
 set OutDirProperty='OutDir=${outputDir}${Path.DirectorySeparatorChar};' if='!string.IsNullOrWhiteSpace(outputDir)'
