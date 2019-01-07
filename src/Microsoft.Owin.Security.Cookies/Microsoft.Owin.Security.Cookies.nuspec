@@ -5,6 +5,7 @@
     <version>$version$</version>
     <authors>$authors$</authors>
     <owners>$authors$</owners>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <licenseUrl>$licenseUrl$</licenseUrl>
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
