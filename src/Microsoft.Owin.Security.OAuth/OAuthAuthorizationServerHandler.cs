@@ -473,7 +473,7 @@ namespace Microsoft.Owin.Security.OAuth
                 body = memory.ToArray();
             }
             Response.ContentType = "application/json;charset=UTF-8";
-            Response.Headers.Set("Cache-Control", "no-cache");
+            Response.Headers.Set("Cache-Control", "private, no-cache, no-store, max-age=0");
             Response.Headers.Set("Pragma", "no-cache");
             Response.Headers.Set("Expires", "-1");
             Response.ContentLength = body.Length;
