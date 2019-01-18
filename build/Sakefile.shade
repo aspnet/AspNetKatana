@@ -1,7 +1,7 @@
 
 var PROJECT='Katana'
 var AUTHORS='Microsoft'
-var SHIP='${Version(4, 0, 0, "rtm")}'
+var SHIP='${Version(4, 0, 1, "rtm")}'
 var DEV='${Version(0, 31, 0, "pre")}'
 set FINAL_MILESTONE='${true}'
 var AZUREAD_VERSION='5.3.0'
