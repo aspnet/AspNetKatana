@@ -23,7 +23,7 @@ If you do not want to build the source, nightly builds are available via a priva
 * IdentityModel dependencies: https://www.myget.org/F/azureadwebstacknightly/
 
 ## Contribute
-There are lots of ways to [contribute](https://github.com/aspnet/Home/blob/dev/CONTRIBUTING.md) to the project, and we appreciate our contributors.
+There are lots of ways to [contribute](https://github.com/aspnet/Home/blob/master/CONTRIBUTING.md) to the project, and we appreciate our contributors.
 You can contribute by reviewing and sending feedback on code commits, suggesting and trying out new features as they are implemented, submit bugs and help us verify fixes as they are checked in, as well as submit code fixes or code contributions of your own. Note that all code submissions will be rigorously reviewed and tested by the Katana team, and only those that meet an extremely high bar for both quality and design/roadmap appropriateness will be merged into the source.
 
 ## Roadmap
