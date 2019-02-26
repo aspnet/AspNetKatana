@@ -20,7 +20,6 @@ namespace Microsoft.Owin.Security.Facebook
     internal class FacebookAuthenticationHandler : AuthenticationHandler<FacebookAuthenticationOptions>
     {
         private const string XmlSchemaString = "http://www.w3.org/2001/XMLSchema#string";
-        private const string HttpSecure = "https";
 
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
@@ -77,7 +76,7 @@ namespace Microsoft.Owin.Security.Facebook
                     return new AuthenticationTicket(null, properties);
                 }
 
-                string requestPrefix = GetScheme() + "://" + Request.Host;
+                string requestPrefix = Request.Scheme + "://" + Request.Host;
                 string redirectUri = requestPrefix + Request.PathBase + Options.CallbackPath;
 
                 string tokenRequest = "grant_type=authorization_code" +
@@ -170,8 +169,8 @@ namespace Microsoft.Owin.Security.Facebook
 
             if (challenge != null)
             {
-                string baseUri =
-                    GetScheme() + 
+                string baseUri = 
+                    Request.Scheme + 
                     Uri.SchemeDelimiter + 
                     Request.Host +
                     Request.PathBase;
@@ -281,11 +280,6 @@ namespace Microsoft.Owin.Security.Facebook
                 }
                 return builder.ToString();
             }
-        }
-
-        private string GetScheme()
-        {
-            return Options.ForceSecureRedirect ? HttpSecure : Request.Scheme;
         }
     }
 }

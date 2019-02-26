@@ -151,10 +151,5 @@ namespace Microsoft.Owin.Security.Facebook
         /// An abstraction for reading and setting cookies during the authentication process.
         /// </summary>
         public ICookieManager CookieManager { get; set; }
-
-        /// <summary>
-        /// Gets or set whether to override request scheme to force secure redirect (https) from OAuth callback.
-        /// </summary>
-        public bool ForceSecureRedirect { get; set; }
     }
 }
