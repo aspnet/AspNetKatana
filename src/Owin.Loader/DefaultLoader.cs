@@ -192,7 +192,7 @@ namespace Owin.Loader
                     // checking attribute's name first and only then instantiating it
                     // then we are filtering attributes by name second time as inheritors could be added by calling to GetCustomAttributes(type)
                     attributes = assembly.GetCustomAttributesData()
-                        .Where(data => DoesTypeNameReferToStartupAttribute(data.AttributeType))
+                        .Where(data => MatchesStartupAttribute(data.AttributeType))
                         .Select(data => data.AttributeType)
                         .SelectMany(type => assembly.GetCustomAttributes(type))
                         .Distinct()
@@ -203,7 +203,7 @@ namespace Owin.Loader
                     continue;
                 }
                 
-                foreach (var owinStartupAttribute in attributes.Where(attribute => DoesTypeNameReferToStartupAttribute(attribute.GetType())))
+                foreach (var owinStartupAttribute in attributes.Where(attribute => MatchesStartupAttribute(attribute.GetType())))
                 {
                     Type attributeType = owinStartupAttribute.GetType();
                     foundAnyInstances = true;
@@ -273,7 +273,7 @@ namespace Owin.Loader
             return fullMatch;
         }
         
-        private static bool DoesTypeNameReferToStartupAttribute(Type type)
+        private static bool MatchesStartupAttribute(Type type)
         {
             return type.Name.Equals(Constants.OwinStartupAttribute, StringComparison.Ordinal);
         }
