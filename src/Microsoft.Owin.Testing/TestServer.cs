@@ -187,7 +187,10 @@ namespace Microsoft.Owin.Testing
         protected virtual void Dispose(bool disposing)
         {
             _disposed = true;
-            _started.Dispose();
+            if (_started != null)
+            {
+                _started.Dispose();
+            }
         }
 
         private class TestServerFactory
