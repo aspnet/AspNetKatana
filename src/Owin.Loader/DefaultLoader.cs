@@ -186,17 +186,24 @@ namespace Owin.Loader
             Assembly matchedAssembly = null;
             foreach (var assembly in _referencedAssemblies)
             {
-                object[] attributes;
+                Attribute[] attributes;
                 try
                 {
-                    attributes = assembly.GetCustomAttributes(inherit: false);
+                    // checking attribute's name first and only then instantiating it
+                    // then we are filtering attributes by name second time as inheritors could be added by calling to GetCustomAttributes(type)
+                    attributes = assembly.GetCustomAttributesData()
+                        .Where(data => MatchesStartupAttribute(data.AttributeType))
+                        .Select(data => data.AttributeType)
+                        .SelectMany(type => assembly.GetCustomAttributes(type))
+                        .Distinct()
+                        .ToArray();
                 }
                 catch (CustomAttributeFormatException)
                 {
                     continue;
                 }
-
-                foreach (var owinStartupAttribute in attributes.Where(attribute => attribute.GetType().Name.Equals(Constants.OwinStartupAttribute, StringComparison.Ordinal)))
+                
+                foreach (var owinStartupAttribute in attributes.Where(attribute => MatchesStartupAttribute(attribute.GetType())))
                 {
                     Type attributeType = owinStartupAttribute.GetType();
                     foundAnyInstances = true;
@@ -264,6 +271,11 @@ namespace Owin.Loader
                 return null;
             }
             return fullMatch;
+        }
+        
+        private static bool MatchesStartupAttribute(Type type)
+        {
+            return type.Name.Equals(Constants.OwinStartupAttribute, StringComparison.Ordinal);
         }
 
         // Search for any assemblies with a Startup or [AssemblyName].Startup class.
