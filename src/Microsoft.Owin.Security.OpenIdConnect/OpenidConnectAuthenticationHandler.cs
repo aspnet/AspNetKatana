@@ -145,11 +145,19 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     RedirectUri = Options.RedirectUri,
                     RequestType = OpenIdConnectRequestType.Authentication,
                     Resource = Options.Resource,
-                    ResponseMode = OpenIdConnectResponseMode.FormPost,
                     ResponseType = Options.ResponseType,
                     Scope = Options.Scope,
                     State = OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
                 };
+
+                // Omitting the response_mode parameter when it already corresponds to the default
+                // response_mode used for the specified response_type is recommended by the specifications.
+                // See http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#ResponseModes
+                if (!string.Equals(Options.ResponseType, OpenIdConnectResponseType.Code, StringComparison.Ordinal) ||
+                    !string.Equals(Options.ResponseMode, OpenIdConnectResponseMode.Query, StringComparison.Ordinal))
+                {
+                    openIdConnectMessage.ResponseMode = Options.ResponseMode;
+                }
 
                 if (Options.ProtocolValidator.RequireNonce)
                 {
@@ -191,8 +199,39 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
             OpenIdConnectMessage openIdConnectMessage = null;
 
+            if (string.Equals(Request.Method, "GET", StringComparison.OrdinalIgnoreCase))
+            {
+                openIdConnectMessage = new OpenIdConnectMessage(Request.Query.Select(pair => new KeyValuePair<string, string[]>(pair.Key, pair.Value)));
+
+                // response_mode=query (explicit or not) and a response_type containing id_token
+                // or token are not considered as a safe combination and MUST be rejected.
+                // See http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#Security
+                if (!string.IsNullOrEmpty(openIdConnectMessage.IdToken) || !string.IsNullOrEmpty(openIdConnectMessage.AccessToken))
+                {
+                    var invalidResponseEx = new OpenIdConnectProtocolException("An OpenID Connect response cannot contain an identity token or an access token when using response_mode=query");
+
+                    _logger.WriteError("Exception occurred while processing message: ", invalidResponseEx);
+
+                    var authenticationFailedNotification = new AuthenticationFailedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
+                    {
+                        ProtocolMessage = openIdConnectMessage,
+                        Exception = invalidResponseEx
+                    };
+                    await Options.Notifications.AuthenticationFailed(authenticationFailedNotification);
+                    if (authenticationFailedNotification.HandledResponse)
+                    {
+                        return GetHandledResponseTicket();
+                    }
+                    if (authenticationFailedNotification.Skipped)
+                    {
+                        return null;
+                    }
+
+                    throw invalidResponseEx;
+                }
+            }
             // assumption: if the ContentType is "application/x-www-form-urlencoded" it should be safe to read as it is small.
-            if (string.Equals(Request.Method, "POST", StringComparison.OrdinalIgnoreCase)
+            else if (string.Equals(Request.Method, "POST", StringComparison.OrdinalIgnoreCase)
               && !string.IsNullOrWhiteSpace(Request.ContentType)
                 // May have media/type; charset=utf-8, allow partial match.
               && Request.ContentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase)

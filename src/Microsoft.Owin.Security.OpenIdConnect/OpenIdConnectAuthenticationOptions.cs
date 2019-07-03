@@ -41,6 +41,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <para>Caption: <see cref="OpenIdConnectAuthenticationDefaults.Caption"/>.</para>
         /// <para>ProtocolValidator: new <see cref="OpenIdConnectProtocolValidator"/>.</para>
         /// <para>RefreshOnIssuerKeyNotFound: true</para>
+        /// <para>ResponseMode: <see cref="OpenIdConnectResponseMode.FormPost"/></para>
         /// <para>ResponseType: <see cref="OpenIdConnectResponseTypes.CodeIdToken"/></para>
         /// <para>Scope: <see cref="OpenIdConnectScopes.OpenIdProfile"/>.</para>
         /// <para>TokenValidationParameters: new <see cref="TokenValidationParameters"/> with AuthenticationType = authenticationType.</para>
@@ -60,6 +61,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 NonceLifetime = TimeSpan.FromMinutes(15)
             };
             RefreshOnIssuerKeyNotFound = true;
+            ResponseMode = OpenIdConnectResponseMode.FormPost;
             ResponseType = OpenIdConnectResponseType.CodeIdToken;
             Scope = OpenIdConnectScope.OpenIdProfile;
             SecurityTokenValidator = new JwtSecurityTokenHandler();
@@ -215,6 +217,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// Gets or sets the 'resource'.
         /// </summary>
         public string Resource { get; set; }
+
+        /// <summary>
+        /// Gets or sets the 'response_mode'.
+        /// </summary>
+        public string ResponseMode { get; set; }
 
         /// <summary>
         /// Gets or sets the 'response_type'.
