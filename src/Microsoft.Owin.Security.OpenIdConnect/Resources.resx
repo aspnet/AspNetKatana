@@ -129,4 +129,10 @@
   <data name="Exception_ValidatorHandlerMismatch" xml:space="preserve">
     <value>An ICertificateValidator cannot be specified at the same time as an HttpMessageHandler unless it is a WebRequestHandler.</value>
   </data>
+  <data name="UnableToValidateToken" xml:space="preserve">
+    <value>Unable to validate the 'id_token', no suitable ISecurityTokenValidator was found for: '{0}'."</value>
+  </data>
+  <data name="ValidatedSecurityTokenNotJwt" xml:space="preserve">
+    <value>The Validated Security Token must be of type JwtSecurityToken, but instead its type is: '{0}'.</value>
+  </data>
 </root>
