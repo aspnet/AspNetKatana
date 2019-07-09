@@ -37,6 +37,11 @@ namespace Microsoft.Owin.Security.Notifications
         public JwtSecurityToken JwtSecurityToken { get; set; }
 
         /// <summary>
+        /// The request that will be sent to the token endpoint and is available for customization.
+        /// </summary>
+        public OpenIdConnectMessage TokenEndpointRequest { get; set; }
+
+        /// <summary>
         /// Gets or sets the <see cref="OpenIdConnectMessage"/>.
         /// </summary>
         public OpenIdConnectMessage ProtocolMessage { get; set; }

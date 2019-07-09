@@ -125,6 +125,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         }
 
         /// <summary>
+        /// Used to communicate with the remote identity provider.
+        /// </summary>
+        public HttpClient Backchannel { get; set; }
+
+        /// <summary>
         /// Get or sets the text that the user can display on a sign in user interface.
         /// </summary>
         public string Caption
@@ -296,6 +301,14 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             get;
             set;
         }
+
+        /// <summary>
+        /// Defines whether access and refresh tokens should be stored in the
+        /// <see cref="AuthenticationProperties"/> after a successful authorization.
+        /// This property is set to <c>false</c> by default to reduce
+        /// the size of the final authentication cookie.
+        /// </summary>
+        public bool SaveTokens { get; set; }
 
         /// <summary>
         /// An abstraction for reading and setting cookies during the authentication process.

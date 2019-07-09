@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.ExceptionServices;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -30,6 +31,14 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
         private readonly ILogger _logger;
         private OpenIdConnectConfiguration _configuration;
+
+        protected HttpClient Backchannel
+        {
+            get
+            {
+                return Options.Backchannel;
+            }
+        }
 
         /// <summary>
         /// Creates a new OpenIdConnectAuthenticationHandler
@@ -199,7 +208,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
             OpenIdConnectMessage openIdConnectMessage = null;
 
-            if (string.Equals(Request.Method, "GET", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(Request.Method, "GET", StringComparison.OrdinalIgnoreCase) && Request.Query.Any())
             {
                 openIdConnectMessage = new OpenIdConnectMessage(Request.Query.Select(pair => new KeyValuePair<string, string[]>(pair.Key, pair.Value)));
 
@@ -288,18 +297,52 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 // devs will need to hook AuthenticationFailedNotification to avoid having 'raw' runtime errors displayed to users.
                 if (!string.IsNullOrWhiteSpace(openIdConnectMessage.Error))
                 {
-                    throw new OpenIdConnectProtocolException(
-                        string.Format(CultureInfo.InvariantCulture,
-                                      Resources.Exception_OpenIdConnectMessageError,
-                                      openIdConnectMessage.Error, openIdConnectMessage.ErrorDescription ?? string.Empty, openIdConnectMessage.ErrorUri ?? string.Empty));
+                    throw CreateOpenIdConnectProtocolException(openIdConnectMessage);
                 }
 
-                // code is only accepted with id_token, in this version, hence check for code is inside this if
-                // OpenIdConnect protocol allows a Code to be received without the id_token
-                if (string.IsNullOrWhiteSpace(openIdConnectMessage.IdToken))
+                if (_configuration == null)
                 {
-                    _logger.WriteWarning("The id_token is missing.");
-                    return null;
+                    _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
+                }
+
+                PopulateSessionProperties(openIdConnectMessage, properties);
+
+                // Authorization Code Flow
+                if (openIdConnectMessage.Code != null && string.IsNullOrWhiteSpace(openIdConnectMessage.IdToken))
+                {
+                    var tokenEndpointRequest = new OpenIdConnectMessage()
+                    {
+                        ClientId = Options.ClientId,
+                        ClientSecret = Options.ClientSecret,
+                        Code = openIdConnectMessage.Code,
+                        GrantType = OpenIdConnectGrantTypes.AuthorizationCode,
+                        RedirectUri = properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey]
+                    };
+
+                    var authorizationCodeReceivedNotification = new AuthorizationCodeReceivedNotification(Context, Options)
+                    {
+                        Code = openIdConnectMessage.Code,
+                        ProtocolMessage = openIdConnectMessage,
+                        RedirectUri = properties.Dictionary.ContainsKey(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey) ?
+                            properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey] : string.Empty,
+                        TokenEndpointRequest = tokenEndpointRequest
+                    };
+                    await Options.Notifications.AuthorizationCodeReceived(authorizationCodeReceivedNotification);
+                    if (authorizationCodeReceivedNotification.HandledResponse)
+                    {
+                        return GetHandledResponseTicket();
+                    }
+                    if (authorizationCodeReceivedNotification.Skipped)
+                    {
+                        return null;
+                    }
+
+                    openIdConnectMessage = await RedeemAuthorizationCodeAsync(authorizationCodeReceivedNotification.TokenEndpointRequest);
+                }
+
+                if (Options.SaveTokens)
+                {
+                    SaveTokens(properties, openIdConnectMessage);
                 }
 
                 var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
@@ -314,11 +357,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 if (securityTokenReceivedNotification.Skipped)
                 {
                     return null;
-                }
-
-                if (_configuration == null)
-                {
-                    _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.Request.CallCancelled);
                 }
 
                 // Copy and augment to avoid cross request race conditions for updated configurations.
@@ -345,17 +383,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                     // deletes the nonce cookie
                     nonce = RetrieveNonce(openIdConnectMessage);
-                }
-
-                // remember 'session_state' and 'check_session_iframe'
-                if (!string.IsNullOrWhiteSpace(openIdConnectMessage.SessionState))
-                {
-                    ticket.Properties.Dictionary[OpenIdConnectSessionProperties.SessionState] = openIdConnectMessage.SessionState;
-                }
-
-                if (!string.IsNullOrWhiteSpace(_configuration.CheckSessionIframe))
-                {
-                    ticket.Properties.Dictionary[OpenIdConnectSessionProperties.CheckSessionIFrame] = _configuration.CheckSessionIframe;
                 }
 
                 if (Options.UseTokenLifetime)
@@ -460,6 +487,91 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Redeems the authorization code for tokens at the token endpoint.
+        /// </summary>
+        /// <param name="tokenEndpointRequest">The request that will be sent to the token endpoint and is available for customization.</param>
+        /// <returns>OpenIdConnect message that has tokens inside it.</returns>
+        protected virtual async Task<OpenIdConnectMessage> RedeemAuthorizationCodeAsync(OpenIdConnectMessage tokenEndpointRequest)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, _configuration.TokenEndpoint);
+            requestMessage.Content = new FormUrlEncodedContent(tokenEndpointRequest.Parameters);
+
+            var responseMessage = await Backchannel.SendAsync(requestMessage);
+
+            var contentMediaType = responseMessage.Content.Headers.ContentType != null ? responseMessage.Content.Headers.ContentType.MediaType : null;
+            if (string.IsNullOrEmpty(contentMediaType))
+            {
+                _logger.WriteVerbose(string.Format("Unexpected token response format. Status Code: {0}. Content-Type header is missing.", (int)responseMessage.StatusCode));
+            }
+            else if (!string.Equals(contentMediaType, "application/json", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.WriteVerbose(string.Format("Unexpected token response format. Status Code: {0}. Content-Type {1}.", (int)responseMessage.StatusCode, responseMessage.Content.Headers.ContentType));
+            }
+
+            // Error handling:
+            // 1. If the response body can't be parsed as json, throws.
+            // 2. If the response's status code is not in 2XX range, throw OpenIdConnectProtocolException. If the body is correct parsed,
+            //    pass the error information from body to the exception.
+            OpenIdConnectMessage message;
+            try
+            {
+                var responseContent = await responseMessage.Content.ReadAsStringAsync();
+                message = new OpenIdConnectMessage(responseContent);
+            }
+            catch (Exception ex)
+            {
+                throw new OpenIdConnectProtocolException(string.Format("Failed to parse token response body as JSON. Status Code: {0}. Content-Type: {1}", (int)responseMessage.StatusCode, responseMessage.Content.Headers.ContentType), ex);
+            }
+
+            if (!responseMessage.IsSuccessStatusCode)
+            {
+                throw CreateOpenIdConnectProtocolException(message);
+            }
+
+            return message;
+        }
+
+        /// <summary>
+        /// Save the tokens contained in the <see cref="OpenIdConnectMessage"/> in the <see cref="ClaimsPrincipal"/>.
+        /// </summary>
+        /// <param name="properties">The <see cref="AuthenticationProperties"/> in which tokens are saved.</param>
+        /// <param name="message">The OpenID Connect response.</param>
+        private static void SaveTokens(AuthenticationProperties properties, OpenIdConnectMessage message)
+        {
+            if (!string.IsNullOrEmpty(message.AccessToken))
+            {
+                properties.Dictionary[OpenIdConnectParameterNames.AccessToken] = message.AccessToken;
+            }
+
+            if (!string.IsNullOrEmpty(message.IdToken))
+            {
+                properties.Dictionary[OpenIdConnectParameterNames.IdToken] = message.IdToken;
+            }
+
+            if (!string.IsNullOrEmpty(message.RefreshToken))
+            {
+                properties.Dictionary[OpenIdConnectParameterNames.RefreshToken] = message.RefreshToken;
+            }
+
+            if (!string.IsNullOrEmpty(message.TokenType))
+            {
+                properties.Dictionary[OpenIdConnectParameterNames.TokenType] = message.TokenType;
+            }
+
+            if (!string.IsNullOrEmpty(message.ExpiresIn))
+            {
+                int value;
+                if (int.TryParse(message.ExpiresIn, NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
+                {
+                    var expiresAt = DateTime.UtcNow + TimeSpan.FromSeconds(value);
+                    // https://www.w3.org/TR/xmlschema-2/#dateTime
+                    // https://msdn.microsoft.com/en-us/library/az4se3k1(v=vs.110).aspx
+                    properties.Dictionary["expires_at"] = expiresAt.ToString("o", CultureInfo.InvariantCulture);
+                }
+            }
         }
 
         /// <summary>
@@ -611,6 +723,41 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             {
                 return Options.StateDataFormat.Unprotect(Uri.UnescapeDataString(state.Substring(authenticationIndex, endIndex).Replace('+', ' ')));
             }
+        }
+
+        private void PopulateSessionProperties(OpenIdConnectMessage message, AuthenticationProperties properties)
+        {
+            // remember 'session_state' and 'check_session_iframe'
+            if (!string.IsNullOrWhiteSpace(message.SessionState))
+            {
+                properties.Dictionary[OpenIdConnectSessionProperties.SessionState] = message.SessionState;
+            }
+
+            if (!string.IsNullOrWhiteSpace(_configuration.CheckSessionIframe))
+            {
+                properties.Dictionary[OpenIdConnectSessionProperties.CheckSessionIFrame] = _configuration.CheckSessionIframe;
+            }
+        }
+
+        private OpenIdConnectProtocolException CreateOpenIdConnectProtocolException(OpenIdConnectMessage message)
+        {
+            var description = message.ErrorDescription ?? "error_description is null";
+            var errorUri = message.ErrorUri ?? "error_uri is null";
+
+            var errorMessage = string.Format(
+                CultureInfo.InvariantCulture,
+                Resources.Exception_OpenIdConnectMessageError,
+                message.Error,
+                description,
+                errorUri);
+
+            _logger.WriteError(errorMessage);
+
+            var ex = new OpenIdConnectProtocolException(errorMessage);
+            ex.Data["error"] = message.Error;
+            ex.Data["error_description"] = description;
+            ex.Data["error_uri"] = errorUri;
+            return ex;
         }
 
         /// <summary>

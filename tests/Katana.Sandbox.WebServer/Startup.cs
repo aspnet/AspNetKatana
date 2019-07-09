@@ -132,7 +132,10 @@ namespace Katana.Sandbox.WebServer
                 Authority = Environment.GetEnvironmentVariable("oidc:authority"),
                 ClientId = Environment.GetEnvironmentVariable("oidc:clientid"),
                 RedirectUri = "https://localhost:44318/",
-                CookieManager = new SystemWebCookieManager()
+                CookieManager = new SystemWebCookieManager(),
+                //ResponseType = "code",
+                //ResponseMode = "query",
+                //SaveTokens = true
             });
 
             /*
