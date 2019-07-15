@@ -47,5 +47,12 @@ namespace Microsoft.Owin
         /// </summary>
         /// <returns>true if a cookie is accessible by client-side script; otherwise, false.</returns>
         public bool HttpOnly { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates on which requests client should or should not send cookie back to the server.
+        /// Set to null to do not include SameSite attribute at all.
+        /// </summary>
+        /// <returns>SameSite attribute value or null if attribute must not be set.</returns>
+        public SameSiteMode? SameSite { get; set; }
     }
 }
