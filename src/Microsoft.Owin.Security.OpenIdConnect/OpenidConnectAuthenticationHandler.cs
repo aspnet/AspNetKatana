@@ -330,7 +330,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         return null;
                     }
 
-                    user = ValidateToken(openIdConnectMessage.IdToken, validationParameters, out jwt);
+                    user = ValidateToken(openIdConnectMessage.IdToken, properties, validationParameters, out jwt);
                 }
 
                 if (Options.ProtocolValidator.RequireNonce)
@@ -353,7 +353,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 });
 
                 // Authorization Code Flow
-                if (openIdConnectMessage.Code != null && string.IsNullOrWhiteSpace(openIdConnectMessage.IdToken))
+                if (!string.IsNullOrEmpty(openIdConnectMessage.Code) && string.IsNullOrEmpty(openIdConnectMessage.IdToken))
                 {
                     var tokenEndpointRequest = new OpenIdConnectMessage()
                     {
@@ -404,7 +404,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                     // At least a cursory validation is required on the new IdToken, even if we've already validated the one from the authorization response.
                     // And we'll want to validate the new JWT in ValidateTokenResponse.
-                    user = ValidateToken(openIdConnectMessage.IdToken, validationParameters, out jwt);
+                    user = ValidateToken(openIdConnectMessage.IdToken, properties, validationParameters, out jwt);
 
                     if (Options.ProtocolValidator.RequireNonce)
                     {
@@ -436,22 +436,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                 ClaimsIdentity claimsIdentity = user.Identity as ClaimsIdentity;
                 AuthenticationTicket ticket = new AuthenticationTicket(claimsIdentity, properties);
-
-                if (Options.UseTokenLifetime)
-                {
-                    // Override any session persistence to match the token lifetime.
-                    DateTime issued = jwt.ValidFrom;
-                    if (issued != DateTime.MinValue)
-                    {
-                        ticket.Properties.IssuedUtc = issued.ToUniversalTime();
-                    }
-                    DateTime expires = jwt.ValidTo;
-                    if (expires != DateTime.MinValue)
-                    {
-                        ticket.Properties.ExpiresUtc = expires.ToUniversalTime();
-                    }
-                    ticket.Properties.AllowRefresh = false;
-                }
 
                 var securityTokenValidatedNotification = new SecurityTokenValidatedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                 {
@@ -739,7 +723,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             }
         }
 
-        private ClaimsPrincipal ValidateToken(string idToken, TokenValidationParameters validationParameters, out JwtSecurityToken jwt)
+        // Note this modifies properties if Options.UseTokenLifetime
+        private ClaimsPrincipal ValidateToken(string idToken, AuthenticationProperties properties, TokenValidationParameters validationParameters, out JwtSecurityToken jwt)
         {
 
             if (!Options.SecurityTokenValidator.CanReadToken(idToken))
@@ -771,6 +756,22 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             {
                 _logger.WriteError(string.Format(CultureInfo.InvariantCulture, Resources.UnableToValidateToken, idToken));
                 throw new SecurityTokenException(string.Format(CultureInfo.InvariantCulture, Resources.UnableToValidateToken, idToken));
+            }
+
+            if (Options.UseTokenLifetime)
+            {
+                // Override any session persistence to match the token lifetime.
+                DateTime issued = jwt.ValidFrom;
+                if (issued != DateTime.MinValue)
+                {
+                    properties.IssuedUtc = issued.ToUniversalTime();
+                }
+                DateTime expires = jwt.ValidTo;
+                if (expires != DateTime.MinValue)
+                {
+                    properties.ExpiresUtc = expires.ToUniversalTime();
+                }
+                properties.AllowRefresh = false;
             }
 
             return principal;
