@@ -85,6 +85,7 @@
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Notifications\AuthorizationCodeReceivedNotification.cs" />
+    <Compile Include="Notifications\TokenResponseReceivedNotification.cs" />
     <Compile Include="OpenIdConnectAuthenticationDefaults.cs" />
     <Compile Include="OpenIdConnectAuthenticationExtensions.cs" />
     <Compile Include="OpenidConnectAuthenticationHandler.cs" />

@@ -24,6 +24,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             SecurityTokenReceived = notification => Task.FromResult(0);
             SecurityTokenValidated = notification => Task.FromResult(0);
             RedirectToIdentityProvider = notification => Task.FromResult(0);
+            TokenResponseReceived = notification => Task.FromResult(0);
         }
 
         /// <summary>
@@ -55,5 +56,10 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// Invoked after the security token has passed validation and a ClaimsIdentity has been generated.
         /// </summary>
         public Func<SecurityTokenValidatedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> SecurityTokenValidated { get; set; }
+
+        /// <summary>
+        /// Invoked after "authorization code" is redeemed for tokens at the token endpoint.
+        /// </summary>
+        public Func<TokenResponseReceivedNotification, Task> TokenResponseReceived { get; set; }
     }
 }

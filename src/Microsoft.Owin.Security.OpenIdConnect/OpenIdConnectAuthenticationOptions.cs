@@ -41,10 +41,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <para>Caption: <see cref="OpenIdConnectAuthenticationDefaults.Caption"/>.</para>
         /// <para>ProtocolValidator: new <see cref="OpenIdConnectProtocolValidator"/>.</para>
         /// <para>RefreshOnIssuerKeyNotFound: true</para>
+        /// <para>ResponseMode: <see cref="OpenIdConnectResponseMode.FormPost"/></para>
         /// <para>ResponseType: <see cref="OpenIdConnectResponseTypes.CodeIdToken"/></para>
         /// <para>Scope: <see cref="OpenIdConnectScopes.OpenIdProfile"/>.</para>
         /// <para>TokenValidationParameters: new <see cref="TokenValidationParameters"/> with AuthenticationType = authenticationType.</para>
         /// <para>UseTokenLifetime: true.</para>
+        /// <para>RedeemCode: false.</para>
         /// </remarks>
         /// <param name="authenticationType"> will be used to when creating the <see cref="System.Security.Claims.ClaimsIdentity"/> for the AuthenticationType property.</param>
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions.set_Caption(System.String)", Justification = "Not a LOC field")]
@@ -60,6 +62,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 NonceLifetime = TimeSpan.FromMinutes(15)
             };
             RefreshOnIssuerKeyNotFound = true;
+            ResponseMode = OpenIdConnectResponseMode.FormPost;
             ResponseType = OpenIdConnectResponseType.CodeIdToken;
             Scope = OpenIdConnectScope.OpenIdProfile;
             SecurityTokenValidator = new JwtSecurityTokenHandler();
@@ -67,6 +70,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             TokenValidationParameters = new TokenValidationParameters();
             UseTokenLifetime = true;
             CookieManager = new CookieManager();
+            RedeemCode = false;
         }
 
         /// <summary>
@@ -121,6 +125,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 _backchannelTimeout = value;
             }
         }
+
+        /// <summary>
+        /// Used to communicate with the remote identity provider.
+        /// </summary>
+        public HttpClient Backchannel { get; set; }
 
         /// <summary>
         /// Get or sets the text that the user can display on a sign in user interface.
@@ -217,6 +226,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         public string Resource { get; set; }
 
         /// <summary>
+        /// Gets or sets the 'response_mode'.
+        /// </summary>
+        public string ResponseMode { get; set; }
+
+        /// <summary>
         /// Gets or sets the 'response_type'.
         /// </summary>
         public string ResponseType { get; set; }
@@ -291,8 +305,22 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         }
 
         /// <summary>
+        /// Defines whether access and refresh tokens should be stored in the
+        /// <see cref="AuthenticationProperties"/> after a successful authorization.
+        /// This property is set to <c>false</c> by default to reduce
+        /// the size of the final authentication cookie.
+        /// </summary>
+        public bool SaveTokens { get; set; }
+
+        /// <summary>
         /// An abstraction for reading and setting cookies during the authentication process.
         /// </summary>
         public ICookieManager CookieManager { get; set; }
+
+        /// <summary>
+        /// When set to <c>true</c> the authorization code will be redeemed for tokens at the token endpoint.
+        /// This property is set to <c>false</c> by default.
+        /// </summary>
+        public bool RedeemCode { get; set; }
     }
 }
