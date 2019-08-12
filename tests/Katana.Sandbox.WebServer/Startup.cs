@@ -131,6 +131,7 @@ namespace Katana.Sandbox.WebServer
             {
                 Authority = Environment.GetEnvironmentVariable("oidc:authority"),
                 ClientId = Environment.GetEnvironmentVariable("oidc:clientid"),
+                ClientSecret = Environment.GetEnvironmentVariable("oidc:clientsecret"),
                 RedirectUri = "https://localhost:44318/",
                 CookieManager = new SystemWebCookieManager(),
                 //ResponseType = "code",
@@ -146,6 +147,7 @@ namespace Katana.Sandbox.WebServer
                 //        var requestMessage = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Post, _configuration.TokenEndpoint);
                 //        requestMessage.Content = new System.Net.Http.FormUrlEncodedContent(n.TokenEndpointRequest.Parameters);
                 //        var responseMessage = await n.Options.Backchannel.SendAsync(requestMessage);
+                //        responseMessage.EnsureSuccessStatusCode();
                 //        var responseContent = await responseMessage.Content.ReadAsStringAsync();
                 //        Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectMessage message = new Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectMessage(responseContent);
 

@@ -317,7 +317,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 // Hybrid or Implicit flow
                 if (!string.IsNullOrEmpty(authorizationResponse.IdToken))
                 {
-                    // NOTE: This diverges from AspNetCore to maintain the existing order of events in AspNetKatana.
                     var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                     {
                         ProtocolMessage = authorizationResponse,
@@ -333,6 +332,17 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     }
 
                     user = ValidateToken(authorizationResponse.IdToken, properties, validationParameters, out jwt);
+
+                    if (Options.ProtocolValidator.RequireNonce)
+                    {
+                        if (string.IsNullOrWhiteSpace(authorizationResponse.Nonce))
+                        {
+                            authorizationResponse.Nonce = jwt.Payload.Nonce;
+                        }
+
+                        // deletes the nonce cookie
+                        nonce = RetrieveNonce(authorizationResponse);
+                    }
 
                     ClaimsIdentity claimsIdentity = user.Identity as ClaimsIdentity;
                     ticket = new AuthenticationTicket(claimsIdentity, properties);
@@ -353,17 +363,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     }
                     // Flow possible changes
                     ticket = securityTokenValidatedNotification.AuthenticationTicket;
-                }
-
-                if (Options.ProtocolValidator.RequireNonce)
-                {
-                    if (string.IsNullOrWhiteSpace(authorizationResponse.Nonce) && jwt != null)
-                    {
-                        authorizationResponse.Nonce = jwt.Payload.Nonce;
-                    }
-
-                    // deletes the nonce cookie
-                    nonce = RetrieveNonce(authorizationResponse);
                 }
 
                 Options.ProtocolValidator.ValidateAuthenticationResponse(new OpenIdConnectProtocolValidationContext()
@@ -421,17 +420,17 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     
                     if (tokenEndpointResponse != null)
                     {
-                        // NOTE: This event has already fired for Hybrid or Implicit flow. Should it fire again here in those flows?
-                        var securityTokenReceivedNotification = new SecurityTokenReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
+                        var tokenResponseReceivedNotification = new TokenResponseReceivedNotification(Context, Options)
                         {
-                            ProtocolMessage = tokenEndpointResponse
+                            ProtocolMessage = authorizationResponse,
+                            TokenEndpointResponse = tokenEndpointResponse
                         };
-                        await Options.Notifications.SecurityTokenReceived(securityTokenReceivedNotification);
-                        if (securityTokenReceivedNotification.HandledResponse)
+                        await Options.Notifications.TokenResponseReceived(tokenResponseReceivedNotification);
+                        if (tokenResponseReceivedNotification.HandledResponse)
                         {
                             return GetHandledResponseTicket();
                         }
-                        if (securityTokenReceivedNotification.Skipped)
+                        if (tokenResponseReceivedNotification.Skipped)
                         {
                             return null;
                         }
@@ -448,6 +447,20 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         // Avoid running the event, etc, if it was already done as part of the authorization response validation.
                         if (user == null)
                         {
+                            if (Options.ProtocolValidator.RequireNonce)
+                            {
+                                if (string.IsNullOrWhiteSpace(tokenEndpointResponse.Nonce))
+                                {
+                                    tokenEndpointResponse.Nonce = tokenEndpointJwt.Payload.Nonce;
+                                }
+
+                                // deletes the nonce cookie
+                                if (nonce == null)
+                                {
+                                    nonce = RetrieveNonce(tokenEndpointResponse);
+                                }
+                            }
+
                             ClaimsIdentity claimsIdentity = tokenEndpointUser.Identity as ClaimsIdentity;
                             ticket = new AuthenticationTicket(claimsIdentity, properties);
 
@@ -482,20 +495,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     // Validate the token response if it wasn't provided manually
                     if (!authorizationCodeReceivedNotification.HandledCodeRedemption && Options.RedeemCode)
                     {
-                        if (Options.ProtocolValidator.RequireNonce)
-                        {
-                            if (string.IsNullOrWhiteSpace(tokenEndpointResponse.Nonce) && jwt != null)
-                            {
-                                tokenEndpointResponse.Nonce = jwt.Payload.Nonce;
-                            }
-
-                            // deletes the nonce cookie
-                            if (nonce == null)
-                            {
-                                nonce = RetrieveNonce(tokenEndpointResponse);
-                            }
-                        }
-
                         Options.ProtocolValidator.ValidateTokenResponse(new OpenIdConnectProtocolValidationContext()
                         {
                             ClientId = Options.ClientId,
