@@ -56,6 +56,7 @@ namespace Microsoft.Owin
             bool domainHasValue = !string.IsNullOrEmpty(options.Domain);
             bool pathHasValue = !string.IsNullOrEmpty(options.Path);
             bool expiresHasValue = options.Expires.HasValue;
+            bool sameSiteHasValue = options.SameSite.HasValue;
 
             string setCookieValue = string.Concat(
                 Uri.EscapeDataString(key),
@@ -66,10 +67,12 @@ namespace Microsoft.Owin
                 !pathHasValue ? null : "; path=",
                 !pathHasValue ? null : options.Path,
                 !expiresHasValue ? null : "; expires=",
-                !expiresHasValue ? null : options.Expires.Value.ToString("ddd, dd-MMM-yyyy HH:mm:ss ", CultureInfo.InvariantCulture) + "GMT",
+                !expiresHasValue ? null : options.Expires.Value.ToString("ddd, dd-MMM-yyyy HH:mm:ss \\G\\M\\T", CultureInfo.InvariantCulture),
                 !options.Secure ? null : "; secure",
-                !options.HttpOnly ? null : "; HttpOnly");
-            Headers.AppendValues("Set-Cookie", setCookieValue);
+                !options.HttpOnly ? null : "; HttpOnly",
+                !sameSiteHasValue ? null : "; SameSite=",
+                !sameSiteHasValue ? null : GetStringRepresentationOfSameSite(options.SameSite.Value));
+            Headers.AppendValues(Constants.Headers.SetCookie, setCookieValue);
         }
 
         /// <summary>
@@ -137,6 +140,26 @@ namespace Microsoft.Owin
                 Domain = options.Domain,
                 Expires = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             });
+        }
+
+        /// <summary>
+        /// Analogous to ToString() but without boxing so
+        /// we can save a bit of memory.
+        /// </summary>
+        private static string GetStringRepresentationOfSameSite(SameSiteMode siteMode)
+        {
+            switch (siteMode)
+            {
+                case SameSiteMode.None:
+                    return "None";
+                case SameSiteMode.Lax:
+                    return "Lax";
+                case SameSiteMode.Strict:
+                    return "Strict";
+                default:
+                    throw new ArgumentOutOfRangeException("siteMode",
+                        string.Format(CultureInfo.InvariantCulture, "Unexpected SameSiteMode value: {0}", siteMode));
+            }
         }
     }
 }

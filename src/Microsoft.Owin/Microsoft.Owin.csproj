@@ -95,6 +95,7 @@
     <Compile Include="Infrastructure\SystemClock.cs" />
     <Compile Include="Infrastructure\WebUtils.cs" />
     <Compile Include="ResponseCookieCollection.cs" />
+    <Compile Include="SameSiteMode.cs" />
     <Compile Include="Security\AuthenticateResult.cs" />
     <Compile Include="Security\AuthenticationDescription.cs" />
     <Compile Include="Extensions\IntegratedPipelineExtensions.cs" />
