@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -32,6 +33,9 @@ namespace Katana.Sandbox.WebServer
 
         public void Configuration(IAppBuilder app)
         {
+            // For twitter:
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
             var logger = app.CreateLogger("Katana.Sandbox.WebServer");
 
             logger.WriteInformation("Application Started");
@@ -125,6 +129,7 @@ namespace Katana.Sandbox.WebServer
             {
                 Wtrealm = "https://tratcheroutlook.onmicrosoft.com/AspNetCoreSample",
                 MetadataAddress = "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml",
+                Wreply = "https://localhost:44318/",
             });
 
             app.UseOpenIdConnectAuthentication(new Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions()
@@ -133,7 +138,7 @@ namespace Katana.Sandbox.WebServer
                 ClientId = Environment.GetEnvironmentVariable("oidc:clientid"),
                 ClientSecret = Environment.GetEnvironmentVariable("oidc:clientsecret"),
                 RedirectUri = "https://localhost:44318/",
-                CookieManager = new SystemWebCookieManager(),
+                // CookieManager = new SystemWebCookieManager(),
                 //ResponseType = "code",
                 //ResponseMode = "query",
                 //SaveTokens = true,

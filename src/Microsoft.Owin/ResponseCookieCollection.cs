@@ -138,14 +138,13 @@ namespace Microsoft.Owin
             {
                 Path = options.Path,
                 Domain = options.Domain,
+                HttpOnly = options.HttpOnly,
+                SameSite = options.SameSite,
+                Secure = options.Secure,
                 Expires = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc),
             });
         }
 
-        /// <summary>
-        /// Analogous to ToString() but without boxing so
-        /// we can save a bit of memory.
-        /// </summary>
         private static string GetStringRepresentationOfSameSite(SameSiteMode siteMode)
         {
             switch (siteMode)
