@@ -105,7 +105,7 @@ namespace Microsoft.Owin.Security.Tests
             result.ShouldBe(true);
         }
 
-        [Fact]
+        [Fact(Skip = "Uses outdated hash")]
         public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasAChainElementThumbprintWhiteListed()
         {
             var instance = new CertificateThumbprintValidator(new[] { MicrosoftInternetAuthorityThumbprint });

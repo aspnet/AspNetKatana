@@ -103,7 +103,7 @@ namespace Microsoft.Owin.Security.Tests
             result.ShouldBe(true);
         }
 
-        [Fact]
+        [Fact(Skip = "Uses outdated hash")]
         public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasAChainElementSubjectKeyIdentifierWhiteListed()
         {
             var instance = new CertificateSubjectKeyIdentifierValidator(

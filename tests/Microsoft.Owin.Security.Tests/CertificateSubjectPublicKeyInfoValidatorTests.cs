@@ -118,7 +118,7 @@ namespace Microsoft.Owin.Security.Tests
             result.ShouldBe(true);
         }
 
-        [Fact]
+        [Fact(Skip = "Uses outdated hash")]
         public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasAChainElementSha1SpkiWhiteListed()
         {
             var instance = new CertificateSubjectPublicKeyInfoValidator(new[] { MicrosoftInternetAuthoritySha1Hash }, SubjectPublicKeyInfoAlgorithm.Sha1);
@@ -157,7 +157,7 @@ namespace Microsoft.Owin.Security.Tests
             result.ShouldBe(true);
         }
 
-        [Fact]
+        [Fact(Skip = "Uses outdated hash")]
         public void ValidatorShouldReturnTrueWhenPassedATrustedCertificateWhichHasAChainElementSha256SpkiWhiteListed()
         {
             var instance = new CertificateSubjectPublicKeyInfoValidator(new[] { MicrosoftInternetAuthoritySha256Hash }, SubjectPublicKeyInfoAlgorithm.Sha256);
