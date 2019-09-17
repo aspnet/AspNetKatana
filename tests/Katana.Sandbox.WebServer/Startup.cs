@@ -63,7 +63,8 @@ namespace Katana.Sandbox.WebServer
                 AuthenticationMode = AuthenticationMode.Active,
                 CookieName = CookieAuthenticationDefaults.CookiePrefix + "External",
                 ExpireTimeSpan = TimeSpan.FromMinutes(5),
-                CookieManager = new SystemWebChunkingCookieManager()
+                // CookieManager = new SystemWebChunkingCookieManager()
+                CookieManager = new SameSiteCookieManager()
             });
 
             // https://developers.facebook.com/apps/
@@ -73,7 +74,7 @@ namespace Katana.Sandbox.WebServer
                 AppSecret = Environment.GetEnvironmentVariable("facebook:appsecret"),
                 Scope = { "email" },
                 Fields = { "name", "email" },
-                CookieManager = new SystemWebCookieManager()
+                // CookieManager = new SystemWebCookieManager()
             });
 
             // https://console.developers.google.com/apis/credentials
@@ -134,11 +135,17 @@ namespace Katana.Sandbox.WebServer
 
             app.UseOpenIdConnectAuthentication(new Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions()
             {
+                // https://github.com/IdentityServer/IdentityServer4.Demo/blob/master/src/IdentityServer4Demo/Config.cs
+                ClientId = "server.hybrid",
+                ClientSecret = "secret", // for code flow
+                Authority = "https://demo.identityserver.io/",
+                /*
                 Authority = Environment.GetEnvironmentVariable("oidc:authority"),
                 ClientId = Environment.GetEnvironmentVariable("oidc:clientid"),
-                ClientSecret = Environment.GetEnvironmentVariable("oidc:clientsecret"),
                 RedirectUri = "https://localhost:44318/",
+                ClientSecret = Environment.GetEnvironmentVariable("oidc:clientsecret"),*/
                 // CookieManager = new SystemWebCookieManager(),
+                CookieManager = new SameSiteCookieManager(),
                 //ResponseType = "code",
                 //ResponseMode = "query",
                 //SaveTokens = true,
