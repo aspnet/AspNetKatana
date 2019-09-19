@@ -40,21 +40,22 @@ namespace Katana.Sandbox.WebServer
 
         private void CheckSameSite(IOwinContext context, CookieOptions options)
         {
-            if (IsIOS12(context) && options.SameSite == SameSiteMode.None)
+            if (DisallowsSameSiteNone(context) && options.SameSite == SameSiteMode.None)
             {
-                // IOS12 treats SameSite=None as SameSite=Strict. Exclude the option instead.
+                // IOS12 and Mac OS X 10.14 treat SameSite=None as SameSite=Strict. Exclude the option instead.
                 // https://bugs.webkit.org/show_bug.cgi?id=198181
                 options.SameSite = null;
             }
         }
 
         // https://myip.ms/view/comp_browsers/8568/Safari_12.html
-        public static bool IsIOS12(IOwinContext context)
+        public static bool DisallowsSameSiteNone(IOwinContext context)
         {
             // TODO: Use your User Agent library of choice here.
             var userAgent = context.Request.Headers["User-Agent"];
-            return userAgent.Contains("iPad; CPU OS 12")
-                || userAgent.Contains("CPU iPhone OS 12"); // Also covers iPod touch
+            return userAgent.Contains("CPU iPhone OS 12") // Also covers iPod touch
+                || userAgent.Contains("iPad; CPU OS 12")
+                || (userAgent.Contains("Macintosh; Intel Mac OS X 10_14") && userAgent.Contains("Version/12")); // Mojave & Safari 12
         }
     }
 }
