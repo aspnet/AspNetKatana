@@ -17,6 +17,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         internal static readonly bool IsSameSiteAvailable;
         internal static readonly MethodInfo SameSiteSetter;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
         static SystemWebCookieManager()
         {
             var systemWeb = typeof(HttpContextBase).Assembly;
