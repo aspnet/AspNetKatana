@@ -55,7 +55,8 @@ namespace Katana.Sandbox.WebServer
             var userAgent = context.Request.Headers["User-Agent"];
             return userAgent.Contains("CPU iPhone OS 12") // Also covers iPod touch
                 || userAgent.Contains("iPad; CPU OS 12")
-                || (userAgent.Contains("Macintosh; Intel Mac OS X 10_14") && userAgent.Contains("Version/12")); // Mojave & Safari 12
+                // Safari 12 and 13 are both broken on Mojave
+                || userAgent.Contains("Macintosh; Intel Mac OS X 10_14");
         }
     }
 }
