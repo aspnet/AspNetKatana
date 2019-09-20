@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -32,6 +33,9 @@ namespace Katana.Sandbox.WebServer
 
         public void Configuration(IAppBuilder app)
         {
+            // For twitter:
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
             var logger = app.CreateLogger("Katana.Sandbox.WebServer");
 
             logger.WriteInformation("Application Started");
@@ -59,7 +63,8 @@ namespace Katana.Sandbox.WebServer
                 AuthenticationMode = AuthenticationMode.Active,
                 CookieName = CookieAuthenticationDefaults.CookiePrefix + "External",
                 ExpireTimeSpan = TimeSpan.FromMinutes(5),
-                CookieManager = new SystemWebChunkingCookieManager()
+                // CookieManager = new SystemWebChunkingCookieManager()
+                CookieManager = new SameSiteCookieManager()
             });
 
             // https://developers.facebook.com/apps/
@@ -69,7 +74,7 @@ namespace Katana.Sandbox.WebServer
                 AppSecret = Environment.GetEnvironmentVariable("facebook:appsecret"),
                 Scope = { "email" },
                 Fields = { "name", "email" },
-                CookieManager = new SystemWebCookieManager()
+                // CookieManager = new SystemWebCookieManager()
             });
 
             // https://console.developers.google.com/apis/credentials
@@ -125,15 +130,22 @@ namespace Katana.Sandbox.WebServer
             {
                 Wtrealm = "https://tratcheroutlook.onmicrosoft.com/AspNetCoreSample",
                 MetadataAddress = "https://login.windows.net/cdc690f9-b6b8-4023-813a-bae7143d1f87/FederationMetadata/2007-06/FederationMetadata.xml",
+                Wreply = "https://localhost:44318/",
             });
 
             app.UseOpenIdConnectAuthentication(new Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions()
             {
+                // https://github.com/IdentityServer/IdentityServer4.Demo/blob/master/src/IdentityServer4Demo/Config.cs
+                ClientId = "server.hybrid",
+                ClientSecret = "secret", // for code flow
+                Authority = "https://demo.identityserver.io/",
+                /*
                 Authority = Environment.GetEnvironmentVariable("oidc:authority"),
                 ClientId = Environment.GetEnvironmentVariable("oidc:clientid"),
-                ClientSecret = Environment.GetEnvironmentVariable("oidc:clientsecret"),
                 RedirectUri = "https://localhost:44318/",
-                CookieManager = new SystemWebCookieManager(),
+                ClientSecret = Environment.GetEnvironmentVariable("oidc:clientsecret"),*/
+                // CookieManager = new SystemWebCookieManager(),
+                CookieManager = new SameSiteCookieManager(),
                 //ResponseType = "code",
                 //ResponseMode = "query",
                 //SaveTokens = true,

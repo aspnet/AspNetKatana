@@ -66,6 +66,12 @@ namespace Microsoft.Owin.Security.Cookies
         public bool CookieHttpOnly { get; set; }
 
         /// <summary>
+        /// Determines if the browser should allow the cookie to be sent with requests initiated from other sites.
+        /// The default is 'null' to exclude the setting and let the browser choose the default behavior.
+        /// </summary>
+        public SameSiteMode? CookieSameSite { get; set; }
+
+        /// <summary>
         /// Determines if the cookie should only be transmitted on HTTPS request. The default is to limit the cookie
         /// to HTTPS requests if the page which is doing the SignIn is also HTTPS. If you have an HTTPS sign in page
         /// and portions of your site are HTTP you may need to change this value.

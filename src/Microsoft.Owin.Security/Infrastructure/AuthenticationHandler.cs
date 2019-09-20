@@ -215,6 +215,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             var cookieOptions = new CookieOptions
             {
+                SameSite = SameSiteMode.None,
                 HttpOnly = true,
                 Secure = Request.IsSecure
             };
@@ -243,6 +244,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             var cookieOptions = new CookieOptions
             {
+                SameSite = SameSiteMode.None,
                 HttpOnly = true,
                 Secure = Request.IsSecure
             };
@@ -277,6 +279,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             var cookieOptions = new CookieOptions
             {
+                SameSite = SameSiteMode.None,
                 HttpOnly = true,
                 Secure = Request.IsSecure
             };
@@ -332,6 +335,7 @@ namespace Microsoft.Owin.Security.Infrastructure
 
             var cookieOptions = new CookieOptions
             {
+                SameSite = SameSiteMode.None,
                 HttpOnly = true,
                 Secure = Request.IsSecure
             };

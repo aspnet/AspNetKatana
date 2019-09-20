@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Reflection;
 using System.Web;
 using Microsoft.Owin.Infrastructure;
 
@@ -12,6 +13,21 @@ namespace Microsoft.Owin.Host.SystemWeb
     /// </summary>
     public class SystemWebCookieManager : ICookieManager
     {
+        // .NET 4.7.2, but requries a patch to emit SameSite=None
+        internal static readonly bool IsSameSiteAvailable;
+        internal static readonly MethodInfo SameSiteSetter;
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
+        static SystemWebCookieManager()
+        {
+            var systemWeb = typeof(HttpContextBase).Assembly;
+            IsSameSiteAvailable = systemWeb.GetType("System.Web.SameSiteMode") != null;
+            if (IsSameSiteAvailable)
+            {
+                SameSiteSetter = typeof(HttpCookie).GetProperty("SameSite").SetMethod;
+            }
+        }
+
         /// <summary>
         /// Creates a new instance of SystemWebCookieManager.
         /// </summary>
@@ -104,6 +120,13 @@ namespace Microsoft.Owin.Host.SystemWeb
             {
                 cookie.HttpOnly = true;
             }
+            if (IsSameSiteAvailable)
+            {
+                SameSiteSetter.Invoke(cookie, new object[]
+                {
+                    options.SameSite ?? (SameSiteMode)(-1) // Unspecified
+                });
+            }
 
             webContext.Response.AppendCookie(cookie);
         }
@@ -133,6 +156,9 @@ namespace Microsoft.Owin.Host.SystemWeb
                 {
                     Path = options.Path,
                     Domain = options.Domain,
+                    HttpOnly = options.HttpOnly,
+                    Secure = options.Secure,
+                    SameSite = options.SameSite,
                     Expires = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                 });
         }

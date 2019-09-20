@@ -637,6 +637,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 Convert.ToBase64String(Encoding.UTF8.GetBytes(Options.StateDataFormat.Protect(properties))),
                 new CookieOptions
                 {
+                    SameSite = SameSiteMode.None,
                     HttpOnly = true,
                     Secure = Request.IsSecure,
                     Expires = DateTime.UtcNow + Options.ProtocolValidator.NonceLifetime
@@ -667,6 +668,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             {
                 var cookieOptions = new CookieOptions
                 {
+                    SameSite = SameSiteMode.None,
                     HttpOnly = true,
                     Secure = Request.IsSecure
                 };

@@ -146,6 +146,7 @@ namespace Microsoft.Owin.Security.Cookies
                 {
                     Domain = Options.CookieDomain,
                     HttpOnly = Options.CookieHttpOnly,
+                    SameSite = Options.CookieSameSite,
                     Path = Options.CookiePath ?? "/",
                 };
                 if (Options.CookieSecure == CookieSecureOption.SameAsRequest)
