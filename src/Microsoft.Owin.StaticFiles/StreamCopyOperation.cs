@@ -13,7 +13,7 @@ namespace Microsoft.Owin.StaticFiles
     // FYI: In most cases the source will be a FileStream and the destination will be to the network.
     internal class StreamCopyOperation
     {
-        private const int DefaultBufferSize = 1024 * 16;
+        private const int DefaultBufferSize = 1024 * 64;
 
         private readonly TaskCompletionSource<object> _tcs;
         private readonly Stream _source;
