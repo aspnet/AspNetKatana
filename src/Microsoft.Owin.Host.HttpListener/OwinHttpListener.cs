@@ -214,30 +214,12 @@ namespace Microsoft.Owin.Host.HttpListener
                 {
                     context = await _listener.GetContextAsync();
                 }
-                catch (ApplicationException ae)
-                {
-                    // These come from the thread pool if HttpListener tries to call BindHandle after the listener has been disposed.
-                    Interlocked.Decrement(ref _currentOutstandingAccepts);
-                    LogHelper.LogException(_logger, "Accept", ae);
-                    return;
-                }
-                catch (HttpListenerException hle)
-                {
-                    // These happen if HttpListener has been disposed
-                    Interlocked.Decrement(ref _currentOutstandingAccepts);
-                    LogHelper.LogException(_logger, "Accept", hle);
-                    return;
-                }
-                catch (ObjectDisposedException ode)
-                {
-                    // These happen if HttpListener has been disposed
-                    Interlocked.Decrement(ref _currentOutstandingAccepts);
-                    LogHelper.LogException(_logger, "Accept", ode);
-                    return;
-                }
                 catch (Exception ex)
                 {
-                    // Some other unknown error. Log it and try to keep going.
+                    // HttpListenerException happen if HttpListener has been disposed, or if the client disconnects mid request.
+                    // ObjectDisposedException happen if HttpListener has been disposed.
+                    // ApplicationException come from the thread pool if HttpListener tries to call BindHandle after the listener has been disposed.
+                    // Log it and try to keep going. Let IsListening break the loop.
                     Interlocked.Decrement(ref _currentOutstandingAccepts);
                     LogHelper.LogException(_logger, "Accept", ex);
                     continue;
