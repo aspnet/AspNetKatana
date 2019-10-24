@@ -384,7 +384,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         ClientSecret = Options.ClientSecret,
                         Code = authorizationResponse.Code,
                         GrantType = OpenIdConnectGrantTypes.AuthorizationCode,
-                        RedirectUri = properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey]
+                        RedirectUri = properties.Dictionary.ContainsKey(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey) ?
+                            properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey] : string.Empty,
                     };
 
                     var authorizationCodeReceivedNotification = new AuthorizationCodeReceivedNotification(Context, Options)
@@ -393,8 +394,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         Code = authorizationResponse.Code,
                         JwtSecurityToken = jwt,
                         ProtocolMessage = authorizationResponse,
-                        RedirectUri = properties.Dictionary.ContainsKey(OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey) ?
-                            properties.Dictionary[OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey] : string.Empty,
+                        RedirectUri = tokenEndpointRequest.RedirectUri,
                         TokenEndpointRequest = tokenEndpointRequest
                     };
                     await Options.Notifications.AuthorizationCodeReceived(authorizationCodeReceivedNotification);
