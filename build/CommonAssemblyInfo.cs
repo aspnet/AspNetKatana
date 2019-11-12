@@ -8,6 +8,6 @@ using System.Reflection;
 [assembly: AssemblyCopyright("\x00a9 Microsoft Corporation All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyVersion("4.1.0.0")]
-[assembly: AssemblyFileVersion("4.1.80911.0")]
-[assembly: AssemblyInformationalVersion("4.1.0-preview1-000")]
+[assembly: AssemblyFileVersion("4.1.81112.0")]
+[assembly: AssemblyInformationalVersion("4.1.0-rtw-000")]
 [assembly: AssemblyMetadata("Serviceable", "True")]

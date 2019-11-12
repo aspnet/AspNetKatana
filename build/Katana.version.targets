@@ -3,13 +3,13 @@
   <PropertyGroup>
     <ShipVersion>4.1.0</ShipVersion>
     <ShipStrongNameVersion>4.1.0.0</ShipStrongNameVersion>
-    <ShipFullVersion>4.1.0-preview1-000</ShipFullVersion>
-    <ShipFileVersion>4.1.80911.0</ShipFileVersion>
+    <ShipFullVersion>4.1.0-rtw-000</ShipFullVersion>
+    <ShipFileVersion>4.1.81112.0</ShipFileVersion>
     <MajorVersion>4</MajorVersion>
     <MinorVersion>1</MinorVersion>
     <PatchVersion>0</PatchVersion>
-    <BuildQuality>preview1</BuildQuality>
-    <BuildDate>80911</BuildDate>
+    <BuildQuality>rtw</BuildQuality>
+    <BuildDate>81112</BuildDate>
     <BranchSuffix></BranchSuffix>
     <Eula>https://raw.githubusercontent.com/aspnet/AspNetKatana/v4.0.1/LICENSE.txt</Eula>
     <ProjectUrl>https://github.com/aspnet/AspNetKatana/</ProjectUrl>
