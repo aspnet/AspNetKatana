@@ -11,9 +11,8 @@ namespace Katana.Sandbox.WebServer
     {
         private readonly ICookieManager _innerManager;
 
-        public SameSiteCookieManager()
-            : this(new CookieManager())
-        {   
+        public SameSiteCookieManager() : this(new CookieManager())
+        {
         }
 
         public SameSiteCookieManager(ICookieManager innerManager)
@@ -21,7 +20,8 @@ namespace Katana.Sandbox.WebServer
             _innerManager = innerManager;
         }
 
-        public void AppendResponseCookie(IOwinContext context, string key, string value, CookieOptions options)
+        public void AppendResponseCookie(IOwinContext context, string key, string value,
+                                         CookieOptions options)
         {
             CheckSameSite(context, options);
             _innerManager.AppendResponseCookie(context, key, value, options);
@@ -40,23 +40,57 @@ namespace Katana.Sandbox.WebServer
 
         private void CheckSameSite(IOwinContext context, CookieOptions options)
         {
-            if (DisallowsSameSiteNone(context) && options.SameSite == SameSiteMode.None)
+            if (options.SameSite == SameSiteMode.None && DisallowsSameSiteNone(context))
             {
-                // IOS12 and Mac OS X 10.14 treat SameSite=None as SameSite=Strict. Exclude the option instead.
-                // https://bugs.webkit.org/show_bug.cgi?id=198181
                 options.SameSite = null;
             }
         }
 
-        // https://myip.ms/view/comp_browsers/8568/Safari_12.html
         public static bool DisallowsSameSiteNone(IOwinContext context)
         {
             // TODO: Use your User Agent library of choice here.
             var userAgent = context.Request.Headers["User-Agent"];
-            return userAgent.Contains("CPU iPhone OS 12") // Also covers iPod touch
-                || userAgent.Contains("iPad; CPU OS 12")
-                // Safari 12 and 13 are both broken on Mojave
-                || userAgent.Contains("Macintosh; Intel Mac OS X 10_14");
+            return DisallowsSameSiteNone(userAgent);
+        }
+
+        public static bool DisallowsSameSiteNone(string userAgent)
+        {
+            if (string.IsNullOrEmpty(userAgent))
+            {
+                return false;
+            }
+
+            // Cover all iOS based browsers here. This includes:
+            // - Safari on iOS 12 for iPhone, iPod Touch, iPad
+            // - WkWebview on iOS 12 for iPhone, iPod Touch, iPad
+            // - Chrome on iOS 12 for iPhone, iPod Touch, iPad
+            // All of which are broken by SameSite=None, because they use the iOS networking stack
+            if (userAgent.Contains("CPU iPhone OS 12") || userAgent.Contains("iPad; CPU OS 12"))
+            {
+                return true;
+            }
+
+            // Cover Mac OS X based browsers that use the Mac OS networking stack. This includes:
+            // - Safari on Mac OS X.
+            // This does not include:
+            // - Chrome on Mac OS X
+            // Because they do not use the Mac OS networking stack.
+            if (userAgent.Contains("Macintosh; Intel Mac OS X 10_14") &&
+                userAgent.Contains("Version/") && userAgent.Contains("Safari"))
+            {
+                return true;
+            }
+
+            // Cover Chrome 50-69, because some versions are broken by SameSite=None, 
+            // and none in this range require it.
+            // Note: this covers some pre-Chromium Edge versions, 
+            // but pre-Chromium Edge does not require SameSite=None.
+            if (userAgent.Contains("Chrome/5") || userAgent.Contains("Chrome/6"))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
