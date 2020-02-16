@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -79,18 +80,56 @@ namespace Microsoft.Owin.Security.Facebook
                 string requestPrefix = Request.Scheme + "://" + Request.Host;
                 string redirectUri = requestPrefix + Request.PathBase + Options.CallbackPath;
 
-                string tokenRequest = "grant_type=authorization_code" +
+                string tokenRequestParams = "grant_type=authorization_code" +
                     "&code=" + Uri.EscapeDataString(code) +
                     "&redirect_uri=" + Uri.EscapeDataString(redirectUri) +
                     "&client_id=" + Uri.EscapeDataString(Options.AppId) +
                     "&client_secret=" + Uri.EscapeDataString(Options.AppSecret);
 
-                HttpResponseMessage tokenResponse = await _httpClient.GetAsync(Options.TokenEndpoint + "?" + tokenRequest, Request.CallCancelled);
+                var tokenRequest = new HttpRequestMessage(HttpMethod.Get, Options.TokenEndpoint + "?" + tokenRequestParams);
+                tokenRequest.Headers.Add("Accept", "application/json");
+                var tokenResponse = await _httpClient.SendAsync(tokenRequest, Request.CallCancelled);
                 tokenResponse.EnsureSuccessStatusCode();
                 string text = await tokenResponse.Content.ReadAsStringAsync();
-                JObject response = JObject.Parse(text);
 
-                string accessToken = response.Value<string>("access_token");
+                string accessToken, expires;
+                if (text.StartsWith("{"))
+                {
+                    JObject response = JObject.Parse(text);
+
+                    accessToken = response.Value<string>("access_token");
+
+                    if (string.IsNullOrWhiteSpace(accessToken))
+                    {
+                        _logger.WriteWarning("Access token was not found");
+                        return new AuthenticationTicket(null, properties);
+                    }
+
+                    expires = response.Value<string>("expires_in");
+
+                    _logger.WriteVerbose("Extracted Facebook access token using JSON decoding");
+                }
+                else
+                {
+                    var parameters = text.Split('&')
+                        .Select(
+                            entry =>
+                            {
+                                var index = entry.IndexOf('=');
+                                return new
+                                {
+                                    Key = entry.Substring(0, index),
+                                    Value = entry.Substring(index + 1)
+                                };
+                            })
+                        .ToDictionary(
+                            e => e.Key,
+                            e => e.Value);
+                    accessToken = parameters["access_token"];
+                    expires = parameters["expires_in"];
+
+                    _logger.WriteVerbose("Extracted Facebook access token using URL decoding");
+                }
 
                 if (string.IsNullOrWhiteSpace(accessToken))
                 {
@@ -98,7 +137,6 @@ namespace Microsoft.Owin.Security.Facebook
                     return new AuthenticationTicket(null, properties);
                 }
 
-                string expires = response.Value<string>("expires_in");
                 string graphAddress = WebUtilities.AddQueryString(Options.UserInformationEndpoint, "access_token", accessToken);
                 if (Options.SendAppSecretProof)
                 {
