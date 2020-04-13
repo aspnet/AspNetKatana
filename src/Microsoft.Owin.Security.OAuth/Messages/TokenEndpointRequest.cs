@@ -53,7 +53,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
             {
                 ResourceOwnerPasswordCredentialsGrant = new TokenEndpointRequestResourceOwnerPasswordCredentials
                 {
-                    UserName = getParameter(Constants.Parameters.Username),
+                    Username = getParameter(Constants.Parameters.Username),
                     Password = getParameter(Constants.Parameters.Password),
                     Scope = (getParameter(Constants.Parameters.Scope) ?? string.Empty).Split(' ')
                 };

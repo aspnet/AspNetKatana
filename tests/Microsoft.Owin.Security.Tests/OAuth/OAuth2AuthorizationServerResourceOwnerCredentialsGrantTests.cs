@@ -39,8 +39,8 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             transaction1.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
             var accessToken = transaction1.ResponseToken.Value<string>("access_token");
 
-            string userName = await GetUserName(server, accessToken);
-            userName.ShouldBe("the-username");
+            string username = await GetUsername(server, accessToken);
+            username.ShouldBe("the-username");
         }
 
         [Fact]
@@ -80,8 +80,8 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             transaction1.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
             var accessToken = transaction1.ResponseToken.Value<string>("access_token");
 
-            string userName = await GetUserName(server, accessToken);
-            userName.ShouldBe("the-username");
+            string username = await GetUsername(server, accessToken);
+            username.ShouldBe("the-username");
         }
 
         [Fact]
@@ -127,8 +127,8 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             transaction1.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
             var accessToken = transaction1.ResponseToken.Value<string>("access_token");
 
-            string userName = await GetUserName(server, accessToken);
-            userName.ShouldBe("the-username");
+            string username = await GetUsername(server, accessToken);
+            username.ShouldBe("the-username");
         }
 
         [Fact]
@@ -242,16 +242,16 @@ namespace Microsoft.Owin.Security.Tests.OAuth
         }
 
         private Func<OAuthGrantResourceOwnerCredentialsContext, Task> GrantResourceOwnerCredentials(
-            string userName,
+            string username,
             string password)
         {
             return ctx =>
             {
-                if (ctx.UserName == userName && ctx.Password == password)
+                if (ctx.Username == username && ctx.Password == password)
                 {
                     var claims = new List<Claim>
                     {
-                        new Claim(ClaimsIdentity.DefaultNameClaimType, ctx.UserName)
+                        new Claim(ClaimsIdentity.DefaultNameClaimType, ctx.Username)
                     };
                     string scope = string.Join(" ", ctx.Scope);
                     if (!String.IsNullOrEmpty(scope))
@@ -268,7 +268,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             };
         }
 
-        private async Task<string> GetUserName(OAuth2TestServer server, string accessToken)
+        private async Task<string> GetUsername(OAuth2TestServer server, string accessToken)
         {
             OAuth2TestServer.Transaction transaction = await server.SendAsync("https://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));

@@ -132,7 +132,7 @@ namespace FunctionalTests.Facts.Security.Facebook
                                 Assert.Equal<string>("Id", context.Id);
                                 Assert.Equal<string>("https://www.facebook.com/myLink", context.Link);
                                 Assert.Equal<string>("Owinauthtester Owinauthtester", context.Name);
-                                Assert.Equal<string>("owinauthtester.owinauthtester.7", context.UserName);
+                                Assert.Equal<string>("owinauthtester.owinauthtester.7", context.Username);
                                 Assert.Equal<string>(context.Id, context.User.SelectToken("id").ToString());
                                 Assert.Equal<TimeSpan>(TimeSpan.FromSeconds(100), context.ExpiresIn.Value);
                                 context.Identity.AddClaim(new Claim("Authenticated", "true"));

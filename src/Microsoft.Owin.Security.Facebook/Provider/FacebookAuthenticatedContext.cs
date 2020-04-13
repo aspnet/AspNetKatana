@@ -36,7 +36,7 @@ namespace Microsoft.Owin.Security.Facebook
             Id = TryGetValue(user, "id");
             Name = TryGetValue(user, "name");
             Link = TryGetValue(user, "link");
-            UserName = TryGetValue(user, "username");
+            Username = TryGetValue(user, "username");
             Email = TryGetValue(user, "email");
         }
 
@@ -70,7 +70,7 @@ namespace Microsoft.Owin.Security.Facebook
         /// <summary>
         /// Gets the Facebook username
         /// </summary>
-        public string UserName { get; private set; }
+        public string Username { get; private set; }
 
         /// <summary>
         /// Gets the Facebook email

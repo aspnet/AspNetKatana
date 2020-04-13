@@ -55,7 +55,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             transaction2.ResponseText.ShouldBe("alpha");
         }
 
-        private async Task<string> GetUserName(OAuth2TestServer server, string accessToken)
+        private async Task<string> GetUsername(OAuth2TestServer server, string accessToken)
         {
             OAuth2TestServer.Transaction transaction = await server.SendAsync("https://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));

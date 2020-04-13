@@ -113,11 +113,11 @@ namespace Microsoft.Owin.Security.Tests.OAuth
             transaction1.Response.StatusCode.ShouldBe(HttpStatusCode.OK);
             var accessToken = transaction1.ResponseToken.Value<string>("access_token");
 
-            string userName = await GetUserName(server, accessToken);
-            userName.ShouldBe("alpha");
+            string username = await GetUsername(server, accessToken);
+            username.ShouldBe("alpha");
         }
 
-        private async Task<string> GetUserName(OAuth2TestServer server, string accessToken)
+        private async Task<string> GetUsername(OAuth2TestServer server, string accessToken)
         {
             OAuth2TestServer.Transaction transaction = await server.SendAsync("https://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));

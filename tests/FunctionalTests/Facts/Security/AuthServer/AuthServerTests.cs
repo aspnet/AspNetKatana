@@ -314,7 +314,7 @@ namespace FunctionalTests.Facts.Security.AuthServer
                         },
                     OnGrantResourceOwnerCredentials = context =>
                         {
-                            if (context.UserName == "user1" && context.Password == "password1")
+                            if (context.Username == "user1" && context.Password == "password1")
                             {
                                 var scope = context.Scope;
                                 if (scope.Count == 3 && scope.Contains("scope1") && scope.Contains("scope2") && scope.Contains("scope3"))

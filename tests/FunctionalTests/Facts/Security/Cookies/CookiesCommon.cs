@@ -40,7 +40,7 @@ namespace FunctionalTests.Facts.Security
                     }
                     else
                     {
-                        await context.Response.WriteAsync("<html><head><title>Login page</title></head><body><form method=\"post\">UserName: <input type=\"text\" name=\"userName\" /><br />Password: <input type=\"password\" name=\"password\" /><br /><br />Remember Me: <input type=\"checkbox\" name=\"rememberme\" /><br /><input type=\"submit\" /></form></body></html>");
+                        await context.Response.WriteAsync("<html><head><title>Login page</title></head><body><form method=\"post\">Username: <input type=\"text\" name=\"username\" /><br />Password: <input type=\"password\" name=\"password\" /><br /><br />Remember Me: <input type=\"checkbox\" name=\"rememberme\" /><br /><input type=\"submit\" /></form></body></html>");
                     }
                 });
             });

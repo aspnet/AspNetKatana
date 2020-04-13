@@ -560,7 +560,7 @@ namespace Microsoft.Owin.Security.OAuth
                 Context,
                 Options,
                 validatingContext.ClientContext.ClientId,
-                tokenEndpointRequest.ResourceOwnerPasswordCredentialsGrant.UserName,
+                tokenEndpointRequest.ResourceOwnerPasswordCredentialsGrant.Username,
                 tokenEndpointRequest.ResourceOwnerPasswordCredentialsGrant.Password,
                 tokenEndpointRequest.ResourceOwnerPasswordCredentialsGrant.Scope);
 

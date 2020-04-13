@@ -16,20 +16,20 @@ namespace Microsoft.Owin.Security.OAuth
         /// <param name="context"></param>
         /// <param name="options"></param>
         /// <param name="clientId"></param>
-        /// <param name="userName"></param>
+        /// <param name="username"></param>
         /// <param name="password"></param>
         /// <param name="scope"></param>
         public OAuthGrantResourceOwnerCredentialsContext(
             IOwinContext context,
             OAuthAuthorizationServerOptions options,
             string clientId,
-            string userName,
+            string username,
             string password,
             IList<string> scope)
             : base(context, options, null)
         {
             ClientId = clientId;
-            UserName = userName;
+            Username = username;
             Password = password;
             Scope = scope;
         }
@@ -42,7 +42,7 @@ namespace Microsoft.Owin.Security.OAuth
         /// <summary>
         /// Resource owner username.
         /// </summary>
-        public string UserName { get; private set; }
+        public string Username { get; private set; }
 
         /// <summary>
         /// Resource owner password.

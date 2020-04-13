@@ -118,8 +118,8 @@ namespace Microsoft.Owin.Security.Tests.OAuth
 
             NameValueCollection fragment = transaction1.ParseRedirectFragment();
 
-            string userName = await GetUserName(server, fragment.Get("access_token"));
-            userName.ShouldBe("epsilon");
+            string username = await GetUsername(server, fragment.Get("access_token"));
+            username.ShouldBe("epsilon");
         }
         
         private Task SignInEpsilon(IOwinContext ctx)
@@ -143,7 +143,7 @@ namespace Microsoft.Owin.Security.Tests.OAuth
                 "Bearer");
         }
 
-        private async Task<string> GetUserName(OAuth2TestServer server, string accessToken)
+        private async Task<string> GetUsername(OAuth2TestServer server, string accessToken)
         {
             OAuth2TestServer.Transaction transaction = await server.SendAsync("https://example.com/me",
                 authenticateHeader: new AuthenticationHeaderValue("Bearer", accessToken));
