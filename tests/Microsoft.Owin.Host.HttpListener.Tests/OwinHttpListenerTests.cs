@@ -4,9 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -379,6 +382,88 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 clientDisposed.Set();
 
                 Assert.True(requestCanceled.WaitOne(1000));
+            }
+        }
+
+        [Fact]
+        public void Fixed_Crash_Owin_HttpListener()
+        {
+            // Memo: This testcase always success, but occured `ObjectDisposedException` on test console.
+            
+            var httpServerAddress = HttpServerAddress.ToArray();
+            var ipAddress = Dns.GetHostAddresses(httpServerAddress[1]).First(address => address.AddressFamily == AddressFamily.InterNetwork);
+            httpServerAddress[1] = ipAddress.ToString();
+            
+            OwinHttpListener listener = CreateServer(env =>
+            {
+                var responseStream = env.Get<Stream>("owin.ResponseBody");
+                var responseBytes = Encoding.UTF8.GetBytes("ok");
+                responseStream.Write(responseBytes, 0, responseBytes.Length);
+                return Task.FromResult(0);
+            }, httpServerAddress);
+
+            using (listener)
+            {
+                var rawHttpMessage = new List<string>
+                {
+                    "POST /BaseAddress/ HTTP/1.1",
+                    string.Format("Host: {0}:{1}", ipAddress, HttpServerAddress[2]),
+                    "Content-Type: application/json",
+                    "",
+                    ""
+                };
+
+                var responseMessage = SendPostMessageViaSocket(ipAddress, rawHttpMessage.ToArray());
+                Assert.Contains("<h1>Length Required</h1>", responseMessage);
+                
+                rawHttpMessage.Insert(rawHttpMessage.Count - 2, "Content-Length: 0");
+                responseMessage = SendPostMessageViaSocket(ipAddress, rawHttpMessage.ToArray());
+                Assert.NotNull(responseMessage);
+                Assert.Contains("ok", responseMessage);
+            }
+        }
+
+        private static string SendPostMessageViaSocket(IPAddress ipAddress, string[] rawHttpMessage)
+        {
+            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            {
+                var endpoint = new IPEndPoint(ipAddress, int.Parse(HttpServerAddress[2]));
+                try
+                {
+                    var byteHttpMessage = Encoding.UTF8.GetBytes(string.Join("\r\n", rawHttpMessage));
+                    var beginAsync = socket.BeginConnect(endpoint, null, null);
+                    if (beginAsync.AsyncWaitHandle.WaitOne(3000, false))
+                    {
+                        socket.EndConnect(beginAsync);
+                    }
+                    
+                    var sendAsync = socket.BeginSend(byteHttpMessage, 0, byteHttpMessage.Length, SocketFlags.None, null, null);
+                    if (sendAsync != null && sendAsync.AsyncWaitHandle.WaitOne(3000, false))
+                    {
+                        socket.EndSend(sendAsync);
+                    }
+                    var byteResponse = new byte[socket.ReceiveBufferSize];
+                    var receiveAsync = socket.BeginReceive(byteResponse, 0, byteResponse.Length, SocketFlags.None, null, null);
+                    if (receiveAsync != null && receiveAsync.AsyncWaitHandle.WaitOne(3000, false))
+                    {
+                        var receivedCount = socket.EndReceive(receiveAsync);
+                        return Encoding.UTF8.GetString(byteResponse, 0, receivedCount);
+                    }
+                    
+                    return null;
+                }
+                finally
+                {
+                    if (socket.Connected)
+                    {
+                        var disconnectAsync = socket.BeginDisconnect(false, null, null);
+                        if (disconnectAsync.AsyncWaitHandle.WaitOne(3000, false))
+                        {
+                            socket.EndDisconnect(disconnectAsync);
+                            socket.Close(3000);
+                        }
+                    }
+                }
             }
         }
 

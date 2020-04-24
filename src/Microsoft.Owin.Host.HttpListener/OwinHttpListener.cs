@@ -213,6 +213,12 @@ namespace Microsoft.Owin.Host.HttpListener
                 try
                 {
                     context = await _listener.GetContextAsync();
+                    if (IsEmptyPayloadAndContentLength(context))
+                    {
+                        Interlocked.Decrement(ref _currentOutstandingAccepts);
+                        OffloadStartNextRequest();
+                        continue;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -269,6 +275,23 @@ namespace Microsoft.Owin.Host.HttpListener
                     owinContext.Dispose();
                 }
             }
+        }
+
+        private static bool IsEmptyPayloadAndContentLength(HttpListenerContext context)
+        {
+            var request = context.Request;
+            if ("POST".Equals(request.HttpMethod, StringComparison.InvariantCultureIgnoreCase) ||
+                "PUT".Equals(request.HttpMethod, StringComparison.InvariantCultureIgnoreCase))
+            {
+                var inputStream = request.InputStream;
+                var headers = request.Headers;
+                if (inputStream.Length == 0 && inputStream.ReadByte() == -1 && headers["Content-Length"] == null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void StartNextRequestError(Task faultedTask)
