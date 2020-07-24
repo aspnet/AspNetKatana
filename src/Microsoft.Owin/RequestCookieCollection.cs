@@ -37,8 +37,11 @@ namespace Microsoft.Owin
             get
             {
                 string value;
-                Store.TryGetValue(key, out value);
-                return value;
+                if (Store.TryGetValue(key, out value) || Store.TryGetValue(Uri.EscapeDataString(key), out value))
+                {
+                    return value;
+                }
+                return null;
             }
         }
 

@@ -14,7 +14,7 @@ namespace Microsoft.Owin.Tests
         private static readonly string[] RawValues = new[] { "v1", "v2, v3", "\"v4, b\"", "v5, v6", "v7", };
         private const string JoinedValues = "v1,v2, v3,\"v4, b\",v5, v6,v7";
 
-        private const string OriginalFormsString = "q1=v1&q2=v2,b&q3=v3&q3=v4&q4&q5=v5&q5=v5";
+        private const string OriginalFormsString = "q1=v1&q2=v2,b&q3=v3&q3=v4&q4&q5=v5&q5=v+5";
 
         [Fact]
         public void ParseForm()
@@ -30,7 +30,7 @@ namespace Microsoft.Owin.Tests
             Assert.Equal("v2,b", form.Get("Q2"));
             Assert.Equal("v3,v4", form.Get("q3"));
             Assert.Null(form.Get("q4"));
-            Assert.Equal("v5,v5", form.Get("Q5"));
+            Assert.Equal("v5,v+5", form.Get("Q5"));
             Assert.True(stream.CanRead);
         }
 
@@ -89,7 +89,7 @@ namespace Microsoft.Owin.Tests
             Assert.Equal("v2,b", form.Get("Q2"));
             Assert.Equal("v3,v4", form.Get("q3"));
             Assert.Null(form.Get("q4"));
-            Assert.Equal("v5,v5", form.Get("Q5"));
+            Assert.Equal("v5,v+5", form.Get("Q5"));
         }
 
         [Fact]
@@ -107,14 +107,14 @@ namespace Microsoft.Owin.Tests
             Assert.Equal("v2,b", form.Get("Q2"));
             Assert.Equal("v3,v4", form.Get("q3"));
             Assert.Null(form.Get("q4"));
-            Assert.Equal("v5,v5", form.Get("Q5"));
+            Assert.Equal("v5,v+5", form.Get("Q5"));
 
             form = request.ReadFormAsync().Result;
             Assert.Equal("v1", form.Get("q1"));
             Assert.Equal("v2,b", form.Get("Q2"));
             Assert.Equal("v3,v4", form.Get("q3"));
             Assert.Null(form.Get("q4"));
-            Assert.Equal("v5,v5", form.Get("Q5"));
+            Assert.Equal("v5,v+5", form.Get("Q5"));
         }
     }
 }

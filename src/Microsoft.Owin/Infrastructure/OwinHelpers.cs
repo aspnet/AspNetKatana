@@ -530,13 +530,13 @@ namespace Microsoft.Owin.Infrastructure
             if (request.Get<string>("Microsoft.Owin.Cookies#text") != text)
             {
                 cookies.Clear();
-                ParseDelimited(text, SemicolonAndComma, AddCookieCallback, cookies);
+                ParseDelimited(text, SemicolonAndComma, AddCookieCallback, decodePlus: false, decodeKey: false, state: cookies);
                 request.Set("Microsoft.Owin.Cookies#text", text);
             }
             return cookies;
         }
 
-        internal static void ParseDelimited(string text, char[] delimiters, Action<string, string, object> callback, object state)
+        internal static void ParseDelimited(string text, char[] delimiters, Action<string, string, object> callback, bool decodePlus, bool decodeKey, object state)
         {
             int textLength = text.Length;
             int equalIndex = text.IndexOf('=');
@@ -560,10 +560,17 @@ namespace Microsoft.Owin.Infrastructure
                     }
                     string name = text.Substring(scanIndex, equalIndex - scanIndex);
                     string value = text.Substring(equalIndex + 1, delimiterIndex - equalIndex - 1);
-                    callback(
-                        Uri.UnescapeDataString(name.Replace('+', ' ')),
-                        Uri.UnescapeDataString(value.Replace('+', ' ')),
-                        state);
+                    if (decodePlus)
+                    {
+                        name.Replace('+', ' ');
+                        value.Replace('+', ' ');
+                    }
+                    if (decodeKey)
+                    {
+                        name = Uri.UnescapeDataString(name);
+                    }
+                    value = Uri.UnescapeDataString(value);
+                    callback(name, value, state);
                     equalIndex = text.IndexOf('=', delimiterIndex);
                     if (equalIndex == -1)
                     {
@@ -799,7 +806,7 @@ namespace Microsoft.Owin.Infrastructure
             {
                 query.Clear();
                 var accumulator = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-                ParseDelimited(text, AmpersandAndSemicolon, AppendItemCallback, accumulator);
+                ParseDelimited(text, AmpersandAndSemicolon, AppendItemCallback, decodePlus: true, decodeKey: true, state: accumulator);
                 foreach (var kv in accumulator)
                 {
                     query.Add(kv.Key, kv.Value.ToArray());
@@ -813,7 +820,7 @@ namespace Microsoft.Owin.Infrastructure
         {
             IDictionary<string, string[]> form = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
             var accumulator = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-            ParseDelimited(text, new[] { '&' }, AppendItemCallback, accumulator);
+            ParseDelimited(text, new[] { '&' }, AppendItemCallback, decodePlus: false, decodeKey: true, state: accumulator);
             foreach (var kv in accumulator)
             {
                 form.Add(kv.Key, kv.Value.ToArray());
