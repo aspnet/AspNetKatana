@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ShipVersion>4.1.0</ShipVersion>
-    <ShipStrongNameVersion>4.1.0.0</ShipStrongNameVersion>
-    <ShipFullVersion>4.1.0-rtw-000</ShipFullVersion>
-    <ShipFileVersion>4.1.81112.0</ShipFileVersion>
+    <ShipVersion>4.1.1</ShipVersion>
+    <ShipStrongNameVersion>4.1.1.0</ShipStrongNameVersion>
+    <ShipFullVersion>4.1.1-rtw-000</ShipFullVersion>
+    <ShipFileVersion>4.1.90831.0</ShipFileVersion>
     <MajorVersion>4</MajorVersion>
     <MinorVersion>1</MinorVersion>
-    <PatchVersion>0</PatchVersion>
+    <PatchVersion>1</PatchVersion>
     <BuildQuality>rtw</BuildQuality>
-    <BuildDate>81112</BuildDate>
+    <BuildDate>90831</BuildDate>
     <BranchSuffix></BranchSuffix>
     <Eula>https://raw.githubusercontent.com/aspnet/AspNetKatana/v4.0.1/LICENSE.txt</Eula>
     <ProjectUrl>https://github.com/aspnet/AspNetKatana/</ProjectUrl>
