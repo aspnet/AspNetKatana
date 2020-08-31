@@ -3,7 +3,7 @@ cd %~dp0
 
 IF EXIST .nuget\NuGet.exe goto part2
 echo Downloading latest version of NuGet.exe...
-@powershell -NoProfile -ExecutionPolicy unrestricted -Command "((new-object net.webclient).DownloadFile('https://dist.nuget.org/win-x86-commandline/latest/nuget.exe', '.nuget\NuGet.exe'))"
+@powershell -NoProfile -ExecutionPolicy unrestricted -Command ".\build\downloadnuget.ps1"
 
 :part2
 set EnableNuGetPackageRestore=true
