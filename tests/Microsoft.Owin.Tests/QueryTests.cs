@@ -12,7 +12,7 @@ namespace Microsoft.Owin.Tests
         private static readonly string[] RawValues = new[] { "v1", "v2, v3", "\"v4, b\"", "v5, v6", "v7", };
         private const string JoinedValues = "v1,v2, v3,\"v4, b\",v5, v6,v7";
 
-        private const string OriginalQueryString = "q1=v1;q2=v2,b;q3=v3;q3=v4;q4;q5=v5;q5=v5";
+        private const string OriginalQueryString = "q1=v1;q2=v2,b;q3=v3;q3=v4;q4;q5=v5;q5=v5;q+6=v+6";
 
         [Fact]
         public void ParseQuery()
@@ -28,6 +28,7 @@ namespace Microsoft.Owin.Tests
             Assert.Equal("v3,v4", query.Get("q3"));
             Assert.Null(query.Get("q4"));
             Assert.Equal("v5,v5", query.Get("Q5"));
+            Assert.Equal("v 6", query.Get("Q 6"));
         }
 
         [Fact]

@@ -562,8 +562,8 @@ namespace Microsoft.Owin.Infrastructure
                     string value = text.Substring(equalIndex + 1, delimiterIndex - equalIndex - 1);
                     if (decodePlus)
                     {
-                        name.Replace('+', ' ');
-                        value.Replace('+', ' ');
+                        name = name.Replace('+', ' ');
+                        value = value.Replace('+', ' ');
                     }
                     if (decodeKey)
                     {
