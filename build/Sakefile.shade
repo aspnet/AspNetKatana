@@ -8,7 +8,6 @@ var AZUREAD_VERSION='5.3.0'
 var AZUREAD_SUFFIX=''
 var VERSION='${SHIP.VERSION}'
 var FULL_VERSION='${SHIP.FULL_VERSION}'
-var EULA='https://raw.githubusercontent.com/aspnet/AspNetKatana/v4.0.1/LICENSE.txt'
 var PROJECT_URL='https://github.com/aspnet/AspNetKatana/'
 var TAGS='Microsoft OWIN Katana'
 
@@ -107,7 +106,6 @@ use-standard-goals features='nuget,xunit'
         + "    <BuildQuality>" + SHIP.MILESTONE + "</BuildQuality>" + Environment.NewLine
         + "    <BuildDate>" + BuildDate() + "</BuildDate>" + Environment.NewLine
         + "    <BranchSuffix>" + BranchSuffix() + "</BranchSuffix>" + Environment.NewLine
-        + "    <Eula>" + EULA + "</Eula>" + Environment.NewLine
         + "    <ProjectUrl>" + PROJECT_URL + "</ProjectUrl>" + Environment.NewLine
         + "    <Tags>" + TAGS + "</Tags>" + Environment.NewLine
         + "  </PropertyGroup>" + Environment.NewLine
@@ -275,11 +273,10 @@ var signing='${new List<string>()}'
     var azureAdSuffix='${AZUREAD_SUFFIX}'
     set azureAdSuffix='' if='OFFICIAL_BUILD && RELEASE_BUILD && FINAL_MILESTONE'
 
-    var licenseUrl='${EULA}'
     var projectUrl='${PROJECT_URL}'
     var tags='${TAGS}'
 
-    nuget-pack nuspecFile='${file}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Symbols -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${title};description=${description};licenseUrl=${licenseUrl};projectUrl=${projectUrl};tags=${tags};azureAdVersion=${azureAdVersion};azureAdSuffix=${azureAdSuffix}"'
+    nuget-pack nuspecFile='${file}' outputDir='${TARGET_DIR}' extra='-NoPackageAnalysis -Symbols -Properties "id=${baseName};authors=${AUTHORS};author=${AUTHORS};title=${title};description=${description};projectUrl=${projectUrl};tags=${tags};azureAdVersion=${azureAdVersion};azureAdSuffix=${azureAdSuffix}"'
 
 #nuget-deploy target='deploy' description='Upload NuGet packages to gallery'
   var extra=''
