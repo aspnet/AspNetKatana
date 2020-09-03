@@ -136,13 +136,13 @@ namespace Katana.Sandbox.WebServer
             app.UseOpenIdConnectAuthentication(new Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions()
             {
                 // https://github.com/IdentityServer/IdentityServer4.Demo/blob/master/src/IdentityServer4Demo/Config.cs
-                ClientId = "server.hybrid",
+                ClientId = "hybrid",
                 ClientSecret = "secret", // for code flow
                 Authority = "https://demo.identityserver.io/",
+                RedirectUri = "https://localhost:44318/signin-oidc",
                 /*
                 Authority = Environment.GetEnvironmentVariable("oidc:authority"),
                 ClientId = Environment.GetEnvironmentVariable("oidc:clientid"),
-                RedirectUri = "https://localhost:44318/",
                 ClientSecret = Environment.GetEnvironmentVariable("oidc:clientsecret"),*/
                 // CookieManager = new SystemWebCookieManager(),
                 CookieManager = new SameSiteCookieManager(),
