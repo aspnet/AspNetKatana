@@ -6,7 +6,7 @@
     <authors>$authors$</authors>
     <owners>$authors$</owners>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
-    <licenseUrl>$licenseUrl$</licenseUrl>
+    <license type="expression">Apache-2.0</license>
     <projectUrl>$projectUrl$</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <title>$title$</title>

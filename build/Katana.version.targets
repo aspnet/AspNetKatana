@@ -11,7 +11,6 @@
     <BuildQuality>rtw</BuildQuality>
     <BuildDate>90831</BuildDate>
     <BranchSuffix></BranchSuffix>
-    <Eula>https://raw.githubusercontent.com/aspnet/AspNetKatana/v4.0.1/LICENSE.txt</Eula>
     <ProjectUrl>https://github.com/aspnet/AspNetKatana/</ProjectUrl>
     <Tags>Microsoft OWIN Katana</Tags>
   </PropertyGroup>
