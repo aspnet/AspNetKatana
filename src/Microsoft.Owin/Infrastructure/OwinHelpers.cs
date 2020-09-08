@@ -820,7 +820,7 @@ namespace Microsoft.Owin.Infrastructure
         {
             IDictionary<string, string[]> form = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
             var accumulator = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-            ParseDelimited(text, new[] { '&' }, AppendItemCallback, decodePlus: false, decodeKey: true, state: accumulator);
+            ParseDelimited(text, new[] { '&' }, AppendItemCallback, decodePlus: true, decodeKey: true, state: accumulator);
             foreach (var kv in accumulator)
             {
                 form.Add(kv.Key, kv.Value.ToArray());

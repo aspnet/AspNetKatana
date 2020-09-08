@@ -21,8 +21,11 @@ namespace Microsoft.Owin.Security.Twitter
     {
         private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         private const string StateCookie = "__TwitterState";
+        // https://developer.twitter.com/en/docs/basics/authentication/api-reference/request_token
         private const string RequestTokenEndpoint = "https://api.twitter.com/oauth/request_token";
+        // https://developer.twitter.com/en/docs/basics/authentication/api-reference/authenticate
         private const string AuthenticationEndpoint = "https://api.twitter.com/oauth/authenticate?oauth_token=";
+        // https://developer.twitter.com/en/docs/basics/authentication/api-reference/access_token
         private const string AccessTokenEndpoint = "https://api.twitter.com/oauth/access_token";
 
         private readonly HttpClient _httpClient;
