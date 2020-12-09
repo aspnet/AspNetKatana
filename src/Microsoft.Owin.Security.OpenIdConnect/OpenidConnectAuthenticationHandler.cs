@@ -166,17 +166,12 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     using (HashAlgorithm hash = SHA256.Create())
                     {
                         byte[] bytes = new byte[32];
-
                         randomNumberGenerator.GetBytes(bytes);
-
                         string codeVerifier = TextEncodings.Base64Url.Encode(bytes);
 
-                        // Store this for use during the code redemption. See RunAuthorizationCodeReceivedEventAsync.
+                        // Store this for use during the code redemption.
                         properties.Dictionary.Add(OAuthConstants.CodeVerifierKey, codeVerifier);
-
-                        
                         byte[] challengeBytes = hash.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier));
-
                         string codeChallenge = TextEncodings.Base64Url.Encode(challengeBytes);
 
                         openIdConnectMessage.Parameters.Add(OAuthConstants.CodeChallengeKey, codeChallenge);
