@@ -72,7 +72,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             UseTokenLifetime = true;
             CookieManager = new CookieManager();
             RedeemCode = false;
-            UsePkce = false;
+            UsePkce = true;
         }
 
         /// <summary>
