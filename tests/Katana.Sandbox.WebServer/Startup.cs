@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Katana.Sandbox.WebServer;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.Owin;
 using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Host.SystemWeb;
@@ -135,9 +136,9 @@ namespace Katana.Sandbox.WebServer
 
             app.UseOpenIdConnectAuthentication(new Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions()
             {
-                // https://github.com/IdentityServer/IdentityServer4.Demo/blob/master/src/IdentityServer4Demo/Config.cs
-                ClientId = "hybrid",
-                ClientSecret = "secret", // for code flow
+                // https://github.com/IdentityServer/IdentityServer4.Demo/blob/main/src/IdentityServer4Demo/Config.cs
+                ClientId = "interactive.confidential.short", // client requires pkce
+                ClientSecret = "secret",
                 Authority = "https://demo.identityserver.io/",
                 RedirectUri = "https://localhost:44318/signin-oidc",
                 /*
@@ -146,11 +147,11 @@ namespace Katana.Sandbox.WebServer
                 ClientSecret = Environment.GetEnvironmentVariable("oidc:clientsecret"),*/
                 // CookieManager = new SystemWebCookieManager(),
                 CookieManager = new SameSiteCookieManager(),
-                //ResponseType = "code",
-                //ResponseMode = "query",
-                //SaveTokens = true,
-                //Scope = "openid profile offline_access",
-                //RedeemCode = true,
+                ResponseType = OpenIdConnectResponseType.Code,
+                ResponseMode = OpenIdConnectResponseMode.Query,
+                SaveTokens = true,
+                Scope = "openid profile offline_access",
+                RedeemCode = true,
                 //Notifications = new Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationNotifications
                 //{
                 //    AuthorizationCodeReceived = async n =>
@@ -166,6 +167,7 @@ namespace Katana.Sandbox.WebServer
                 //        n.HandleCodeRedemption(message);
                 //    }
                 //}
+                UsePkce = true,
             });
 
             /*

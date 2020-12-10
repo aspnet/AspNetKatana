@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin.Logging;
+using Microsoft.Owin.Security.DataHandler.Encoder;
 using Microsoft.Owin.Security.Infrastructure;
 using Microsoft.Owin.Security.Notifications;
 
@@ -155,9 +156,30 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     RequestType = OpenIdConnectRequestType.Authentication,
                     Resource = Options.Resource,
                     ResponseType = Options.ResponseType,
-                    Scope = Options.Scope,
-                    State = OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties)),
+                    Scope = Options.Scope
                 };
+
+                // https://tools.ietf.org/html/rfc7636
+                if (Options.UsePkce && Options.ResponseType == OpenIdConnectResponseType.Code)
+                {
+                    using (RandomNumberGenerator randomNumberGenerator = RandomNumberGenerator.Create())
+                    using (HashAlgorithm hash = SHA256.Create())
+                    {
+                        byte[] bytes = new byte[32];
+                        randomNumberGenerator.GetBytes(bytes);
+                        string codeVerifier = TextEncodings.Base64Url.Encode(bytes);
+
+                        // Store this for use during the code redemption.
+                        properties.Dictionary.Add(OAuthConstants.CodeVerifierKey, codeVerifier);
+                        byte[] challengeBytes = hash.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier));
+                        string codeChallenge = TextEncodings.Base64Url.Encode(challengeBytes);
+
+                        openIdConnectMessage.Parameters.Add(OAuthConstants.CodeChallengeKey, codeChallenge);
+                        openIdConnectMessage.Parameters.Add(OAuthConstants.CodeChallengeMethodKey, OAuthConstants.CodeChallengeMethodS256);
+                    }
+                }
+
+                openIdConnectMessage.State = OpenIdConnectAuthenticationDefaults.AuthenticationPropertiesKey + "=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(properties));
 
                 // Omitting the response_mode parameter when it already corresponds to the default
                 // response_mode used for the specified response_type is recommended by the specifications.
@@ -397,6 +419,15 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                         RedirectUri = tokenEndpointRequest.RedirectUri,
                         TokenEndpointRequest = tokenEndpointRequest
                     };
+
+                    // PKCE https://tools.ietf.org/html/rfc7636#section-4.5
+                    string codeVerifier;
+                    if (properties.Dictionary.TryGetValue(OAuthConstants.CodeVerifierKey, out codeVerifier))
+                    {
+                        tokenEndpointRequest.Parameters.Add(OAuthConstants.CodeVerifierKey, codeVerifier);
+                        properties.Dictionary.Remove(OAuthConstants.CodeVerifierKey);
+                    }
+
                     await Options.Notifications.AuthorizationCodeReceived(authorizationCodeReceivedNotification);
                     if (authorizationCodeReceivedNotification.HandledResponse)
                     {

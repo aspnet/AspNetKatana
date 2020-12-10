@@ -47,6 +47,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <para>TokenValidationParameters: new <see cref="TokenValidationParameters"/> with AuthenticationType = authenticationType.</para>
         /// <para>UseTokenLifetime: true.</para>
         /// <para>RedeemCode: false.</para>
+        /// <para>UsePkce: true.</para>
         /// </remarks>
         /// <param name="authenticationType"> will be used to when creating the <see cref="System.Security.Claims.ClaimsIdentity"/> for the AuthenticationType property.</param>
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions.set_Caption(System.String)", Justification = "Not a LOC field")]
@@ -71,6 +72,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             UseTokenLifetime = true;
             CookieManager = new CookieManager();
             RedeemCode = false;
+            UsePkce = true;
         }
 
         /// <summary>
@@ -322,5 +324,15 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// This property is set to <c>false</c> by default.
         /// </summary>
         public bool RedeemCode { get; set; }
+
+        /// <summary>
+        /// Enables or disables the use of the Proof Key for Code Exchange (PKCE) standard.
+        /// This only applies when the <see cref="ResponseType"/> is set to <see cref="OpenIdConnectResponseType.Code"/>.
+        /// See https://tools.ietf.org/html/rfc7636.
+        /// The default value is `true`.
+        /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Pkce",
+        Justification = "Pkce is a valid acronym.")]
+        public bool UsePkce { get; set; }
     }
 }
