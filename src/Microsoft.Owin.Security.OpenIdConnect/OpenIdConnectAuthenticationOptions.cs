@@ -47,7 +47,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <para>TokenValidationParameters: new <see cref="TokenValidationParameters"/> with AuthenticationType = authenticationType.</para>
         /// <para>UseTokenLifetime: true.</para>
         /// <para>RedeemCode: false.</para>
-        /// <para>UsePkce: false.</para>
+        /// <para>UsePkce: true.</para>
         /// </remarks>
         /// <param name="authenticationType"> will be used to when creating the <see cref="System.Security.Claims.ClaimsIdentity"/> for the AuthenticationType property.</param>
         [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Microsoft.Owin.Security.OpenIdConnect.OpenIdConnectAuthenticationOptions.set_Caption(System.String)", Justification = "Not a LOC field")]
