@@ -21,8 +21,8 @@ var TEST_DIR='${Path.Combine(TARGET_DIR, "test")}'
 var SIGN_DIR='${Path.Combine(TARGET_DIR, "sign")}'
 var PACKAGE_DIR='${Path.Combine(TARGET_DIR, "package")}'
 
-var NUGET_GALLERY_SOURCE='https://api.nuget.org/v3/index.json'
-var NUGET_ASPNET_SOURCE='https://dotnet.myget.org/F/katana-dev/api/v3/index.json'
+var NUGET_GALLERY_SOURCE='https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json'
+var NUGET_ASPNET_SOURCE='https://pkgs.dev.azure.com/dnceng/public/_packaging/myget-legacy/nuget/v3/index.json'
 -// var NUGET_AZUREAD_SOURCE='https://www.myget.org/F/azureadwebstacknightly/'
 var NUGET_AZUREAD_SOURCE=''
 
