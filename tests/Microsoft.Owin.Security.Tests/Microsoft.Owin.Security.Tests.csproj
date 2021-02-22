@@ -43,6 +43,12 @@
       <HintPath>..\..\packages\Microsoft.IdentityModel.Logging.5.3.0\lib\net45\Microsoft.IdentityModel.Logging.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.IdentityModel.Protocols, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.IdentityModel.Protocols.5.3.0\lib\net45\Microsoft.IdentityModel.Protocols.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.IdentityModel.Protocols.OpenIdConnect.5.3.0\lib\net45\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.IdentityModel.Tokens.5.3.0\lib\net45\Microsoft.IdentityModel.Tokens.dll</HintPath>
       <Private>True</Private>
@@ -89,6 +95,7 @@
     <Compile Include="Facebook\FacebookMiddlewareTests.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Google\GoogleOAuth2MiddlewareTests.cs" />
+    <Compile Include="OpenIdConnect\OpenIdConnectMiddlewareTests.cs" />
     <Compile Include="MicrosoftAccount\MicrosoftAccountMiddlewareTests.cs" />
     <Compile Include="OAuth\OAuth2AuthorizationCustomGrantTests.cs" />
     <Compile Include="OAuth\OAuth2BearerTokenTests.cs" />
