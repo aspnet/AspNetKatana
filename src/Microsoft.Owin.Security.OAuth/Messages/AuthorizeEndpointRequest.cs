@@ -60,7 +60,7 @@ namespace Microsoft.Owin.Security.OAuth.Messages
         public IList<string> Scope { get; private set; }
 
         /// <summary>
-        /// The "scope" query string parameter of the Authorize request. May be absent if the client does not require state to be 
+        /// The "state" query string parameter of the Authorize request. May be absent if the client does not require state to be 
         /// included when returning to the RedirectUri.
         /// </summary>
         public string State { get; set; }
