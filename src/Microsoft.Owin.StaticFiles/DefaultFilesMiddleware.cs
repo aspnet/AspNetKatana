@@ -70,7 +70,7 @@ namespace Microsoft.Owin.StaticFiles
                     string defaultFile = _options.DefaultFileNames[matchIndex];
                     IFileInfo file;
                     // TryMatchPath will make sure subpath always ends with a "/" by adding it if needed.
-                    if (_options.FileSystem.TryGetFileInfo(subpath + defaultFile, out file))
+                    if (_options.FileSystem.TryGetFileInfo(subpath.Value + defaultFile, out file))
                     {
                         // If the path matches a directory but does not end in a slash, redirect to add the slash.
                         // This prevents relative links from breaking.

@@ -61,6 +61,8 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("", @".\", "/SubFolder/")]
         [InlineData("", @"SubFolder", "/")]
         [InlineData("", @".\SubFolder", "/")]
+        [InlineData("", @"./SubFolder", "/你好/")]
+        [InlineData("", @"./SubFolder", "/你好/世界/")]
         public void FoundDirectoryWithDefaultFile_PathModified(string baseUrl, string baseDir, string requestUrl)
         {
             IAppBuilder builder = new AppBuilder();
