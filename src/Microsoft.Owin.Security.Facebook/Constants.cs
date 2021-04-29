@@ -8,8 +8,8 @@ namespace Microsoft.Owin.Security.Facebook
         public const string DefaultAuthenticationType = "Facebook";
 
         // https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow#login
-        internal const string AuthorizationEndpoint = "https://www.facebook.com/v8.0/dialog/oauth";
-        internal const string TokenEndpoint = "https://graph.facebook.com/v8.0/oauth/access_token";
-        internal const string UserInformationEndpoint = "https://graph.facebook.com/v8.0/me";
+        internal const string AuthorizationEndpoint = "https://www.facebook.com/v10.0/dialog/oauth";
+        internal const string TokenEndpoint = "https://graph.facebook.com/v10.0/oauth/access_token";
+        internal const string UserInformationEndpoint = "https://graph.facebook.com/v10.0/me";
     }
 }
