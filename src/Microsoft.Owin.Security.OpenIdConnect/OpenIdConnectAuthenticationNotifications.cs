@@ -53,7 +53,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         public Func<SecurityTokenReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> SecurityTokenReceived { get; set; }
 
         /// <summary>
-        /// Invoked after the security token has passed validation and a ClaimsIdentity has been generated.
+        /// Invoked after the security token has passed validation and a ClaimsIdentity has been generated. Note there are additional checks after this
+        /// event that validate other aspects of the authentication flow like the nonce.
         /// </summary>
         public Func<SecurityTokenValidatedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> SecurityTokenValidated { get; set; }
 
