@@ -59,7 +59,7 @@ namespace Microsoft.Owin.Security.Tests.Facebook
             var transaction = await SendAsync(server, "http://example.com/challenge");
             transaction.Response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
             var location = transaction.Response.Headers.Location.AbsoluteUri;
-            location.ShouldContain("https://www.facebook.com/v2.8/dialog/oauth");
+            location.ShouldContain("https://www.facebook.com/v10.0/dialog/oauth");
             location.ShouldContain("?response_type=code");
             location.ShouldContain("&client_id=");
             location.ShouldContain("&redirect_uri=");

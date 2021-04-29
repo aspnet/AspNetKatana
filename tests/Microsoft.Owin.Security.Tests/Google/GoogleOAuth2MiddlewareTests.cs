@@ -230,7 +230,7 @@ namespace Microsoft.Owin.Security.Tests.Google
                 {
                     Sender = async req =>
                         {
-                            if (req.RequestUri.AbsoluteUri == "https://www.googleapis.com/oauth2/v4/token")
+                            if (req.RequestUri.AbsoluteUri == "https://oauth2.googleapis.com/token")
                             {
                                 return await ReturnJsonResponse(new
                                 {
@@ -351,7 +351,7 @@ namespace Microsoft.Owin.Security.Tests.Google
                 {
                     Sender = async req =>
                     {
-                        if (req.RequestUri.AbsoluteUri == "https://www.googleapis.com/oauth2/v4/token")
+                        if (req.RequestUri.AbsoluteUri == "https://oauth2.googleapis.com/token")
                         {
                             return await ReturnJsonResponse(new
                             {
