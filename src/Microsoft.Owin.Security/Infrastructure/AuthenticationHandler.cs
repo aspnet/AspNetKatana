@@ -180,7 +180,7 @@ namespace Microsoft.Owin.Security.Infrastructure
         }
 
         /// <summary>
-        /// Override this method to dela with sign-in/sign-out concerns, if an authentication scheme in question
+        /// Override this method to deal with sign-in/sign-out concerns, if an authentication scheme in question
         /// deals with grant/revoke as part of it's request flow. (like setting/deleting cookies)
         /// </summary>
         /// <returns></returns>
