@@ -45,7 +45,7 @@ namespace Microsoft.Owin
         /// <summary>
         /// Gets or sets a value that indicates whether a cookie is accessible by client-side script.
         /// </summary>
-        /// <returns>true if a cookie is accessible by client-side script; otherwise, false.</returns>
+        /// <returns>false if a cookie is accessible by client-side script; otherwise, true.</returns>
         public bool HttpOnly { get; set; }
 
         /// <summary>
