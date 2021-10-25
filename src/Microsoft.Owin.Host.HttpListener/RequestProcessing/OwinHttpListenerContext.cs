@@ -89,7 +89,6 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
 
         private void CancelDisconnectToken()
         {
-            // TODO: LOG
             // Lazy initialized
             if (_cts != null)
             {
