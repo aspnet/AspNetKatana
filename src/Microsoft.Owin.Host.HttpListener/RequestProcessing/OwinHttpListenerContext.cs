@@ -62,22 +62,7 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         {
             if (ex != null)
             {
-                // TODO: LOG
-                // Lazy initialized
-                if (_cts != null)
-                {
-                    try
-                    {
-                        _cts.Cancel();
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                    }
-                    catch (AggregateException)
-                    {
-                        // TODO: LOG
-                    }
-                }
+                CancelDisconnectToken();
             }
 
             End();
@@ -99,7 +84,26 @@ namespace Microsoft.Owin.Host.HttpListener.RequestProcessing
         private static void SetDisconnected(object state)
         {
             var context = (OwinHttpListenerContext)state;
-            context.End(new HttpListenerException(Constants.ErrorConnectionNoLongerValid));
+            context.CancelDisconnectToken();
+        }
+
+        private void CancelDisconnectToken()
+        {
+            // Lazy initialized
+            if (_cts != null)
+            {
+                try
+                {
+                    _cts.Cancel();
+                }
+                catch (ObjectDisposedException)
+                {
+                }
+                catch (AggregateException)
+                {
+                    // TODO: LOG
+                }
+            }
         }
 
         public void Dispose()
