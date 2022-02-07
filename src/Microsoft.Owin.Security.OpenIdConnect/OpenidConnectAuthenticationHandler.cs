@@ -190,11 +190,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     openIdConnectMessage.ResponseMode = Options.ResponseMode;
                 }
 
-                if (Options.ProtocolValidator.RequireNonce)
-                {
-                    AddNonceToMessage(openIdConnectMessage);
-                }
-
                 var notification = new RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(Context, Options)
                 {
                     ProtocolMessage = openIdConnectMessage
@@ -204,6 +199,11 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                 if (!notification.HandledResponse)
                 {
+                    if (Options.ProtocolValidator.RequireNonce)
+                    {
+                        AddNonceToMessage(openIdConnectMessage);
+                    }
+
                     string redirectUri = notification.ProtocolMessage.CreateAuthenticationRequestUrl();
                     if (!Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
                     {
