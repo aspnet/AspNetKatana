@@ -13,8 +13,8 @@ variables:
     value: Release
 
     # used for post-build phases, internal builds only
-  - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-    - group: AspNetKatana-SDLValidation-Params
+  #- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+  #  - group: AspNetKatana-SDLValidation-Params
 
 # CI and PR triggers
 trigger:
