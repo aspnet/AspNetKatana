@@ -24,7 +24,7 @@ trigger:
     - main
     - release/*
     - internal/release/*
-
+ 
 pr:
   autoCancel: false
   branches:
