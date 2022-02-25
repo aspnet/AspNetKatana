@@ -11,7 +11,6 @@
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <LangVersion>Latest</LangVersion>
-
     <IsShipping>true</IsShipping>
   </PropertyGroup>
 
