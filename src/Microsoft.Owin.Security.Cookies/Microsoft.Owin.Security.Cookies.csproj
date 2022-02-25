@@ -47,9 +47,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
-    </Compile>
     <Compile Include="CookieAuthenticationDefaults.cs" />
     <Compile Include="CookieSecureOption.cs" />
     <Compile Include="CookieAuthenticationHandler.cs" />

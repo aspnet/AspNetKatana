@@ -44,9 +44,6 @@
     <DocumentationFile>bin\Release\Microsoft.Owin.Hosting.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
-    </Compile>
     <Compile Include="..\Owin.Loader\Constants.cs">
       <Link>App_Packages\Owin.Loader\Constants.cs</Link>
     </Compile>

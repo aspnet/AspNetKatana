@@ -51,9 +51,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
-    </Compile>
     <Compile Include="LogHelper.cs" />
     <Compile Include="RequestProcessing\CallEnvironment.Generated.cs">
       <DependentUpon>CallEnvironment.Generated.tt</DependentUpon>

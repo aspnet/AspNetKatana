@@ -53,9 +53,6 @@
     <Reference Include="System.Net.Http.WebRequest" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
-    </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="FacebookAuthenticationHandler.cs" />
     <Compile Include="FacebookAuthenticationExtensions.cs" />

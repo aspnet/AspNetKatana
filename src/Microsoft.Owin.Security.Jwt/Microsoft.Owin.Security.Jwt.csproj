@@ -68,9 +68,6 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
-    </Compile>
     <Compile Include="IIssuerSecurityKeyProvider.cs" />
     <Compile Include="JwtBearerAuthenticationExtensions.cs" />
     <Compile Include="JwtBearerAuthenticationOptions.cs" />
