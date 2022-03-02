@@ -14,7 +14,7 @@ namespace FunctionalTests.Facts.Security
         public static void IsRedirectedToCookiesLogin(Uri requestUri, string protectedResourceUri, string message, string queryParameterName = "ReturnUrl")
         {
             Assert.True(requestUri.AbsolutePath.EndsWith("/Auth/CookiesLogin"), message);
-            Assert.Equal<string>(new Uri(protectedResourceUri).AbsolutePath, requestUri.ParseQueryString()[queryParameterName]);
+            Assert.Equal(new Uri(protectedResourceUri).AbsolutePath, requestUri.ParseQueryString()[queryParameterName]);
         }
 
         public static void UseCookiesLoginSetup(this IAppBuilder app)

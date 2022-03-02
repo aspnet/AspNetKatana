@@ -52,7 +52,7 @@ namespace Microsoft.Owin.Testing.Tests
                 IOwinContext context = new OwinContext(env);
 
                 Assert.Equal("1.0", context.Get<string>("owin.Version"));
-                Assert.NotNull(context.Get<CancellationToken>("owin.CallCancelled"));
+                Assert.NotEqual(default, context.Get<CancellationToken>("owin.CallCancelled"));
                 Assert.Equal("HTTP/1.1", context.Request.Protocol);
                 Assert.Equal("GET", context.Request.Method);
                 Assert.Equal("https", context.Request.Scheme);
@@ -257,7 +257,7 @@ namespace Microsoft.Owin.Testing.Tests
             Assert.Equal("TestValue", response.Headers.GetValues("TestHeader").First());
             block.Set();
             AggregateException ex = Assert.Throws<AggregateException>(() => response.Content.ReadAsStringAsync().Result);
-            Assert.True(ex.ToString().Contains("Test Exception"));
+            Assert.Contains("Test Exception", ex.ToString());
         }
     }
 }

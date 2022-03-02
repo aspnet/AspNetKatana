@@ -53,7 +53,7 @@ namespace FunctionalTests.Facts.StaticFiles
         private void DownloadAndCompareFiles(HttpClient httpClient, string fileName, string expectedMimeType)
         {
             var httpContent = httpClient.GetAsync(fileName).Result.Content;
-            Assert.Equal<string>(expectedMimeType, httpContent.Headers.ContentType.MediaType);
+            Assert.Equal(expectedMimeType, httpContent.Headers.ContentType.MediaType);
 
             using (var baselineStream = new FileStream(fileName, FileMode.Open))
             {
@@ -76,7 +76,7 @@ namespace FunctionalTests.Facts.StaticFiles
             }
         }
 
-        public void ContentTypesConfiguration(IAppBuilder app)
+        internal void ContentTypesConfiguration(IAppBuilder app)
         {
             app.UseStaticFiles();
         }
@@ -96,12 +96,12 @@ namespace FunctionalTests.Facts.StaticFiles
                 httpClient.DefaultRequestHeaders.Add("ServeUnknown", "true");
                 response = httpClient.GetAsync("RequirementFiles/ContentTypes/Unknown.Unknown").Result;
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<string>(@"ContentTypes\Unknown.Unknown", response.Content.ReadAsStringAsync().Result);
-                Assert.Equal<string>("unknown/unknown", response.Content.Headers.ContentType.MediaType);
+                Assert.Equal(@"ContentTypes\Unknown.Unknown", response.Content.ReadAsStringAsync().Result);
+                Assert.Equal("unknown/unknown", response.Content.Headers.ContentType.MediaType);
             }
         }
 
-        public void ServeUnknownFileTypesConfiguration(IAppBuilder app)
+        internal void ServeUnknownFileTypesConfiguration(IAppBuilder app)
         {
             var staticFileOptions = new StaticFileOptions();
 
@@ -125,11 +125,11 @@ namespace FunctionalTests.Facts.StaticFiles
                 var httpClient = new HttpClient() { BaseAddress = new Uri(applicationUrl) };
 
                 var response = httpClient.GetAsync(@"RequirementFiles\ContentTypes\Unknown.unknown").Result;
-                Assert.Equal<string>("CustomUnknown", string.Join("", response.Content.Headers.GetValues("Content-Type")));
+                Assert.Equal("CustomUnknown", string.Join("", response.Content.Headers.GetValues("Content-Type")));
             }
         }
 
-        public void CustomMimeTypeConfiguration(IAppBuilder app)
+        internal void CustomMimeTypeConfiguration(IAppBuilder app)
         {
             var options = new StaticFileOptions();
             (options.ContentTypeProvider as FileExtensionContentTypeProvider).Mappings.Add(".Unknown", "CustomUnknown");
@@ -146,14 +146,14 @@ namespace FunctionalTests.Facts.StaticFiles
                 var httpClient = new HttpClient() { BaseAddress = new Uri(applicationUrl) };
 
                 var response = httpClient.GetAsync(@"RequirementFiles\ContentTypes\Unknown.unknown").Result;
-                Assert.Equal<string>("CustomMimeTypeProvider", string.Join("", response.Content.Headers.GetValues("Content-Type")));
+                Assert.Equal("CustomMimeTypeProvider", string.Join("", response.Content.Headers.GetValues("Content-Type")));
 
                 response = httpClient.GetAsync(@"RequirementFiles\ContentTypes\SamplePNG.png").Result;
-                Assert.Equal<string>("Hello", string.Join("", response.Content.Headers.GetValues("Content-Type")));
+                Assert.Equal("Hello", string.Join("", response.Content.Headers.GetValues("Content-Type")));
             }
         }
 
-        public void CustomMimeTypeProviderConfiguration(IAppBuilder app)
+        internal void CustomMimeTypeProviderConfiguration(IAppBuilder app)
         {
             app.UseStaticFiles(new StaticFileOptions() { ContentTypeProvider = new CustomMimeTypeProvider(), ServeUnknownFileTypes = true, DefaultContentType = "Hello" });
         }
@@ -185,16 +185,16 @@ namespace FunctionalTests.Facts.StaticFiles
                 var httpClient = new HttpClient() { BaseAddress = new Uri(applicationUrl) };
 
                 var response = httpClient.GetAsync(@"RequirementFiles\Dir1\Default.html").Result;
-                Assert.Equal<string>("true", string.Join("", response.Headers.GetValues("CallBackInvoked")));
-                Assert.Equal<bool>(true, response.Content.ReadAsStringAsync().Result.Contains(@"Dir1\Default.html"));
+                Assert.Equal("true", string.Join("", response.Headers.GetValues("CallBackInvoked")));
+                Assert.Contains(@"Dir1\Default.html", response.Content.ReadAsStringAsync().Result);
             }
         }
 
-        public void OnPrepareResponseTestConfiguration(IAppBuilder app)
+        internal void OnPrepareResponseTestConfiguration(IAppBuilder app)
         {
             Action<StaticFileResponseContext> onPrepareResponseCallBack = context =>
                 {
-                    Assert.Equal<string>("Default.html", context.File.Name);
+                    Assert.Equal("Default.html", context.File.Name);
                     context.OwinContext.Response.Headers.Add("CallBackInvoked", new string[] { "true" });
                 };
 

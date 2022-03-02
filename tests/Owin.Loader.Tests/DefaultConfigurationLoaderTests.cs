@@ -58,7 +58,10 @@ namespace Owin.Loader.Tests
             }
         }
 
+#pragma warning disable xUnit1013 // Public method should be marked as test
+        // Must be public to be loaded dynamically
         public static void Hello(IAppBuilder builder)
+#pragma warning restore xUnit1013 // Public method should be marked as test
         {
             _helloCalls += 1;
         }

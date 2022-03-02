@@ -200,7 +200,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     {
                         accept(
                             null,
-                            async wsEnv =>
+                            wsEnv =>
                             {
                                 throw new Exception("This wasn't supposed to get called.");
                             });
@@ -216,16 +216,9 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             {
                 using (var client = new ClientWebSocket())
                 {
-                    try
-                    {
-                        Task task = client.ConnectAsync(new Uri(WsClientAddress), CancellationToken.None);
-                        Assert.True(sync.WaitOne(500));
-                        await task;
-                        Assert.Equal(string.Empty, "A WebSocketException was expected.");
-                    }
-                    catch (WebSocketException)
-                    {
-                    }
+                    Task task = client.ConnectAsync(new Uri(WsClientAddress), CancellationToken.None);
+                    Assert.True(sync.WaitOne(500));
+                    await Assert.ThrowsAsync<WebSocketException>(() => task);
                 }
             }
         }
@@ -241,7 +234,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     accept(
                         null,
-                        async wsEnv =>
+                        wsEnv =>
                         {
                             sync.Set();
                             throw new Exception("Application WebSocket error.");
@@ -257,15 +250,8 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 {
                     await client.ConnectAsync(new Uri(WsClientAddress), CancellationToken.None);
 
-                    try
-                    {
-                        Assert.True(sync.WaitOne(500));
-                        await client.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
-                        Assert.Equal(string.Empty, "A WebSocketException was expected.");
-                    }
-                    catch (WebSocketException)
-                    {
-                    }
+                    Assert.True(sync.WaitOne(500));
+                    await Assert.ThrowsAsync<WebSocketException>(() => client.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None));
                 }
             }
         }

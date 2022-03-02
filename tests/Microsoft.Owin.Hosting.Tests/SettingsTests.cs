@@ -16,10 +16,10 @@ namespace Microsoft.Owin.Hosting.Tests
             IDictionary<string, string> settings = SettingsLoader.LoadFromConfig();
             string value;
             Assert.True(settings.TryGetValue("UpperCase", out value));
-            Assert.True(string.Equals("UpperCaseValue", value, StringComparison.Ordinal));
+            Assert.Equal("UpperCaseValue", value, StringComparer.Ordinal);
 
             Assert.True(settings.TryGetValue("uppercase", out value));
-            Assert.True(string.Equals("UpperCaseValue", value, StringComparison.Ordinal));
+            Assert.Equal("UpperCaseValue", value, StringComparer.Ordinal);
         }
 
         [Fact]
@@ -30,10 +30,10 @@ namespace Microsoft.Owin.Hosting.Tests
             IDictionary<string, string> settings = options.Settings;
             string value;
             Assert.True(settings.TryGetValue("UpperCase", out value));
-            Assert.True(string.Equals("UpperCaseValue", value, StringComparison.Ordinal));
+            Assert.Equal("UpperCaseValue", value, StringComparer.Ordinal);
 
             Assert.True(settings.TryGetValue("uppercase", out value));
-            Assert.True(string.Equals("UpperCaseValue", value, StringComparison.Ordinal));
+            Assert.Equal("UpperCaseValue", value, StringComparer.Ordinal);
         }
 
         [Fact]
@@ -42,10 +42,10 @@ namespace Microsoft.Owin.Hosting.Tests
             IDictionary<string, string> settings = SettingsLoader.LoadFromSettingsFile("Settings.txt");
             string value;
             Assert.True(settings.TryGetValue("UpperCase", out value));
-            Assert.True(string.Equals("UpperCaseValue", value, StringComparison.Ordinal));
+            Assert.Equal("UpperCaseValue", value, StringComparer.Ordinal);
 
             Assert.True(settings.TryGetValue("uppercase", out value));
-            Assert.True(string.Equals("UpperCaseValue", value, StringComparison.Ordinal));
+            Assert.Equal("UpperCaseValue", value, StringComparer.Ordinal);
         }
 
         [Fact]
@@ -56,10 +56,10 @@ namespace Microsoft.Owin.Hosting.Tests
             IDictionary<string, string> settings = options.Settings;
             string value;
             Assert.True(settings.TryGetValue("UpperCase", out value));
-            Assert.True(string.Equals("UpperCaseValue", value, StringComparison.Ordinal));
+            Assert.Equal("UpperCaseValue", value, StringComparer.Ordinal);
 
             Assert.True(settings.TryGetValue("uppercase", out value));
-            Assert.True(string.Equals("UpperCaseValue", value, StringComparison.Ordinal));
+            Assert.Equal("UpperCaseValue", value, StringComparer.Ordinal);
         }
     }
 }

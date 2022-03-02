@@ -53,12 +53,12 @@ namespace FunctionalTests.Facts.Security.BearerToken
                 for (int count = 0; count < 5; count++)
                 {
                     response = await httpClient.GetAsync(applicationUrl);
-                    Assert.Equal<string>("Bearer", await response.Content.ReadAsStringAsync());
+                    Assert.Equal("Bearer", await response.Content.ReadAsStringAsync());
                 }
             }
         }
 
-        public void BearerTokenAuthenticationWithProviderConfiguration(IAppBuilder app)
+        internal void BearerTokenAuthenticationWithProviderConfiguration(IAppBuilder app)
         {
             var bearerOptions = new OAuthBearerAuthenticationOptions()
             {

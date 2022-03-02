@@ -23,35 +23,35 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{69D0ABFE
 		build\Sakefile.shade = build\Sakefile.shade
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Hosting.Tests", "tests\Microsoft.Owin.Hosting.Tests\Microsoft.Owin.Hosting.Tests.csproj", "{D74769C3-CC85-440E-BDB8-9B20BFBFDDAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Hosting.Tests", "tests\Microsoft.Owin.Hosting.Tests\Microsoft.Owin.Hosting.Tests.csproj", "{D74769C3-CC85-440E-BDB8-9B20BFBFDDAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener.Tests", "tests\Microsoft.Owin.Host.HttpListener.Tests\Microsoft.Owin.Host.HttpListener.Tests.csproj", "{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Host.HttpListener.Tests", "tests\Microsoft.Owin.Host.HttpListener.Tests\Microsoft.Owin.Host.HttpListener.Tests.csproj", "{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{E80B5DAB-7D94-4E26-8A9E-98E5A887A72A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb", "src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.csproj", "{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Host.SystemWeb", "src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.csproj", "{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener", "src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191911919}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Host.HttpListener", "src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191911919}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb.Tests", "tests\Microsoft.Owin.Host.SystemWeb.Tests\Microsoft.Owin.Host.SystemWeb.Tests.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191919191}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Host.SystemWeb.Tests", "tests\Microsoft.Owin.Host.SystemWeb.Tests\Microsoft.Owin.Host.SystemWeb.Tests.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191919191}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.IntegrationTests", "tests\Microsoft.Owin.Host.IntegrationTests\Microsoft.Owin.Host.IntegrationTests.csproj", "{9F0C72D8-E43F-4F01-9DEB-123412341234}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Host.IntegrationTests", "tests\Microsoft.Owin.Host.IntegrationTests\Microsoft.Owin.Host.IntegrationTests.csproj", "{9F0C72D8-E43F-4F01-9DEB-123412341234}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CertInstaller", "src\Tools\CertificateInstaller\CertInstaller\CertInstaller.csproj", "{558F65BE-E09D-4A9B-9DA8-C0983445726F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CertInstaller", "src\Tools\CertificateInstaller\CertInstaller\CertInstaller.csproj", "{558F65BE-E09D-4A9B-9DA8-C0983445726F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{47488541-F6D1-4385-AE49-7E3C72042521}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.StaticFiles", "src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.csproj", "{F31A42DB-2F57-4DAC-B2BC-106F2D6F3C82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.StaticFiles", "src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.csproj", "{F31A42DB-2F57-4DAC-B2BC-106F2D6F3C82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.StaticFiles.Tests", "tests\Microsoft.Owin.StaticFiles.Tests\Microsoft.Owin.StaticFiles.Tests.csproj", "{473F6EEE-455F-4553-953D-5D0736D62D11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.StaticFiles.Tests", "tests\Microsoft.Owin.StaticFiles.Tests\Microsoft.Owin.StaticFiles.Tests.csproj", "{473F6EEE-455F-4553-953D-5D0736D62D11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Testing", "src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.csproj", "{73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Testing", "src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.csproj", "{73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Diagnostics", "src\Microsoft.Owin.Diagnostics\Microsoft.Owin.Diagnostics.csproj", "{670915F7-F111-42FF-B004-39379A9D5951}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Diagnostics", "src\Microsoft.Owin.Diagnostics\Microsoft.Owin.Diagnostics.csproj", "{670915F7-F111-42FF-B004-39379A9D5951}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.FileSystems", "src\Microsoft.Owin.FileSystems\Microsoft.Owin.FileSystems.csproj", "{63988A9B-FA70-4BBA-8C7E-784145384F7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.FileSystems", "src\Microsoft.Owin.FileSystems\Microsoft.Owin.FileSystems.csproj", "{63988A9B-FA70-4BBA-8C7E-784145384F7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.FileSystems.Tests", "tests\Microsoft.Owin.FileSystems.Tests\Microsoft.Owin.FileSystems.Tests.csproj", "{5737FA14-B873-496B-8141-49D5B273AC3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.FileSystems.Tests", "tests\Microsoft.Owin.FileSystems.Tests\Microsoft.Owin.FileSystems.Tests.csproj", "{5737FA14-B873-496B-8141-49D5B273AC3A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Prerelease", ".Prerelease", "{A7292674-B84F-4D30-9E2D-C4885AF20608}"
 EndProject
@@ -61,33 +61,33 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Development", "Development"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{10A4935F-4C17-44ED-BB00-D044FC7C77B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Cookies", "src\Microsoft.Owin.Security.Cookies\Microsoft.Owin.Security.Cookies.csproj", "{2FB9342F-CA85-4903-8667-45ED64AD25A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Cookies", "src\Microsoft.Owin.Security.Cookies\Microsoft.Owin.Security.Cookies.csproj", "{2FB9342F-CA85-4903-8667-45ED64AD25A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security", "src\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj", "{AAAF8157-1E33-4D6C-8319-3B304D018005}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security", "src\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj", "{AAAF8157-1E33-4D6C-8319-3B304D018005}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Tests", "tests\Microsoft.Owin.Security.Tests\Microsoft.Owin.Security.Tests.csproj", "{E3B9A023-2146-4D9D-A806-1479683078AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Tests", "tests\Microsoft.Owin.Security.Tests\Microsoft.Owin.Security.Tests.csproj", "{E3B9A023-2146-4D9D-A806-1479683078AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Facebook", "src\Microsoft.Owin.Security.Facebook\Microsoft.Owin.Security.Facebook.csproj", "{F6F1D34F-3AF6-41DD-B493-60899F959BBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Facebook", "src\Microsoft.Owin.Security.Facebook\Microsoft.Owin.Security.Facebook.csproj", "{F6F1D34F-3AF6-41DD-B493-60899F959BBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Google", "src\Microsoft.Owin.Security.Google\Microsoft.Owin.Security.Google.csproj", "{1F46BC62-A011-4B63-A5C6-51AEE2EF538D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Google", "src\Microsoft.Owin.Security.Google\Microsoft.Owin.Security.Google.csproj", "{1F46BC62-A011-4B63-A5C6-51AEE2EF538D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.OAuth", "src\Microsoft.Owin.Security.OAuth\Microsoft.Owin.Security.OAuth.csproj", "{F71E48D0-115A-4105-B332-FCCB2139DC23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.OAuth", "src\Microsoft.Owin.Security.OAuth\Microsoft.Owin.Security.OAuth.csproj", "{F71E48D0-115A-4105-B332-FCCB2139DC23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinHost", "src\OwinHost\OwinHost.csproj", "{D56B8357-F044-45DE-85E9-41AA7C84751E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OwinHost", "src\OwinHost\OwinHost.csproj", "{D56B8357-F044-45DE-85E9-41AA7C84751E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinHost.Tests", "tests\OwinHost.Tests\OwinHost.Tests.csproj", "{62ACEFEA-39F8-405E-BC25-0633F1770A4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OwinHost.Tests", "tests\OwinHost.Tests\OwinHost.Tests.csproj", "{62ACEFEA-39F8-405E-BC25-0633F1770A4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin", "src\Microsoft.Owin\Microsoft.Owin.csproj", "{0DB69CAE-B0BC-4688-9467-66B4C1023D3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin", "src\Microsoft.Owin\Microsoft.Owin.csproj", "{0DB69CAE-B0BC-4688-9467-66B4C1023D3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owin.Loader", "src\Owin.Loader\Owin.Loader.csproj", "{DF967ED4-C320-421C-859C-81034EFF615E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Owin.Loader", "src\Owin.Loader\Owin.Loader.csproj", "{DF967ED4-C320-421C-859C-81034EFF615E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Tests", "tests\Microsoft.Owin.Tests\Microsoft.Owin.Tests.csproj", "{0AF835A6-8181-46DB-A17E-C765FA07A5A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Tests", "tests\Microsoft.Owin.Tests\Microsoft.Owin.Tests.csproj", "{0AF835A6-8181-46DB-A17E-C765FA07A5A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owin.Loader.Tests", "tests\Owin.Loader.Tests\Owin.Loader.Tests.csproj", "{13785347-FC73-4D0E-9DCA-300DD87C308E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Owin.Loader.Tests", "tests\Owin.Loader.Tests\Owin.Loader.Tests.csproj", "{13785347-FC73-4D0E-9DCA-300DD87C308E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Twitter", "src\Microsoft.Owin.Security.Twitter\Microsoft.Owin.Security.Twitter.csproj", "{BBB663CB-E6A2-4E23-83C9-9C8F52325F44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Twitter", "src\Microsoft.Owin.Security.Twitter\Microsoft.Owin.Security.Twitter.csproj", "{BBB663CB-E6A2-4E23-83C9-9C8F52325F44}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.MicrosoftAccount", "src\Microsoft.Owin.Security.MicrosoftAccount\Microsoft.Owin.Security.MicrosoftAccount.csproj", "{52F6930F-FBC0-404B-B135-6B6756F5713A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.MicrosoftAccount", "src\Microsoft.Owin.Security.MicrosoftAccount\Microsoft.Owin.Security.MicrosoftAccount.csproj", "{52F6930F-FBC0-404B-B135-6B6756F5713A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microsoft.Owin.SelfHost", "Microsoft.Owin.SelfHost", "{9298DB20-54F3-4078-8F7F-D95B3CFA1312}"
 	ProjectSection(SolutionItems) = preProject
@@ -95,32 +95,32 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microsoft.Owin.SelfHost", "
 		src\Microsoft.Owin.SelfHost\ReadMe.txt = src\Microsoft.Owin.SelfHost\ReadMe.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Hosting", "src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj", "{C225EB2F-E7A7-463F-B058-1705F204978E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Hosting", "src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj", "{C225EB2F-E7A7-463F-B058-1705F204978E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Testing.Tests", "tests\Microsoft.Owin.Testing.Tests\Microsoft.Owin.Testing.Tests.csproj", "{628A8C89-5E59-4747-8D6A-AA22267552ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Testing.Tests", "tests\Microsoft.Owin.Testing.Tests\Microsoft.Owin.Testing.Tests.csproj", "{628A8C89-5E59-4747-8D6A-AA22267552ED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Middleware", "Middleware", "{C5F4B293-90EC-48B8-97FA-CD23C44C9C30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Cors", "src\Microsoft.Owin.Cors\Microsoft.Owin.Cors.csproj", "{CD4593FD-F70C-4485-ACAD-AC69DAD1BBB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Cors", "src\Microsoft.Owin.Cors\Microsoft.Owin.Cors.csproj", "{CD4593FD-F70C-4485-ACAD-AC69DAD1BBB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Cors.Tests", "tests\Microsoft.Owin.Cors.Tests\Microsoft.Owin.Cors.Tests.csproj", "{3DDAC01B-2567-4C0C-88E1-0A716729203E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Cors.Tests", "tests\Microsoft.Owin.Cors.Tests\Microsoft.Owin.Cors.Tests.csproj", "{3DDAC01B-2567-4C0C-88E1-0A716729203E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Jwt", "src\Microsoft.Owin.Security.Jwt\Microsoft.Owin.Security.Jwt.csproj", "{CC7E3A76-37B0-4C3D-B666-62DC34F04ABC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Jwt", "src\Microsoft.Owin.Security.Jwt\Microsoft.Owin.Security.Jwt.csproj", "{CC7E3A76-37B0-4C3D-B666-62DC34F04ABC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.ActiveDirectory", "src\Microsoft.Owin.Security.ActiveDirectory\Microsoft.Owin.Security.ActiveDirectory.csproj", "{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.ActiveDirectory", "src\Microsoft.Owin.Security.ActiveDirectory\Microsoft.Owin.Security.ActiveDirectory.csproj", "{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Nuget", ".Nuget", "{5230439B-C2AD-4A08-8927-526BA3BF9BF6}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.WsFederation", "src\Microsoft.Owin.Security.WsFederation\Microsoft.Owin.Security.WsFederation.csproj", "{23D90C94-647A-416C-9227-9A0779401EBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.WsFederation", "src\Microsoft.Owin.Security.WsFederation\Microsoft.Owin.Security.WsFederation.csproj", "{23D90C94-647A-416C-9227-9A0779401EBC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.OpenIdConnect", "src\Microsoft.Owin.Security.OpenIdConnect\Microsoft.Owin.Security.OpenIdConnect.csproj", "{AA80B4A3-C885-4A7E-AF1A-FC3E89611988}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.OpenIdConnect", "src\Microsoft.Owin.Security.OpenIdConnect\Microsoft.Owin.Security.OpenIdConnect.csproj", "{AA80B4A3-C885-4A7E-AF1A-FC3E89611988}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FunctionalTests", "FunctionalTests", "{DD2E82F1-F3EA-4D1F-B623-9C34440D79D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionalTests", "tests\FunctionalTests\FunctionalTests.csproj", "{4EF3F748-16D0-4112-AE43-AACADB3EF8E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FunctionalTests", "tests\FunctionalTests\FunctionalTests.csproj", "{4EF3F748-16D0-4112-AE43-AACADB3EF8E9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{EFB86EB3-F362-4E30-92DD-5CB9C5084A6D}"
 EndProject

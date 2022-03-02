@@ -9,7 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Owin;
 using Xunit;
-using Xunit.Extensions;
+
+#pragma warning disable xUnit1013 // Public method should be marked as test
 
 namespace Microsoft.Owin.Host.IntegrationTests
 {

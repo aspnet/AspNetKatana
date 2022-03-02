@@ -40,31 +40,31 @@ namespace FunctionalTests.Facts.Security
                 // Valid credentials
                 var validCookieCredentials = new FormUrlEncodedContent(new kvp[] { new kvp("username", "test"), new kvp("password", "test") });
                 response = httpClient.PostAsync(response.RequestMessage.RequestUri, validCookieCredentials).Result;
-                Assert.Equal<string>("OnResponseSignedIn.CustomSecureDataHandler", response.Content.ReadAsStringAsync().Result);
-                Assert.Equal<string>(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
+                Assert.Equal("OnResponseSignedIn.CustomSecureDataHandler", response.Content.ReadAsStringAsync().Result);
+                Assert.Equal(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
                 var cookieBackup = handler.CookieContainer.GetCookies(new Uri(applicationUrl))[".AspNet.Cookies"];
 
                 for (int retryCount = 0; retryCount < 10; retryCount++)
                 {
                     response = httpClient.GetAsync(applicationUrl).Result;
-                    Assert.Equal<string>("CustomSecureDataHandler", response.Content.ReadAsStringAsync().Result);
-                    Assert.Equal<string>(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
+                    Assert.Equal("CustomSecureDataHandler", response.Content.ReadAsStringAsync().Result);
+                    Assert.Equal(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
                 }
 
                 //Logout the client
                 response = httpClient.GetAsync(logoutPath).Result;
                 Assert.True(handler.CookieContainer.Count == 0, "Cookie is not cleared on logout");
-                Assert.Equal<string>("Welcome Home", response.Content.ReadAsStringAsync().Result);
+                Assert.Equal("Welcome Home", response.Content.ReadAsStringAsync().Result);
 
                 //Try login with a corrupt cookie to see that Exception notification is triggered. 
                 handler.CookieContainer.Add(new Cookie("ExceptionTrigger", "true", "/", cookieBackup.Domain));
                 handler.CookieContainer.Add(cookieBackup);
                 response = httpClient.GetAsync(applicationUrl).Result;
-                Assert.Equal<string>("OnException.CustomSecureDataHandler", response.Content.ReadAsStringAsync().Result);
+                Assert.Equal("OnException.CustomSecureDataHandler", response.Content.ReadAsStringAsync().Result);
             }
         }
 
-        public void CustomSecureDataHandlerConfiguration(IAppBuilder app)
+        internal void CustomSecureDataHandlerConfiguration(IAppBuilder app)
         {
             //Override home action to verify something specific.
             app.Map("/Auth/Home", home =>

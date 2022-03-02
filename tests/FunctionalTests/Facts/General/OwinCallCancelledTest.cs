@@ -43,7 +43,7 @@ namespace FunctionalTests.Facts.General
             }
         }
 
-        public void Configuration(IAppBuilder app)
+        internal void Configuration(IAppBuilder app)
         {
             app.Run(context =>
             {

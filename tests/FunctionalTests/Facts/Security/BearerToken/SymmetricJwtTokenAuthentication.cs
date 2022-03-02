@@ -56,12 +56,12 @@ namespace FunctionalTests.Facts.Security.BearerToken
                 for (int count = 0; count < 5; count++)
                 {
                     response = await httpClient.GetAsync(applicationUrl);
-                    Assert.Equal<string>("Bearer", await response.Content.ReadAsStringAsync());
+                    Assert.Equal("Bearer", await response.Content.ReadAsStringAsync());
                 }
             }
         }
 
-        public void SymmetricJwtTokenAuthenticationWithProviderConfiguration(IAppBuilder app)
+        internal void SymmetricJwtTokenAuthenticationWithProviderConfiguration(IAppBuilder app)
         {
             string issuer = "http://katanatesting.com/";
             var signingAlgorithm = new AesManaged();

@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using FakeN.Web;
 
 namespace Microsoft.Owin.Host.SystemWeb.Tests.FakeN
 {

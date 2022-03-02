@@ -22,17 +22,17 @@ namespace FunctionalTests.Facts.MappingMiddleware
                 string applicationUrl = deployer.Deploy(hostType, MappingMiddlewareConfiguration);
 
                 //Anonymous Auth routes test
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "anonymous1"), "Anonymous1");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "anonymous2"), "Anonymous2");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "a"), "/a");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "a/b"), "/a/b");
+                Assert.Equal("Anonymous1", HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "anonymous1"));
+                Assert.Equal("Anonymous2", HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "anonymous2"));
+                Assert.Equal("/a", HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "a"));
+                Assert.Equal("/a/b", HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "a/b"));
 
                 //Default application
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(applicationUrl), "Default");
+                Assert.Equal("Default", HttpClientUtility.GetResponseTextFromUrl(applicationUrl));
             }
         }
 
-        public void MappingMiddlewareConfiguration(IAppBuilder app)
+        internal void MappingMiddlewareConfiguration(IAppBuilder app)
         {
             app.MapWhen(context => { return context.Request.Path.Value.Contains("/anonymous1"); }, appBuilder =>
             {

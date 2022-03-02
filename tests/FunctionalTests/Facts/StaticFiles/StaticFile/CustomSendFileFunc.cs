@@ -25,11 +25,11 @@ namespace FunctionalTests.Facts.StaticFiles
                 var httpClient = new HttpClient() { BaseAddress = new Uri(applicationUrl) };
 
                 var response = httpClient.GetAsync("RequirementFiles/Dir1/Default.html").Result;
-                Assert.Equal<string>("MyCustomSendFileAsync", response.Content.ReadAsStringAsync().Result);
+                Assert.Equal("MyCustomSendFileAsync", response.Content.ReadAsStringAsync().Result);
             }
         }
 
-        public void CustomSendFileFuncConfiguration(IAppBuilder app)
+        internal void CustomSendFileFuncConfiguration(IAppBuilder app)
         {
             app.Use((context, next) =>
                 {

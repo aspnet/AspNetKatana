@@ -10,8 +10,10 @@
 		<Compile Include="..\Owin.Loader\NullLoader.cs" Link="Loader\NullLoader.cs" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Owin" Version="1.0.0" />
 		<InternalsVisibleTo Include="Microsoft.Owin.Host.SystemWeb.Tests" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Owin" Version="1.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj" />

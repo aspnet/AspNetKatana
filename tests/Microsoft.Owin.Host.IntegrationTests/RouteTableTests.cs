@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 using System.Web.Routing;
 using Owin;
 using Shouldly;
-using Xunit.Extensions;
+using Xunit;
 
 namespace Microsoft.Owin.Host.IntegrationTests
 {
     public class RouteTableTests : TestBase
     {
-        public void SimpleOwinRoute(IAppBuilder ignored)
+        internal void SimpleOwinRoute(IAppBuilder ignored)
         {
             RouteTable.Routes.MapOwinRoute("simple", app => app.Run(context => { return context.Response.WriteAsync("Hello world!"); }));
         }
 
-        public void OneSomethingThree(IAppBuilder ignored)
+        internal void OneSomethingThree(IAppBuilder ignored)
         {
             RouteTable.Routes.MapOwinRoute("one/{something}/three", app => app.Run(context =>
             {

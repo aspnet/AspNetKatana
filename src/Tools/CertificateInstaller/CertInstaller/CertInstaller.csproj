@@ -4,6 +4,6 @@
 		<RootNamespace>CertInstaller</RootNamespace>
 		<TargetFramework>net4.5</TargetFramework>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
-		<IsShipping>true</IsShipping>
+		<IsShipping>false</IsShipping>
 	</PropertyGroup>
 </Project>

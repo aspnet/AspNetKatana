@@ -15,7 +15,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
 {
     public class SystemWebCookieManagerTests : TestBase
     {
-        public void CookieManagerEchoCookieApp(IAppBuilder app)
+        internal void CookieManagerEchoCookieApp(IAppBuilder app)
         {
             app.UseErrorPage(new ErrorPageOptions() { ShowExceptionDetails = true });
             app.Run(context =>
@@ -42,7 +42,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
             Assert.Equal(expected, await response.Content.ReadAsStringAsync());
         }
 
-        public void CookieManagerAppendCookieApp(IAppBuilder app)
+        internal void CookieManagerAppendCookieApp(IAppBuilder app)
         {
             app.UseErrorPage(new ErrorPageOptions() { ShowExceptionDetails = true });
             app.Run(context =>
@@ -70,11 +70,11 @@ namespace Microsoft.Owin.Host.IntegrationTests
             Assert.Equal("AppendCookieApp", await response.Content.ReadAsStringAsync());
             IEnumerable<string> values;
             Assert.True(response.Headers.TryGetValues("Set-Cookie", out values));
-            Assert.Equal(1, values.Count());
+            Assert.Single(values);
             Assert.Equal(expected, values.First());
         }
 
-        public void CookieManagerDeleteCookieApp(IAppBuilder app)
+        internal void CookieManagerDeleteCookieApp(IAppBuilder app)
         {
             app.UseErrorPage(new ErrorPageOptions() { ShowExceptionDetails = true });
             app.Run(context =>
@@ -100,7 +100,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
             Assert.Equal("DeleteCookieApp", await response.Content.ReadAsStringAsync());
             IEnumerable<string> values;
             Assert.True(response.Headers.TryGetValues("Set-Cookie", out values));
-            Assert.Equal(1, values.Count());
+            Assert.Single(values);
             Assert.Equal(expected, values.First());
         }
     }

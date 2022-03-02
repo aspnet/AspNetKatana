@@ -21,14 +21,14 @@ namespace FunctionalTests.Facts.SideBySide
                 ((WebDeployer)deployer.Application).Application.Deploy("Default.aspx", File.ReadAllText("RequirementFiles\\Default.aspx"));
 
                 Assert.True(HttpClientUtility.GetResponseTextFromUrl(url + "/Default.aspx").Contains("Asp.net Test page"), "Default.aspx page not returned successfully in SxS mode");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(url + "/Route"), "Route");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(url + "/Route/Test"), "Route");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(url + "/RouteOne"), "RouteOne");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(url + "/RouteOne/Test"), "RouteOne");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(url + "/RouteTwo"), "RouteTwo");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(url + "/RouteTwo/Test"), "RouteTwo");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(url + "/RouteRouteTest"), "RouteRouteTest");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(url + "/RouteRouteTest/Test"), "RouteRouteTest");
+                Assert.Equal("Route", HttpClientUtility.GetResponseTextFromUrl(url + "/Route"));
+                Assert.Equal("Route", HttpClientUtility.GetResponseTextFromUrl(url + "/Route/Test"));
+                Assert.Equal("RouteOne", HttpClientUtility.GetResponseTextFromUrl(url + "/RouteOne"));
+                Assert.Equal("RouteOne", HttpClientUtility.GetResponseTextFromUrl(url + "/RouteOne/Test"));
+                Assert.Equal("RouteTwo", HttpClientUtility.GetResponseTextFromUrl(url + "/RouteTwo"));
+                Assert.Equal("RouteTwo", HttpClientUtility.GetResponseTextFromUrl(url + "/RouteTwo/Test"));
+                Assert.Equal("RouteRouteTest", HttpClientUtility.GetResponseTextFromUrl(url + "/RouteRouteTest"));
+                Assert.Equal("RouteRouteTest", HttpClientUtility.GetResponseTextFromUrl(url + "/RouteRouteTest/Test"));
             }
         }
 
@@ -37,7 +37,7 @@ namespace FunctionalTests.Facts.SideBySide
         /// SignalR or any partner teams should take dependency over this route extension to get the routes working.
         /// </summary>
         /// <param name="app"></param>
-        public void MapOwinRouteConfiguration(IAppBuilder app)
+        internal void MapOwinRouteConfiguration(IAppBuilder app)
         {
             RouteTable.Routes.MapOwinRoute("Route/{*operation}", builder => { builder.Use(typeof(Application), "Route"); });
             RouteTable.Routes.MapOwinRoute("RouteOne/{*operation}", builder => { builder.Use(typeof(Application), "RouteOne"); });

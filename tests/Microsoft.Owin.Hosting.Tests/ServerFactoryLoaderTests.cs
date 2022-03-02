@@ -52,9 +52,9 @@ namespace Microsoft.Owin.Hosting.Tests
         }
 
         [Theory]
-        [InlineData("Microsoft.Owin.Hosting.Tests.OwinServerFactory, Microsoft.Owin.Hosting.Tests, Culture=neutral, PublicKeyToken=null", "Microsoft.Owin.Hosting.Tests.OwinServerFactory")]
-        [InlineData("Microsoft.Owin.Hosting.Tests.StaticServerFactory, Microsoft.Owin.Hosting.Tests, Culture=neutral, PublicKeyToken=null", "Microsoft.Owin.Hosting.Tests.StaticServerFactory")]
-        [InlineData("Microsoft.Owin.Hosting.Tests.InstanceServerFactory, Microsoft.Owin.Hosting.Tests, Culture=neutral, PublicKeyToken=null", "Microsoft.Owin.Hosting.Tests.InstanceServerFactory")]
+        [InlineData("Microsoft.Owin.Hosting.Tests.OwinServerFactory, Microsoft.Owin.Hosting.Tests, Culture=neutral, PublicKeyToken=31bf3856ad364e35", "Microsoft.Owin.Hosting.Tests.OwinServerFactory")]
+        [InlineData("Microsoft.Owin.Hosting.Tests.StaticServerFactory, Microsoft.Owin.Hosting.Tests, Culture=neutral, PublicKeyToken=31bf3856ad364e35", "Microsoft.Owin.Hosting.Tests.StaticServerFactory")]
+        [InlineData("Microsoft.Owin.Hosting.Tests.InstanceServerFactory, Microsoft.Owin.Hosting.Tests, Culture=neutral, PublicKeyToken=31bf3856ad364e35", "Microsoft.Owin.Hosting.Tests.InstanceServerFactory")]
         public void LoadWithAssemblyAndFullTypeName_Success(string data, string expected)
         {
             var loader = new ServerFactoryLoader(new ServerFactoryActivator(ServicesFactory.Create()));

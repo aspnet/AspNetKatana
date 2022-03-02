@@ -64,7 +64,7 @@ namespace FunctionalTests.Facts.Discovery
             }
         }
 
-        public void ValidConfiguration(IAppBuilder app)
+        internal void ValidConfiguration(IAppBuilder app)
         {
         }
     }

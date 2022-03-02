@@ -63,7 +63,7 @@ namespace FunctionalTests.Facts.StaticFiles
             }
         }
 
-        public void IfMatchConfiguration(IAppBuilder app)
+        internal void IfMatchConfiguration(IAppBuilder app)
         {
             app.UseStaticFiles();
         }

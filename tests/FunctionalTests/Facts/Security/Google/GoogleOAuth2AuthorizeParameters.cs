@@ -26,15 +26,15 @@ namespace FunctionalTests.Facts.Security.Google
 
                 // Unauthenticated request - verify Redirect url
                 var response = await httpClient.GetAsync(applicationUrl);
-                Assert.Equal<string>("https://accounts.google.com/o/oauth2/v2/auth", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
+                Assert.Equal("https://accounts.google.com/o/oauth2/v2/auth", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
                 var queryItems = response.Headers.Location.ParseQueryString();
-                Assert.Equal<string>("custom_accessType", queryItems["access_type"]);
-                Assert.Equal<string>("custom_approval_prompt", queryItems["approval_prompt"]);
-                Assert.Equal<string>("custom_login_hint", queryItems["login_hint"]);
+                Assert.Equal("custom_accessType", queryItems["access_type"]);
+                Assert.Equal("custom_approval_prompt", queryItems["approval_prompt"]);
+                Assert.Equal("custom_login_hint", queryItems["login_hint"]);
             }
         }
 
-        public void GoogleOAuth2Configuration(IAppBuilder app)
+        internal void GoogleOAuth2Configuration(IAppBuilder app)
         {
             app.UseAuthSignInCookie();
 

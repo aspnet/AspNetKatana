@@ -91,7 +91,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
 
             Assert.Equal(HttpStatusCode.Moved, response.StatusCode);
             Assert.Equal(requestUrl + "/" + queryString, response.Headers.Location.ToString());
-            Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
+            Assert.Empty(await response.Content.ReadAsByteArrayAsync());
         }
 
         [Theory]
@@ -131,7 +131,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("text/html; charset=utf-8", response.Content.Headers.ContentType.ToString());
             Assert.True(response.Content.Headers.ContentLength == 0);
-            Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
+            Assert.Empty(await response.Content.ReadAsByteArrayAsync());
         }
     }
 }

@@ -27,11 +27,11 @@ namespace FunctionalTests.Facts.StaticFiles.EmbeddedFileSystem
                 var responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl, out response);
                 Assert.True(!string.IsNullOrWhiteSpace(responseText), "Received empty response");
                 Assert.True((response.Content).Headers.ContentType.ToString() == "text/html; charset=utf-8");
-                Assert.True(responseText.Contains("RequirementFiles.EmbeddedResources.SampleAVI.avi"));
+                Assert.Contains("RequirementFiles.EmbeddedResources.SampleAVI.avi", responseText);
             }
         }
 
-        public void EmbeddedDirectoryBrowserFileSystemConfiguration(IAppBuilder app)
+        internal void EmbeddedDirectoryBrowserFileSystemConfiguration(IAppBuilder app)
         {
             app.UseDirectoryBrowser(new DirectoryBrowserOptions() { FileSystem = new EmbeddedResourceFileSystem(Assembly.GetExecutingAssembly().GetName().Name) });
         }

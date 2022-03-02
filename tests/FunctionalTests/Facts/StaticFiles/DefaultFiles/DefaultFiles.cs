@@ -39,17 +39,17 @@ namespace FunctionalTests.Facts.StaticFiles
                 //Directory with a default file - request path ending with a '/'
                 var responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "RequirementFiles/Dir1/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<bool>(true, responseText.Contains(@"Dir1\Default.html"));
+                Assert.Contains(@"Dir1\Default.html", responseText);
 
                 //Directory with a default file - request path not ending with a '/'
                 responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "RequirementFiles/Dir1", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<bool>(true, responseText.Contains(@"Dir1\Default.html"));
+                Assert.Contains(@"Dir1\Default.html", responseText);
 
                 //Directory with a default file - request path ending with a '/' & case sensitivity check
                 responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "reQuirementFiles/dir1/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<bool>(true, responseText.Contains(@"Dir1\Default.html"));
+                Assert.Contains(@"Dir1\Default.html", responseText);
 
                 /*HEAD requests*/
                 //Directory with no default file - request path ending with '/'
@@ -63,17 +63,17 @@ namespace FunctionalTests.Facts.StaticFiles
                 //Directory with a default file - request path ending with a '/'
                 responseText = HttpClientUtility.HeadResponseTextFromUrl(applicationUrl + "RequirementFiles/Dir1/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<string>(string.Empty, responseText);
+                Assert.Equal(string.Empty, responseText);
 
                 //Directory with a default file - request path not ending with a '/'
                 responseText = HttpClientUtility.HeadResponseTextFromUrl(applicationUrl + "RequirementFiles/Dir1", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<string>(string.Empty, responseText);
+                Assert.Equal(string.Empty, responseText);
 
                 //Directory with a default file - request path ending with a '/' & case sensitivity check
                 responseText = HttpClientUtility.HeadResponseTextFromUrl(applicationUrl + "reQuirementFiles/dir1/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<string>(string.Empty, responseText);
+                Assert.Equal(string.Empty, responseText);
 
                 /*POST requests - no file to be served*/
                 //Directory with no default file - request path ending with '/'
@@ -86,7 +86,7 @@ namespace FunctionalTests.Facts.StaticFiles
             }
         }
 
-        public void FolderWithDefaultFileConfiguration(IAppBuilder app)
+        internal void FolderWithDefaultFileConfiguration(IAppBuilder app)
         {
             app.UseDefaultFiles();
             app.UseStaticFiles();
@@ -105,36 +105,36 @@ namespace FunctionalTests.Facts.StaticFiles
                 //Directory with a default file - request path ending with a '/'. A local directory referred by relative path
                 var responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "customrequestPath/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<bool>(true, responseText.Contains(@"Dir1\Default.html"));
+                Assert.Contains(@"Dir1\Default.html", responseText);
 
                 //Directory with a default file - request path ending with a '/' + Head request. A local directory referred by relative path
                 responseText = HttpClientUtility.HeadResponseTextFromUrl(applicationUrl + "customrequestpath/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<string>(string.Empty, responseText);
+                Assert.Equal(string.Empty, responseText);
 
                 //Directory with a default file - request path ending with a '/'. A local directory referred by absolute path
                 responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "customrequestfullPath/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<bool>(true, responseText.Contains(@"Dir2\TextFile2.txt"));
+                Assert.Contains(@"Dir2\TextFile2.txt", responseText);
 
                 //Directory with a default file - request path ending with a '/' + Head request. A local directory referred by absolute path
                 responseText = HttpClientUtility.HeadResponseTextFromUrl(applicationUrl + "customrequestFullPath/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<string>(string.Empty, responseText);
+                Assert.Equal(string.Empty, responseText);
 
                 //Directory with a default file - request path ending with a '/'. Mapped to a UNC path.
                 responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "customrequestuncPath/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<bool>(true, responseText.Contains(@"Dir3\TextFile3.txt"));
+                Assert.Contains(@"Dir3\TextFile3.txt", responseText);
 
                 //Directory with a default file - request path ending with a '/' + Head request. Mapped to a UNC path.
                 responseText = HttpClientUtility.HeadResponseTextFromUrl(applicationUrl + "customrequestUNCPath/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<string>(string.Empty, responseText);
+                Assert.Equal(string.Empty, responseText);
             }
         }
 
-        public void CustomRequestPathToPhysicalPathMappingConfiguration(IAppBuilder app)
+        internal void CustomRequestPathToPhysicalPathMappingConfiguration(IAppBuilder app)
         {
             //Use relative path from root of the application
             app.UseFileServer(new FileServerOptions() { RequestPath = new PathString("/customrequestPath"), FileSystem = new PhysicalFileSystem(@"RequirementFiles\Dir1") });

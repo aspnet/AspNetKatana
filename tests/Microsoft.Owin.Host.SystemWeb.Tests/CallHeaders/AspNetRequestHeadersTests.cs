@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Linq;
-using FakeN.Web;
 using Microsoft.Owin.Host.SystemWeb.CallHeaders;
+using Microsoft.Owin.Host.SystemWeb.Tests.FakeN;
 using Xunit;
 
 namespace Microsoft.Owin.Host.SystemWeb.Tests.CallHeaders
@@ -15,13 +15,11 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.CallHeaders
         {
             var headers = new AspNetRequestHeaders(new FakeHttpRequest());
 
+#pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
             Assert.Equal(0, headers.Count);
             Assert.Equal(0, headers.Count());
-            foreach (var header in headers)
-            {
-                // Should be empty
-                Assert.True(false);
-            }
+#pragma warning restore xUnit2013 // Do not use equality check to check for collection size.
+            Assert.Empty(headers);
         }
 
         [Fact]
@@ -30,7 +28,7 @@ namespace Microsoft.Owin.Host.SystemWeb.Tests.CallHeaders
             var headers = new AspNetRequestHeaders(new FakeHttpRequest());
 
             headers.Add("content-length", new string[] { "a", "0" });
-            Assert.Equal(1, headers.Count);
+            Assert.Single(headers);
             headers.Add("custom", new string[] { "ddfs", "adsfa" });
             Assert.Equal(2, headers.Count);
 

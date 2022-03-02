@@ -30,7 +30,7 @@ namespace FunctionalTests.Facts.MSOwin
             }
         }
 
-        public void ReadFormParametersConfiguration(IAppBuilder app)
+        internal void ReadFormParametersConfiguration(IAppBuilder app)
         {
             app.Use((context, next) =>
             {

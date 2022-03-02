@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Routing;
-using FakeN.Web;
+using Microsoft.Owin.Host.SystemWeb.Tests.FakeN;
 using Shouldly;
 using Xunit;
 

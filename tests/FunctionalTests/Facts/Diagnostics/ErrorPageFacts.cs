@@ -34,7 +34,7 @@ namespace FunctionalTests.Facts.Diagnostics
             }
         }
 
-        public void ErrorPageConfiguration(IAppBuilder app)
+        internal void ErrorPageConfiguration(IAppBuilder app)
         {
             app.UseErrorPage(new ErrorPageOptions()
             {

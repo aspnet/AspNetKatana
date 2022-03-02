@@ -5,7 +5,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Owin;
 using Shouldly;
-using Xunit.Extensions;
+using Xunit;
+
+#pragma warning disable xUnit1013 // Public method should be marked as test
 
 namespace Microsoft.Owin.Host.IntegrationTests
 {

@@ -27,7 +27,7 @@ namespace FunctionalTests.Facts.IntegratedPipeline
             }
         }
 
-        public void DefaultStageMarkersTestConfiguration(IAppBuilder app)
+        internal void DefaultStageMarkersTestConfiguration(IAppBuilder app)
         {
             app.Use((context, next) =>
             {

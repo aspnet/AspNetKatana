@@ -26,7 +26,7 @@ namespace FunctionalTests.Facts.MiddlewarePatterns
             }
         }
 
-        public void Configuration(IAppBuilder app)
+        internal void Configuration(IAppBuilder app)
         {
             app.Use(new MyInstanceMiddleware(), "SUCCESS");
         }

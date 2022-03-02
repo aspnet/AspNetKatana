@@ -29,7 +29,7 @@ namespace FunctionalTests.Facts.StaticFiles
             }
         }
 
-        public void CacheHeadersDefaultConfiguration(IAppBuilder app)
+        internal void CacheHeadersDefaultConfiguration(IAppBuilder app)
         {
             app.UseStaticFiles();
         }

@@ -101,7 +101,7 @@ namespace FunctionalTests.Facts.General
             return responseDictionary;
         }
 
-        public void Configuration(IAppBuilder appBuilder)
+        internal void Configuration(IAppBuilder appBuilder)
         {
             appBuilder.Run(context =>
             {

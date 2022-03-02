@@ -38,7 +38,7 @@ namespace FunctionalTests.Facts.Security
                 var validPersistingCredentials = new FormUrlEncodedContent(new kvp[] { new kvp("username", "test"), new kvp("password", "test"), new kvp("rememberme", "on") });
                 response = httpClient.PostAsync(response.RequestMessage.RequestUri, validPersistingCredentials).Result;
                 response.EnsureSuccessStatusCode();
-                Assert.Equal<string>(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
+                Assert.Equal(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
 
                 //Verify cookie sent
                 Assert.True(handler.CookieContainer.Count == 1, "Did not receive one cookie as expected");
@@ -49,7 +49,7 @@ namespace FunctionalTests.Facts.Security
                 //Logout the client
                 response = httpClient.GetAsync(logoutPath).Result;
                 Assert.True(handler.CookieContainer.Count == 0, "Cookie is not cleared on logout");
-                Assert.Equal<string>(homePath, response.RequestMessage.RequestUri.AbsoluteUri);
+                Assert.Equal(homePath, response.RequestMessage.RequestUri.AbsoluteUri);
 
                 //Try accessing protected resource again. It should get redirected to login page
                 response = httpClient.GetAsync(applicationUrl).Result;
@@ -57,7 +57,7 @@ namespace FunctionalTests.Facts.Security
             }
         }
 
-        public void PersistentCookieConfiguration(IAppBuilder app)
+        internal void PersistentCookieConfiguration(IAppBuilder app)
         {
             app.UseCookieAuthentication(new CookieAuthenticationOptions()
             {

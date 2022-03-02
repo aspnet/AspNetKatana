@@ -45,7 +45,7 @@ namespace FunctionalTests.Facts.General
             }
         }
 
-        public void Configuration(IAppBuilder app)
+        internal void Configuration(IAppBuilder app)
         {
             appDisposingTokenOnHostProperties = app.Properties.Get<CancellationToken>("host.OnAppDisposing");
             appDisposingTokenOnHostProperties.Register(() =>

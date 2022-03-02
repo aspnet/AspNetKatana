@@ -28,16 +28,16 @@ namespace FunctionalTests.Facts.StaticFiles
                 HttpResponseMessage response;
                 var responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl, out response);
 
-                Assert.Equal<string>("text/html", response.Content.Headers.ContentType.MediaType);
+                Assert.Equal("text/html", response.Content.Headers.ContentType.MediaType);
                 for (int index = 0; index < 10; index++)
                 {
                     var fileSystemEntryName = (index % 2 != 0) ? string.Format("TextFile{0}.txt", index) : string.Format("Dir{0}/", index);
-                    Assert.True(responseText.Contains(fileSystemEntryName));
+                    Assert.Contains(fileSystemEntryName, responseText);
                 }
             }
         }
 
-        public void CustomFileSystemConfiguration(IAppBuilder app)
+        internal void CustomFileSystemConfiguration(IAppBuilder app)
         {
             app.UseDirectoryBrowser(new DirectoryBrowserOptions() { FileSystem = new MyFileSystem() });
         }

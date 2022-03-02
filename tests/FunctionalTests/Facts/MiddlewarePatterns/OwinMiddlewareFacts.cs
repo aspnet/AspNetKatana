@@ -24,7 +24,7 @@ namespace FunctionalTests.Facts.MiddlewarePatterns
             }
         }
 
-        public void OwinAbstractMiddlewareConfiguration(IAppBuilder app)
+        internal void OwinAbstractMiddlewareConfiguration(IAppBuilder app)
         {
             app.Use<PassThroughMiddleware>("p1", 2, "p3");
             app.Use(typeof(MyApplication));

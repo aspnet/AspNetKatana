@@ -54,10 +54,10 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Theory]
-        [InlineData("", @".", "/xunit.xml")]
-        [InlineData("", @".", "/Xunit.Xml")]
-        [InlineData("/somedir", @".", "/somedir/xunit.xml")]
-        [InlineData("/SomeDir", @".", "/soMediR/xunit.XmL")]
+        [InlineData("", @".", "/testrootfile.xml")]
+        [InlineData("", @".", "/TestRootFile.Xml")]
+        [InlineData("/somedir", @".", "/somedir/testrootfile.xml")]
+        [InlineData("/SomeDir", @".", "/soMediR/testrootfile.Xml")]
         [InlineData("", @"SubFolder", "/extra.xml")]
         [InlineData("/somedir", @"SubFolder", "/somedir/extra.xml")]
         public async Task FoundFile_Served(string baseUrl, string baseDir, string requestUrl)
@@ -76,10 +76,10 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Theory]
-        [InlineData("", @".", "/xunit.xml")]
-        [InlineData("", @".", "/Xunit.Xml")]
-        [InlineData("/somedir", @".", "/somedir/xunit.xml")]
-        [InlineData("/SomeDir", @".", "/soMediR/xunit.XmL")]
+        [InlineData("", @".", "/testrootfile.xml")]
+        [InlineData("", @".", "/Testrootfile.Xml")]
+        [InlineData("/somedir", @".", "/somedir/testrootfile.xml")]
+        [InlineData("/SomeDir", @".", "/soMediR/testrootfile.XmL")]
         [InlineData("", @"SubFolder", "/extra.xml")]
         [InlineData("/somedir", @"SubFolder", "/somedir/extra.xml")]
         public async Task PostFile_PassesThrough(string baseUrl, string baseDir, string requestUrl)
@@ -94,10 +94,10 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Theory]
-        [InlineData("", @".", "/xunit.xml")]
-        [InlineData("", @".", "/Xunit.Xml")]
-        [InlineData("/somedir", @".", "/somedir/xunit.xml")]
-        [InlineData("/SomeDir", @".", "/soMediR/xunit.XmL")]
+        [InlineData("", @".", "/testrootfile.xml")]
+        [InlineData("", @".", "/Testrootfile.Xml")]
+        [InlineData("/somedir", @".", "/somedir/testrootfile.xml")]
+        [InlineData("/SomeDir", @".", "/soMediR/testrootfile.XmL")]
         [InlineData("", @"SubFolder", "/extra.xml")]
         [InlineData("/somedir", @"SubFolder", "/somedir/extra.xml")]
         public async Task HeadFile_HeadersButNotBodyServed(string baseUrl, string baseDir, string requestUrl)
@@ -112,7 +112,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("text/xml", response.Content.Headers.ContentType.ToString());
             Assert.True(response.Content.Headers.ContentLength > 0);
-            Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
+            Assert.Empty(await response.Content.ReadAsByteArrayAsync());
         }
     }
 }

@@ -8,7 +8,8 @@ using Microsoft.Owin.Extensions;
 using Microsoft.Owin.StaticFiles;
 using Owin;
 using Xunit;
-using Xunit.Extensions;
+
+#pragma warning disable xUnit1013 // Public method should be marked as test
 
 namespace Microsoft.Owin.Host.IntegrationTests
 {

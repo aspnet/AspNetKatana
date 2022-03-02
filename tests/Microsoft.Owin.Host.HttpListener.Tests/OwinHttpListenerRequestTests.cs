@@ -123,7 +123,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     string[] values;
                     Assert.True(requestHeaders.TryGetValue("host", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal("localhost:8080", values[0]);
 
                     return Task.FromResult(0);
@@ -143,7 +143,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
 
                     string[] values;
                     Assert.True(requestHeaders.TryGetValue("If-None-Match", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal("Value1, value2", values[0]);
 
                     return Task.FromResult(0);
@@ -169,19 +169,19 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     string[] values;
 
                     Assert.True(requestHeaders.TryGetValue("host", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal("localhost:8080", values[0]);
 
                     Assert.True(requestHeaders.TryGetValue("Content-length", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal(requestBody.Length.ToString(), values[0]);
 
                     Assert.True(requestHeaders.TryGetValue("exPect", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal("100-continue", values[0]);
 
                     Assert.True(requestHeaders.TryGetValue("Content-Type", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal("text/plain; charset=utf-8", values[0]);
 
                     return Task.FromResult(0);
@@ -206,19 +206,19 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     string[] values;
 
                     Assert.True(requestHeaders.TryGetValue("host", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal("localhost:8080", values[0]);
 
                     Assert.True(requestHeaders.TryGetValue("Transfer-encoding", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal("chunked", values[0]);
 
                     Assert.True(requestHeaders.TryGetValue("exPect", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal("100-continue", values[0]);
 
                     Assert.True(requestHeaders.TryGetValue("Content-Type", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal("text/plain; charset=utf-8", values[0]);
 
                     return Task.FromResult(0);
@@ -241,7 +241,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
 
                     Assert.True(requestHeaders.TryGetValue("Content-length", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal("0", values[0]);
 
                     Assert.NotNull(env.Get<Stream>("owin.RequestBody"));
@@ -265,7 +265,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
 
                     Assert.True(requestHeaders.TryGetValue("Content-length", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal("11", values[0]);
 
                     var requestBody = env.Get<Stream>("owin.RequestBody");
@@ -294,7 +294,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
 
                     Assert.True(requestHeaders.TryGetValue("Transfer-Encoding", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal("chunked", values[0]);
 
                     var requestBody = env.Get<Stream>("owin.RequestBody");
@@ -324,7 +324,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                     var requestHeaders = env.Get<IDictionary<string, string[]>>("owin.RequestHeaders");
 
                     Assert.True(requestHeaders.TryGetValue("Transfer-Encoding", out values));
-                    Assert.Equal(1, values.Length);
+                    Assert.Single(values);
                     Assert.Equal("chunked", values[0]);
 
                     var requestBody = env.Get<Stream>("owin.RequestBody");

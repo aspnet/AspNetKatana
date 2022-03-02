@@ -65,7 +65,7 @@ namespace FunctionalTests.Facts.StaticFiles
             }
         }
 
-        public void IfNoneMatchConfiguration(IAppBuilder app)
+        internal void IfNoneMatchConfiguration(IAppBuilder app)
         {
             app.UseStaticFiles();
         }

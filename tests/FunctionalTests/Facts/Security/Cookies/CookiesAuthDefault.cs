@@ -54,7 +54,7 @@ namespace FunctionalTests.Facts.Security
 
                 // Valid credentials
                 response = httpClient.PostAsync(response.RequestMessage.RequestUri, GetValidCookieCredentials()).Result;
-                Assert.Equal<string>(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
+                Assert.Equal(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
 
                 //Verify cookie sent
                 Assert.False(handler.CookieContainer.Count != 1 ||
@@ -67,8 +67,8 @@ namespace FunctionalTests.Facts.Security
                     Thread.Sleep(2 * 1000);
                     response = httpClient.GetAsync(applicationUrl).Result;
                     response.EnsureSuccessStatusCode();
-                    Assert.Equal<string>("ProtectedResource", response.Content.ReadAsStringAsync().Result);
-                    Assert.Equal<string>(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
+                    Assert.Equal("ProtectedResource", response.Content.ReadAsStringAsync().Result);
+                    Assert.Equal(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
                 }
 
                 //Expire the cookie & verify if request is redirected to login page again
@@ -79,8 +79,8 @@ namespace FunctionalTests.Facts.Security
 
                 //Reauthenticate with valid cookie & verify if protected resource is accessible again
                 response = httpClient.PostAsync(response.RequestMessage.RequestUri, GetValidCookieCredentials()).Result;
-                Assert.Equal<string>("ProtectedResource", response.Content.ReadAsStringAsync().Result);
-                Assert.Equal<string>(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
+                Assert.Equal("ProtectedResource", response.Content.ReadAsStringAsync().Result);
+                Assert.Equal(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
 
                 //Make one successful call
                 response = httpClient.GetAsync(applicationUrl).Result;
@@ -95,13 +95,13 @@ namespace FunctionalTests.Facts.Security
                 //put back the valid cookie & verify protected resource is accessible again
                 handler.CookieContainer.GetCookies(new Uri(applicationUrl))[0].Value = backUpCookieValue;
                 response = httpClient.GetAsync(applicationUrl).Result;
-                Assert.Equal<string>("ProtectedResource", response.Content.ReadAsStringAsync().Result);
-                Assert.Equal<string>(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
+                Assert.Equal("ProtectedResource", response.Content.ReadAsStringAsync().Result);
+                Assert.Equal(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
 
                 //Logout the client
                 response = httpClient.GetAsync(logoutPath).Result;
                 Assert.True(handler.CookieContainer.Count == 0, "Cookie is not cleared on logout");
-                Assert.Equal<string>("Welcome Home", response.Content.ReadAsStringAsync().Result);
+                Assert.Equal("Welcome Home", response.Content.ReadAsStringAsync().Result);
 
                 //Try accessing protected resource again. It should get redirected to login page
                 response = httpClient.GetAsync(applicationUrl).Result;
@@ -109,7 +109,7 @@ namespace FunctionalTests.Facts.Security
             }
         }
 
-        public void CookieAuthDefaultsConfiguration(IAppBuilder app)
+        internal void CookieAuthDefaultsConfiguration(IAppBuilder app)
         {
             app.UseCookieAuthentication(new CookieAuthenticationOptions()
             {
