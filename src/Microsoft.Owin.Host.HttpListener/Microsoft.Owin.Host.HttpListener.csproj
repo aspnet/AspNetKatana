@@ -4,6 +4,7 @@
 		<RootNamespace>Microsoft.Owin.Host.HttpListener</RootNamespace>
 		<TargetFramework>net4.5</TargetFramework>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<description>OWIN server built on the .NET Framework's HttpListener class. Currently the default server used for self-hosting.</description>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Owin" Version="1.0.0" />

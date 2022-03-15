@@ -3,6 +3,7 @@
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.Security.Facebook</RootNamespace>
 		<TargetFramework>net4.5</TargetFramework>
+		<description>Middleware that enables an application to support Facebook's OAuth 2.0 authentication workflow.</description>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="10.0.1" />

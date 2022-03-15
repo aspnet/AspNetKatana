@@ -3,6 +3,7 @@
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.Security.OpenIdConnect</RootNamespace>
 		<TargetFramework>net4.5</TargetFramework>
+		<description>Middleware that enables an application to use OpenIdConnect for authentication.</description>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="5.3.0" />

@@ -3,6 +3,7 @@
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.Hosting</RootNamespace>
 		<TargetFramework>net4.5</TargetFramework>
+		<description>Provides default infrastructure types for hosting and running OWIN-based applications.</description>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Include="..\Owin.Loader\Constants.cs" Link="Loader\Constants.cs" />

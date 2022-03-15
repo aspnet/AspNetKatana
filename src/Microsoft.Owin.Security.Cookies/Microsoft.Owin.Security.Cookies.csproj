@@ -3,6 +3,7 @@
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.Security.Cookies</RootNamespace>
 		<TargetFramework>net4.5</TargetFramework>
+		<description>Middleware that enables an application to use cookie based authentication, similar to ASP.NET's forms authentication.</description>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Owin" Version="1.0.0" />

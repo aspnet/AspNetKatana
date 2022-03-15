@@ -3,6 +3,7 @@
 		<OutputType>Exe</OutputType>
 		<RootNamespace>OwinHost</RootNamespace>
 		<TargetFramework>net4.5</TargetFramework>
+		<description>Provides a stand-alone executable (OwinHost.exe) which can be used to host an OWIN-based application.</description>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Owin" Version="1.0.0" />

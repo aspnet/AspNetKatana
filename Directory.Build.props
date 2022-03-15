@@ -12,6 +12,7 @@
     <DebugSymbols>true</DebugSymbols>
     <LangVersion>Latest</LangVersion>
     <IsShipping>true</IsShipping>
+    <PackageTags>Microsoft OWIN Katana</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(DotNetBuildOffline)' == 'true'">
