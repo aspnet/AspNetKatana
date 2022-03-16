@@ -118,6 +118,7 @@ namespace FunctionalTests.Facts.Security.Facebook
             var option = new FacebookAuthenticationOptions()
             {
                 AppId = "550624398330273",
+                // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
                 AppSecret = "10e56a291d6b618da61b1e0dae3a8954",
                 Provider = new FacebookAuthenticationProvider()
                 {

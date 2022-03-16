@@ -203,6 +203,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
                 https: true);
 
             var handler = new WebRequestHandler();
+            // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
             handler.ClientCertificates.Add(new X509Certificate2(@"SelfSignedClientCert.pfx", "katana"));
             var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);

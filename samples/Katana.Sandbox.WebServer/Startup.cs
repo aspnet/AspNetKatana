@@ -89,8 +89,8 @@ namespace Katana.Sandbox.WebServer
             //// Flow to get user identifier in OpenID for migration to OAuth 2.0
             //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             //{
-            //    ClientId = "448955186993-2vmtajdpl41ipktlg809780c0craq88e.apps.googleusercontent.com",
-            //    ClientSecret = "Ngdb_GRmO3X2pC3WVt73Rod0",
+            //    ClientId = Environment.GetEnvironmentVariable("google:clientid"),
+            //    ClientSecret = Environment.GetEnvironmentVariable("google:clientsecret"),
             //    Provider = new GoogleOAuth2AuthenticationProvider()
             //    {
             //        OnApplyRedirect = context =>

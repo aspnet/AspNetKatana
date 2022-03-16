@@ -117,6 +117,7 @@ namespace FunctionalTests.Facts.Security.Google
             var option = new GoogleOAuth2AuthenticationOptions()
             {
                 ClientId = "581497791735-f9317hcnvcrg9cvl1jfc3tev7teqfump.apps.googleusercontent.com",
+                // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
                 ClientSecret = "51LHrC4QaudgKrOQbkfEtz9P",
                 AccessType = "offline",
                 Provider = new GoogleOAuth2AuthenticationProvider()

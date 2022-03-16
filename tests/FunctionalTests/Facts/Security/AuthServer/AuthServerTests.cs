@@ -314,6 +314,7 @@ namespace FunctionalTests.Facts.Security.AuthServer
                         },
                     OnGrantResourceOwnerCredentials = context =>
                         {
+                            // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
                             if (context.UserName == "user1" && context.Password == "password1")
                             {
                                 var scope = context.Scope;

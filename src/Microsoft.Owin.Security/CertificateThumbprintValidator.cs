@@ -35,7 +35,7 @@ namespace Microsoft.Owin.Security
         }
 
         /// <summary>
-        /// Validates that the certificate thumbprints in the signing chain match at least one whitelisted thumbprint.
+        /// Validates that the certificate thumbprints in the signing chain match at least one allowed thumbprint.
         /// </summary>
         /// <param name="sender">An object that contains state information for this validation.</param>
         /// <param name="certificate">The certificate used to authenticate the remote party.</param>

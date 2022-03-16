@@ -110,7 +110,9 @@ namespace FunctionalTests.Facts.Security.Twitter
 
             app.UseTwitterAuthentication(new TwitterAuthenticationOptions()
                 {
+                    // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
                     ConsumerKey = "sgdtlH5fVziF5rAsivNZA",
+                    // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
                     ConsumerSecret = "lZLT7gEDcBgMrS9lIVzzPUdg61PoJVwfrOlMngaOhg",
                     Provider = new TwitterAuthenticationProvider()
                     {

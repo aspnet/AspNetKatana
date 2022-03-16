@@ -1,0 +1,12 @@
+{
+  "tool": "Credential Scanner",
+  "suppressions": [
+    {
+      "_justification": "Legitimate key/cert used for testing",
+      "file": [
+        "tests/Microsoft.Owin.Host.HttpListener.Tests/HttpsServerTestCertificate.pfx",
+        "tests/Microsoft.Owin.Host.IntegrationTests/SelfSignedClientCert.pfx"
+      ]
+    }
+  ]
+}

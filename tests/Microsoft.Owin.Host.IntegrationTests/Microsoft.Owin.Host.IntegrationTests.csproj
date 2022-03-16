@@ -31,7 +31,6 @@
 		<None Include="web.routetable.config">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Include="packages.config" />
 		<None Include="web.config">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

@@ -129,6 +129,7 @@ namespace FunctionalTests.Facts.Security.MicrosoftAccount
             var option = new MicrosoftAccountAuthenticationOptions()
             {
                 ClientId = "000000004C0F442C",
+                // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
                 ClientSecret = "EkXbW-Vr6Rqzi6pugl1jWIBsDotKLmqR",
                 Provider = new MicrosoftAccountAuthenticationProvider()
                 {
