@@ -4,12 +4,18 @@
 		<RootNamespace>OwinHost</RootNamespace>
 		<TargetFramework>net4.5</TargetFramework>
 		<description>Provides a stand-alone executable (OwinHost.exe) which can be used to host an OWIN-based application.</description>
+		<PackageReadmeFile>ReadMe.md</PackageReadmeFile>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Owin" Version="1.0.0" />
+		<PackageReference Include="Owin" Version="1.0.0">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj" />
 	  <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="Package\**" Pack="true" PackagePath="\" />
 	</ItemGroup>
 </Project>
