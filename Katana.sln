@@ -89,12 +89,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Twi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.MicrosoftAccount", "src\Microsoft.Owin.Security.MicrosoftAccount\Microsoft.Owin.Security.MicrosoftAccount.csproj", "{52F6930F-FBC0-404B-B135-6B6756F5713A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microsoft.Owin.SelfHost", "Microsoft.Owin.SelfHost", "{9298DB20-54F3-4078-8F7F-D95B3CFA1312}"
-	ProjectSection(SolutionItems) = preProject
-		src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.nuspec = src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.nuspec
-		src\Microsoft.Owin.SelfHost\ReadMe.txt = src\Microsoft.Owin.SelfHost\ReadMe.txt
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Hosting", "src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj", "{C225EB2F-E7A7-463F-B058-1705F204978E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Testing.Tests", "tests\Microsoft.Owin.Testing.Tests\Microsoft.Owin.Testing.Tests.csproj", "{628A8C89-5E59-4747-8D6A-AA22267552ED}"
@@ -129,6 +123,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sandbox.WebClient", "samples\Katana.Sandbox.WebClient\Katana.Sandbox.WebClient.csproj", "{3AE67011-EBB1-4ADE-8F42-8E90EB884219}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sandbox.WebServer", "samples\Katana.Sandbox.WebServer\Katana.Sandbox.WebServer.csproj", "{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.SelfHost", "src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.csproj", "{631EE03C-7887-4F03-A01B-AB669560A061}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -289,6 +285,10 @@ Global
 		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{631EE03C-7887-4F03-A01B-AB669560A061}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{631EE03C-7887-4F03-A01B-AB669560A061}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{631EE03C-7887-4F03-A01B-AB669560A061}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{631EE03C-7887-4F03-A01B-AB669560A061}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -322,7 +322,6 @@ Global
 		{13785347-FC73-4D0E-9DCA-300DD87C308E} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 		{BBB663CB-E6A2-4E23-83C9-9C8F52325F44} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{52F6930F-FBC0-404B-B135-6B6756F5713A} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
-		{9298DB20-54F3-4078-8F7F-D95B3CFA1312} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 		{C225EB2F-E7A7-463F-B058-1705F204978E} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 		{628A8C89-5E59-4747-8D6A-AA22267552ED} = {E7D2B8A2-4586-4660-BB84-E46A58CD5F7F}
 		{CD4593FD-F70C-4485-ACAD-AC69DAD1BBB1} = {C5F4B293-90EC-48B8-97FA-CD23C44C9C30}
@@ -335,6 +334,7 @@ Global
 		{9F2F31EF-6017-48CC-88D6-EC4FF4FEAAA5} = {EFB86EB3-F362-4E30-92DD-5CB9C5084A6D}
 		{3AE67011-EBB1-4ADE-8F42-8E90EB884219} = {EFB86EB3-F362-4E30-92DD-5CB9C5084A6D}
 		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A} = {EFB86EB3-F362-4E30-92DD-5CB9C5084A6D}
+		{631EE03C-7887-4F03-A01B-AB669560A061} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {02123D4B-8D21-4C7F-88B5-E1B1834302BB}
