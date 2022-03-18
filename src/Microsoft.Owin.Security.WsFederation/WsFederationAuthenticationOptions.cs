@@ -118,7 +118,7 @@ namespace Microsoft.Owin.Security.WsFederation
         public WsFederationAuthenticationNotifications Notifications { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="SecurityTokenHandlerCollection"/> of <see cref="SecurityTokenHandler"/>s used to read and validate <see cref="SecurityToken"/>s.
+        /// Gets or sets the collection of <see cref="ISecurityTokenValidator"/>s used to read and validate <see cref="SecurityToken"/>s.
         /// </summary>
         [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "By design")]
         [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "By design")]

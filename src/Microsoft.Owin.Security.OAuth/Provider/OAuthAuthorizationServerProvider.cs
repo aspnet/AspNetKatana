@@ -164,14 +164,12 @@ namespace Microsoft.Owin.Security.OAuth
         /// to issue access or refresh tokens. This call may also be used in order to add additional 
         /// response parameters to the authorization endpoint's response.
         /// </summary>
-        /// <param name="context">The context of the event carries information in and results out.</param>
         /// <returns>Task to enable asynchronous execution</returns>
         public Func<OAuthAuthorizationEndpointResponseContext, Task> OnAuthorizationEndpointResponse { get; set; }
 
         /// <summary>
         /// Called before the TokenEndpoint redirects its response to the caller. 
         /// </summary>
-        /// <param name="context"></param>
         /// <returns></returns>
         public Func<OAuthTokenEndpointResponseContext, Task> OnTokenEndpointResponse { get; set; }
 

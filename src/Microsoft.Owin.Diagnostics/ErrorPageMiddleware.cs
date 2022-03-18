@@ -27,9 +27,6 @@ namespace Microsoft.Owin.Diagnostics
         /// <summary>
         /// Initializes a new instance of the <see cref="ErrorPageMiddleware"/> class
         /// </summary>
-        /// <param name="next"></param>
-        /// <param name="options"></param>
-        /// <param name="isDevMode"></param>
         public ErrorPageMiddleware(AppFunc next, ErrorPageOptions options, ILogger logger, bool isDevMode)
         {
             if (next == null)

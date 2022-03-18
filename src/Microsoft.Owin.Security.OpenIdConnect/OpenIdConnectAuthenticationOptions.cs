@@ -42,8 +42,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <para>ProtocolValidator: new <see cref="OpenIdConnectProtocolValidator"/>.</para>
         /// <para>RefreshOnIssuerKeyNotFound: true</para>
         /// <para>ResponseMode: <see cref="OpenIdConnectResponseMode.FormPost"/></para>
-        /// <para>ResponseType: <see cref="OpenIdConnectResponseTypes.CodeIdToken"/></para>
-        /// <para>Scope: <see cref="OpenIdConnectScopes.OpenIdProfile"/>.</para>
+        /// <para>ResponseType: <see cref="OpenIdConnectResponseType.CodeIdToken"/></para>
+        /// <para>Scope: <see cref="OpenIdConnectScope.OpenIdProfile"/>.</para>
         /// <para>TokenValidationParameters: new <see cref="TokenValidationParameters"/> with AuthenticationType = authenticationType.</para>
         /// <para>UseTokenLifetime: true.</para>
         /// <para>RedeemCode: false.</para>
