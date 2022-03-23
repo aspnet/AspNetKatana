@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.Security.OpenIdConnect</RootNamespace>
-		<TargetFramework>net4.5</TargetFramework>
+		<TargetFramework>$(DefaultNetFxTargetFramework)</TargetFramework>
 		<description>Middleware that enables an application to use OpenIdConnect for authentication.</description>
 	</PropertyGroup>
 	<ItemGroup>

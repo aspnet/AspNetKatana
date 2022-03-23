@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>OwinHost</RootNamespace>
-		<TargetFramework>net4.5</TargetFramework>
+		<TargetFramework>$(DefaultNetFxTargetFramework)</TargetFramework>
 		<description>Provides a stand-alone executable (OwinHost.exe) which can be used to host an OWIN-based application.</description>
 		<PackageReadmeFile>ReadMe.md</PackageReadmeFile>
 		<NoWarn>NU5128</NoWarn>

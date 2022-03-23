@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.StaticFiles.Tests</RootNamespace>
-		<TargetFramework>net4.5.2</TargetFramework>
+		<TargetFramework>$(DefaultNetFxTestTargetFramework)</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Shouldly" Version="$(ShouldlyVersion)" />

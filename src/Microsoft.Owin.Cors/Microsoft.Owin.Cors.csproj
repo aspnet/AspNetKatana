@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.Cors</RootNamespace>
-		<TargetFramework>net4.5</TargetFramework>
+		<TargetFramework>$(DefaultNetFxTargetFramework)</TargetFramework>
 		<description>This package contains the components to enable Cross-Origin Resource Sharing (CORS) in OWIN middleware.</description>
 	</PropertyGroup>
 	<ItemGroup>

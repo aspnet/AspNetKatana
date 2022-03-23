@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.Host.HttpListener.Tests</RootNamespace>
-		<TargetFramework>net4.5.2</TargetFramework>
+		<TargetFramework>$(DefaultNetFxTestTargetFramework)</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj" />

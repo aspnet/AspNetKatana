@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin</RootNamespace>
-		<TargetFramework>net4.5</TargetFramework>
+		<TargetFramework>$(DefaultNetFxTargetFramework)</TargetFramework>
 		<description>Provides a set of helper types and abstractions for simplifying the creation of OWIN components.</description>
 	</PropertyGroup>
 	<ItemGroup>

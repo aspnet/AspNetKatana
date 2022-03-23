@@ -13,6 +13,8 @@
     <LangVersion>Latest</LangVersion>
     <IsShipping>true</IsShipping>
     <PackageTags>Microsoft OWIN Katana</PackageTags>
+    <DefaultNetFxTargetFramework>net4.5</DefaultNetFxTargetFramework>
+    <DefaultNetFxTestTargetFramework>net4.5.2</DefaultNetFxTestTargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(DotNetBuildOffline)' == 'true'">

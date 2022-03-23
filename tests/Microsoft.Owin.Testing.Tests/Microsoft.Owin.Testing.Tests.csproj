@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.Testing.Tests</RootNamespace>
-		<TargetFramework>net4.5.2</TargetFramework>
+		<TargetFramework>$(DefaultNetFxTestTargetFramework)</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Microsoft.Owin.Diagnostics\Microsoft.Owin.Diagnostics.csproj" />

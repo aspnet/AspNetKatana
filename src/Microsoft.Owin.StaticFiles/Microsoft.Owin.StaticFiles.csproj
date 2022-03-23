@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.StaticFiles</RootNamespace>
-		<TargetFramework>net4.5</TargetFramework>
+		<TargetFramework>$(DefaultNetFxTargetFramework)</TargetFramework>
 		<description>This package contains OWIN middleware that handle requests for file system resources including files and directories.</description>
 	</PropertyGroup>
 	<ItemGroup>

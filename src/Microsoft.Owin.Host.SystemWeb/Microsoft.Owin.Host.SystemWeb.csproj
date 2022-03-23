@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.Host.SystemWeb</RootNamespace>
-		<TargetFramework>net4.5</TargetFramework>
+		<TargetFramework>$(DefaultNetFxTargetFramework)</TargetFramework>
 		<description>OWIN server that enables OWIN-based applications to run on IIS using the ASP.NET request pipeline.</description>
 	</PropertyGroup>
 	<ItemGroup>

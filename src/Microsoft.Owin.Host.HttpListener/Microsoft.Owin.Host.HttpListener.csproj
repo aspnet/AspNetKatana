@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.Host.HttpListener</RootNamespace>
-		<TargetFramework>net4.5</TargetFramework>
+		<TargetFramework>$(DefaultNetFxTargetFramework)</TargetFramework>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<description>OWIN server built on the .NET Framework's HttpListener class. Currently the default server used for self-hosting.</description>
 	</PropertyGroup>

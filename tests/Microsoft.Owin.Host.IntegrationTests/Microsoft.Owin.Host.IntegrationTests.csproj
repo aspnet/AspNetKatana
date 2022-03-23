@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.Host.IntegrationTests</RootNamespace>
-		<TargetFramework>net4.5.2</TargetFramework>
+		<TargetFramework>$(DefaultNetFxTestTargetFramework)</TargetFramework>
 		<SignAssembly>false</SignAssembly>
 	</PropertyGroup>
 	<ItemGroup>

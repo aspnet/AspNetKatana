@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <RootNamespace>Owin.Loader</RootNamespace>
-    <TargetFramework>net4.5</TargetFramework>
+    <TargetFramework>$(DefaultNetFxTargetFramework)</TargetFramework>
 	<IsShipping>false</IsShipping>
   </PropertyGroup>
   <ItemGroup>
