@@ -6,6 +6,6 @@
 		<description>Provides a set of helper types and abstractions for simplifying the creation of OWIN components.</description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Owin" Version="1.0.0" />
+		<PackageReference Include="Owin" Version="$(OwinVersion)" />
 	</ItemGroup>
 </Project>

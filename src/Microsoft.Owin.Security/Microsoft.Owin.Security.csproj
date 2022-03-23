@@ -6,7 +6,7 @@
 		<description>Common types which are shared by the various authentication middleware components.</description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Owin" Version="1.0.0" />
+		<PackageReference Include="Owin" Version="$(OwinVersion)" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj" />

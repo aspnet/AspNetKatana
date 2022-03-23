@@ -5,8 +5,7 @@
 		<TargetFramework>net4.5.2</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Owin" Version="1.0.0" />
-		<PackageReference Include="Shouldly" Version="1.1.1.1" />
+		<PackageReference Include="Shouldly" Version="$(ShouldlyVersion)" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.csproj" />

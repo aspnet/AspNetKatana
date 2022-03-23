@@ -14,7 +14,7 @@
 		<InternalsVisibleTo Include="Microsoft.Owin.Host.SystemWeb.Tests" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Owin" Version="1.0.0" />
+		<PackageReference Include="Owin" Version="$(OwinVersion)" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj" />

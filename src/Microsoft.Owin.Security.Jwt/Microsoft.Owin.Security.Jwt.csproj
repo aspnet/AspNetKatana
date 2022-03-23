@@ -6,12 +6,12 @@
 		<description>Middleware that enables an application to protect and validate JSON Web Tokens.</description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="5.3.0" />
-		<PackageReference Include="Microsoft.IdentityModel.Logging" Version="5.3.0" />
-		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.3.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
-		<PackageReference Include="Owin" Version="1.0.0" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.3.0" />
+		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="$(IdentityModelVersion)" />
+		<PackageReference Include="Microsoft.IdentityModel.Logging" Version="$(IdentityModelVersion)" />
+		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="$(IdentityModelVersion)" />
+		<PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" />
+		<PackageReference Include="Owin" Version="$(OwinVersion)" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="$(IdentityModelVersion)" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Microsoft.Owin.Security.OAuth\Microsoft.Owin.Security.OAuth.csproj" />

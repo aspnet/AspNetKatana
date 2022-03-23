@@ -6,7 +6,7 @@
 		<description>Provides helper classes for unit testing OWIN components.</description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Owin" Version="1.0.0" />
+		<PackageReference Include="Owin" Version="$(OwinVersion)" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj" />

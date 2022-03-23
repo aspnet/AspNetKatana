@@ -6,7 +6,7 @@
 		<description>This package contains the components to enable Cross-Origin Resource Sharing (CORS) in OWIN middleware.</description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Owin" Version="1.0.0" />
+		<PackageReference Include="Owin" Version="$(OwinVersion)" />
 		<PackageReference Include="Microsoft.AspNet.Cors" Version="5.0.0" />
 	</ItemGroup>
 	<ItemGroup>

@@ -11,9 +11,9 @@
 		<SuppressDependenciesWhenPacking>True</SuppressDependenciesWhenPacking>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Owin" Version="1.0.0">
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
+		<PackageReference Include="Owin" Version="$(OwinVersion)" />
+		<!--Workaround so the package will get added per project rather than per solution.-->
+		<Reference Include="System" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj" />

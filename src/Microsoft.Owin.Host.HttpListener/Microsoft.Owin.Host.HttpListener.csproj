@@ -7,7 +7,7 @@
 		<description>OWIN server built on the .NET Framework's HttpListener class. Currently the default server used for self-hosting.</description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Owin" Version="1.0.0" />
+		<PackageReference Include="Owin" Version="$(OwinVersion)" />
 		<InternalsVisibleTo Include="Microsoft.Owin.Host.HttpListener.Tests" />
 	</ItemGroup>
 	<ItemGroup>

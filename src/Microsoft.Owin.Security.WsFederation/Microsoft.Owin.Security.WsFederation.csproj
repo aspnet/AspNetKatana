@@ -6,16 +6,16 @@
 		<description>Middleware that enables an application to use WsFederation for authentication.</description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="5.3.0" />
-		<PackageReference Include="Microsoft.IdentityModel.Logging" Version="5.3.0" />
-		<PackageReference Include="Microsoft.IdentityModel.Protocols" Version="5.3.0" />
-		<PackageReference Include="Microsoft.IdentityModel.Protocols.WsFederation" Version="5.3.0" />
-		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.3.0" />
-		<PackageReference Include="Microsoft.IdentityModel.Tokens.Saml" Version="5.3.0" />
-		<PackageReference Include="Microsoft.IdentityModel.Xml" Version="5.3.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
-		<PackageReference Include="Owin" Version="1.0.0" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.3.0" />
+		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="$(IdentityModelVersion)" />
+		<PackageReference Include="Microsoft.IdentityModel.Logging" Version="$(IdentityModelVersion)" />
+		<PackageReference Include="Microsoft.IdentityModel.Protocols" Version="$(IdentityModelVersion)" />
+		<PackageReference Include="Microsoft.IdentityModel.Protocols.WsFederation" Version="$(IdentityModelVersion)" />
+		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="$(IdentityModelVersion)" />
+		<PackageReference Include="Microsoft.IdentityModel.Tokens.Saml" Version="$(IdentityModelVersion)" />
+		<PackageReference Include="Microsoft.IdentityModel.Xml" Version="$(IdentityModelVersion)" />
+		<PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" />
+		<PackageReference Include="Owin" Version="$(OwinVersion)" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="$(IdentityModelVersion)" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj" />
