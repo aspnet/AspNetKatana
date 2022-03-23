@@ -5,6 +5,10 @@
 		<TargetFramework>net4.5</TargetFramework>
 		<description>Provides a stand-alone executable (OwinHost.exe) which can be used to host an OWIN-based application.</description>
 		<PackageReadmeFile>ReadMe.md</PackageReadmeFile>
+		<NoWarn>NU5128</NoWarn>
+		<IsTool>true</IsTool>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+		<SuppressDependenciesWhenPacking>True</SuppressDependenciesWhenPacking>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Owin" Version="1.0.0">
@@ -13,9 +17,31 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj" />
+	  <ProjectReference Include="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj" />
 	  <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="Package\**" Pack="true" PackagePath="\" />
 	</ItemGroup>
+
+	<PropertyGroup>
+		<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);GetMyPackageFiles</TargetsForTfmSpecificBuildOutput>
+	</PropertyGroup>
+
+	<Target Name="GetMyPackageFiles">
+		<ItemGroup>
+			<BuildOutputInPackage Include="$(OutputPath)Owin.dll">
+				<TargetPath>..\..\tools\Owin.dll</TargetPath>
+			</BuildOutputInPackage>
+			<BuildOutputInPackage Include="$(OutputPath)Microsoft.Owin.dll">
+				<TargetPath>..\..\tools\Microsoft.Owin.dll</TargetPath>
+			</BuildOutputInPackage>
+			<BuildOutputInPackage Include="$(OutputPath)Microsoft.Owin.Hosting.dll">
+				<TargetPath>..\..\tools\Microsoft.Owin.Hosting.dll</TargetPath>
+			</BuildOutputInPackage>
+			<BuildOutputInPackage Include="$(OutputPath)Microsoft.Owin.Host.HttpListener.dll">
+				<TargetPath>..\..\tools\Microsoft.Owin.Host.HttpListener.dll</TargetPath>
+			</BuildOutputInPackage>
+		</ItemGroup>
+	</Target>
 </Project>
