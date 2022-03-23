@@ -2,25 +2,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Build", ".Build", "{D425FDFA-90FC-4276-8CBD-2850E8D78656}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solution Items", "{D425FDFA-90FC-4276-8CBD-2850E8D78656}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		azure-pipelines.yml = azure-pipelines.yml
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		global.json = global.json
 		LICENSE.txt = LICENSE.txt
+		NuGet.Config = NuGet.Config
 		README.md = README.md
-		Settings.StyleCop = Settings.StyleCop
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{69D0ABFE-1C8A-4CFD-AF3A-D71445AEE6BF}"
-	ProjectSection(SolutionItems) = preProject
-		build\_apply-net45-changes.shade = build\_apply-net45-changes.shade
-		build.cmd = build.cmd
-		build.sh = build.sh
-		build\CodeAnalysis.ruleset = build\CodeAnalysis.ruleset
-		build\Common.targets = build\Common.targets
-		build\CommonAssemblyInfo.cs = build\CommonAssemblyInfo.cs
-		build\CustomDictionary.xml = build\CustomDictionary.xml
-		build\DevAssemblyInfo.cs = build\DevAssemblyInfo.cs
-		build\Katana.version.targets = build\Katana.version.targets
-		build\Sakefile.shade = build\Sakefile.shade
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Hosting.Tests", "tests\Microsoft.Owin.Hosting.Tests\Microsoft.Owin.Hosting.Tests.csproj", "{D74769C3-CC85-440E-BDB8-9B20BFBFDDAE}"
@@ -52,8 +43,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.FileSystems", "src\Microsoft.Owin.FileSystems\Microsoft.Owin.FileSystems.csproj", "{63988A9B-FA70-4BBA-8C7E-784145384F7C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.FileSystems.Tests", "tests\Microsoft.Owin.FileSystems.Tests\Microsoft.Owin.FileSystems.Tests.csproj", "{5737FA14-B873-496B-8141-49D5B273AC3A}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Prerelease", ".Prerelease", "{A7292674-B84F-4D30-9E2D-C4885AF20608}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hosting", "Hosting", "{B9AC3489-752E-4C4E-84E4-1C82227435BA}"
 EndProject
@@ -103,11 +92,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Jwt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.ActiveDirectory", "src\Microsoft.Owin.Security.ActiveDirectory\Microsoft.Owin.Security.ActiveDirectory.csproj", "{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Nuget", ".Nuget", "{5230439B-C2AD-4A08-8927-526BA3BF9BF6}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.WsFederation", "src\Microsoft.Owin.Security.WsFederation\Microsoft.Owin.Security.WsFederation.csproj", "{23D90C94-647A-416C-9227-9A0779401EBC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.OpenIdConnect", "src\Microsoft.Owin.Security.OpenIdConnect\Microsoft.Owin.Security.OpenIdConnect.csproj", "{AA80B4A3-C885-4A7E-AF1A-FC3E89611988}"
@@ -125,6 +109,28 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sandbox.WebServer", "samples\Katana.Sandbox.WebServer\Katana.Sandbox.WebServer.csproj", "{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.SelfHost", "src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.csproj", "{631EE03C-7887-4F03-A01B-AB669560A061}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{B5567E1E-04AC-42D6-BAAC-E795601C157E}"
+	ProjectSection(SolutionItems) = preProject
+		eng\Build.props = eng\Build.props
+		eng\BuildTask.targets = eng\BuildTask.targets
+		eng\common-variables.yml = eng\common-variables.yml
+		eng\configure-toolset.ps1 = eng\configure-toolset.ps1
+		eng\GoalTimePerDefinition.json = eng\GoalTimePerDefinition.json
+		eng\PoliCheckExclusions.xml = eng\PoliCheckExclusions.xml
+		eng\promote-build.yml = eng\promote-build.yml
+		eng\Publishing.props = eng\Publishing.props
+		eng\Signing.props = eng\Signing.props
+		eng\SourceBuild.props = eng\SourceBuild.props
+		eng\SourceBuildPrebuiltBaseline.xml = eng\SourceBuildPrebuiltBaseline.xml
+		eng\TargetFrameworkDefaults.props = eng\TargetFrameworkDefaults.props
+		eng\test-configuration.json = eng\test-configuration.json
+		eng\update-packagesource.cmd = eng\update-packagesource.cmd
+		eng\update-packagesource.ps1 = eng\update-packagesource.ps1
+		eng\validate-sdk.yml = eng\validate-sdk.yml
+		eng\Version.Details.xml = eng\Version.Details.xml
+		eng\Versions.props = eng\Versions.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -294,7 +300,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{69D0ABFE-1C8A-4CFD-AF3A-D71445AEE6BF} = {D425FDFA-90FC-4276-8CBD-2850E8D78656}
 		{D74769C3-CC85-440E-BDB8-9B20BFBFDDAE} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 		{A8FB7DCB-3370-4D2F-B41A-63C89D281A51} = {E80B5DAB-7D94-4E26-8A9E-98E5A887A72A}
 		{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E} = {E80B5DAB-7D94-4E26-8A9E-98E5A887A72A}
@@ -335,6 +340,7 @@ Global
 		{3AE67011-EBB1-4ADE-8F42-8E90EB884219} = {EFB86EB3-F362-4E30-92DD-5CB9C5084A6D}
 		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A} = {EFB86EB3-F362-4E30-92DD-5CB9C5084A6D}
 		{631EE03C-7887-4F03-A01B-AB669560A061} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
+		{B5567E1E-04AC-42D6-BAAC-E795601C157E} = {D425FDFA-90FC-4276-8CBD-2850E8D78656}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {02123D4B-8D21-4C7F-88B5-E1B1834302BB}
