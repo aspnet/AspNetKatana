@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
     <!-- This repo version -->
     <VersionPrefix>4.2.1</VersionPrefix>
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
+    <PreReleaseVersionIteration>1</PreReleaseVersionIteration>
     <!-- Opt-out repo features -->
     <UsingToolXliff>false</UsingToolXliff>
     <!-- Libs -->
@@ -11,10 +11,5 @@
     <ShouldlyVersion>1.1.1.1</ShouldlyVersion>
     <NewtonsoftJsonVersion>10.0.3</NewtonsoftJsonVersion>
     <IdentityModelVersion>5.3.0</IdentityModelVersion>
-    <MicrosoftSourceLinkGitHubVersion>1.2.0-beta-22121-02</MicrosoftSourceLinkGitHubVersion>
-    <MicrosoftSourceLinkAzureReposGitVersion>1.2.0-beta-22121-02</MicrosoftSourceLinkAzureReposGitVersion>
-    <!-- Used to flow Source Link version through Arcade SDK -->
-    <MicrosoftSourceLinkVersion>$(MicrosoftSourceLinkGitHubVersion)</MicrosoftSourceLinkVersion>
-    <MicrosoftTemplateEngineTasksVersion>7.0.100-preview.2.22075.3</MicrosoftTemplateEngineTasksVersion>
   </PropertyGroup>
 </Project>

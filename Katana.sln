@@ -113,21 +113,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{B5567E1E-04AC-42D6-BAAC-E795601C157E}"
 	ProjectSection(SolutionItems) = preProject
 		eng\Build.props = eng\Build.props
-		eng\BuildTask.targets = eng\BuildTask.targets
-		eng\common-variables.yml = eng\common-variables.yml
-		eng\configure-toolset.ps1 = eng\configure-toolset.ps1
-		eng\GoalTimePerDefinition.json = eng\GoalTimePerDefinition.json
-		eng\PoliCheckExclusions.xml = eng\PoliCheckExclusions.xml
-		eng\promote-build.yml = eng\promote-build.yml
 		eng\Publishing.props = eng\Publishing.props
 		eng\Signing.props = eng\Signing.props
-		eng\SourceBuild.props = eng\SourceBuild.props
-		eng\SourceBuildPrebuiltBaseline.xml = eng\SourceBuildPrebuiltBaseline.xml
-		eng\TargetFrameworkDefaults.props = eng\TargetFrameworkDefaults.props
-		eng\test-configuration.json = eng\test-configuration.json
-		eng\update-packagesource.cmd = eng\update-packagesource.cmd
-		eng\update-packagesource.ps1 = eng\update-packagesource.ps1
-		eng\validate-sdk.yml = eng\validate-sdk.yml
 		eng\Version.Details.xml = eng\Version.Details.xml
 		eng\Versions.props = eng\Versions.props
 	EndProjectSection
