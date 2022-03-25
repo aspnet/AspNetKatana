@@ -66,7 +66,7 @@ namespace FunctionalTests.Facts.General
             }
         }
 
-        public void WebsocketBasicConfiguration(IAppBuilder app)
+        internal void WebsocketBasicConfiguration(IAppBuilder app)
         {
             app.Run(async context =>
                 {

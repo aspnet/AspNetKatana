@@ -55,24 +55,24 @@ namespace FunctionalTests.Facts.Security.AuthServer
                     //Happy path - response_type:code
                     requestUri = AuthZ.CreateAuthZUri(applicationUrl, "code", "123", Client_Redirect_Uri, "scope1", "validstate");
                     landingUri = httpClient.GetAsync(requestUri).Result.RequestMessage.RequestUri;
-                    Assert.Equal<string>(Client_Redirect_Uri, landingUri.GetLeftPart(UriPartial.Path));
+                    Assert.Equal(Client_Redirect_Uri, landingUri.GetLeftPart(UriPartial.Path));
                     Assert.NotNull(landingUri.ParseQueryString()["code"]);
-                    Assert.Equal<string>("validstate", landingUri.ParseQueryString()["state"]);
+                    Assert.Equal("validstate", landingUri.ParseQueryString()["state"]);
 
                     //Happy path - response_type:token
                     requestUri = AuthZ.CreateAuthZUri(applicationUrl, "token", "123", Client_Redirect_Uri, "scope1", "validstate");
                     landingUri = httpClient.GetAsync(requestUri).Result.RequestMessage.RequestUri;
                     landingUri = new Uri(landingUri.AbsoluteUri.Replace('#', '?'));
-                    Assert.Equal<string>(Client_Redirect_Uri, landingUri.GetLeftPart(UriPartial.Path));
+                    Assert.Equal(Client_Redirect_Uri, landingUri.GetLeftPart(UriPartial.Path));
                     Assert.NotNull(landingUri.ParseQueryString()["access_token"]);
                     Assert.NotNull(landingUri.ParseQueryString()["expires_in"]);
-                    Assert.Equal<string>("bearer", landingUri.ParseQueryString()["token_type"]);
-                    Assert.Equal<string>("validstate", landingUri.ParseQueryString()["state"]);
+                    Assert.Equal("bearer", landingUri.ParseQueryString()["token_type"]);
+                    Assert.Equal("validstate", landingUri.ParseQueryString()["state"]);
 
                     //Invalid redirect URI - pass error to application
                     requestUri = AuthZ.CreateAuthZUri(applicationUrl, "code", "123", "invalid_uri_passonerror", "scope1", "validstate");
                     httpResponseMessage = httpClient.GetAsync(requestUri).Result;
-                    Assert.Equal<string>("error: invalid_request\r\n", httpResponseMessage.Content.ReadAsStringAsync().Result);
+                    Assert.Equal("error: invalid_request\r\n", httpResponseMessage.Content.ReadAsStringAsync().Result);
                     Assert.True(httpResponseMessage.RequestMessage.RequestUri.GetLeftPart(UriPartial.Authority).StartsWith(applicationUri.GetLeftPart(UriPartial.Authority)), "Should not be redirected on invalid redirect_uri");
 
                     //Invalid redirect URI - Display error by middleware
@@ -91,23 +91,23 @@ namespace FunctionalTests.Facts.Security.AuthServer
                     requestUri = AuthZ.CreateAuthZUri(applicationUrl, "code", "123", Client_Redirect_Uri, "scope1", "invalidstate");
                     httpResponseMessage = httpClient.GetAsync(requestUri).Result;
                     landingUri = httpResponseMessage.RequestMessage.RequestUri;
-                    Assert.Equal<string>(Client_Redirect_Uri, landingUri.GetLeftPart(UriPartial.Path));
-                    Assert.Equal<string>("state.invalid", landingUri.ParseQueryString()["error"]);
-                    Assert.Equal<string>("state.invaliddescription", landingUri.ParseQueryString()["error_description"]);
-                    Assert.Equal<string>("state.invaliduri", landingUri.ParseQueryString()["error_uri"]);
+                    Assert.Equal(Client_Redirect_Uri, landingUri.GetLeftPart(UriPartial.Path));
+                    Assert.Equal("state.invalid", landingUri.ParseQueryString()["error"]);
+                    Assert.Equal("state.invaliddescription", landingUri.ParseQueryString()["error_description"]);
+                    Assert.Equal("state.invaliduri", landingUri.ParseQueryString()["error_uri"]);
                     Assert.True(httpResponseMessage.Content.ReadAsStringAsync().Result.StartsWith("error=state.invalid&error_description=state.invaliddescription&error_uri=state.invaliduri"), "Did not receive an error when provider did not set Validated");
 
                     //Missing response_type
                     requestUri = AuthZ.CreateAuthZUri(applicationUrl, null, "123", Client_Redirect_Uri, "scope1", "validstate");
                     httpResponseMessage = httpClient.GetAsync(requestUri).Result;
-                    Assert.Equal<string>(Client_Redirect_Uri, httpResponseMessage.RequestMessage.RequestUri.GetLeftPart(UriPartial.Path));
-                    Assert.Equal<string>("invalid_request", httpResponseMessage.RequestMessage.RequestUri.ParseQueryString()["error"]);
+                    Assert.Equal(Client_Redirect_Uri, httpResponseMessage.RequestMessage.RequestUri.GetLeftPart(UriPartial.Path));
+                    Assert.Equal("invalid_request", httpResponseMessage.RequestMessage.RequestUri.ParseQueryString()["error"]);
 
                     //Unsupported response_type
                     requestUri = AuthZ.CreateAuthZUri(applicationUrl, "invalid_response_type", "123", Client_Redirect_Uri, "scope1", "validstate");
                     httpResponseMessage = httpClient.GetAsync(requestUri).Result;
-                    Assert.Equal<string>(Client_Redirect_Uri, httpResponseMessage.RequestMessage.RequestUri.GetLeftPart(UriPartial.Path));
-                    Assert.Equal<string>("unsupported_response_type", httpResponseMessage.RequestMessage.RequestUri.ParseQueryString()["error"]);
+                    Assert.Equal(Client_Redirect_Uri, httpResponseMessage.RequestMessage.RequestUri.GetLeftPart(UriPartial.Path));
+                    Assert.Equal("unsupported_response_type", httpResponseMessage.RequestMessage.RequestUri.ParseQueryString()["error"]);
 
                     //Missing client_id
                     requestUri = AuthZ.CreateAuthZUri(applicationUrl, "token", null, Client_Redirect_Uri, "scope1", "validstate");
@@ -118,59 +118,59 @@ namespace FunctionalTests.Facts.Security.AuthServer
                     //Missing state - Should succeed
                     requestUri = AuthZ.CreateAuthZUri(applicationUrl, "code", "123", Client_Redirect_Uri, "scope1", null);
                     landingUri = httpClient.GetAsync(requestUri).Result.RequestMessage.RequestUri;
-                    Assert.Equal<string>(Client_Redirect_Uri, landingUri.GetLeftPart(UriPartial.Path));
+                    Assert.Equal(Client_Redirect_Uri, landingUri.GetLeftPart(UriPartial.Path));
                     Assert.NotNull(landingUri.ParseQueryString()["code"]);
-                    Assert.Equal<bool>(false, landingUri.ParseQueryString().ContainsKey("state"));
+                    Assert.False(landingUri.ParseQueryString().ContainsKey("state"));
 
                     //Token endpoint tests
                     //Invalid client (client_id, client_secret) - As form parameters
                     var formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "invalid") });
                     var responseMessage = httpClient.PostAsync(tokenEndpointUri, formContent).Result.Content.ReadAsStringAsync().Result;
                     var jToken = JToken.Parse(responseMessage);
-                    Assert.Equal<string>("invalid_client", jToken.SelectToken("error").Value<string>());
+                    Assert.Equal("invalid_client", jToken.SelectToken("error").Value<string>());
 
                     //Invalid client (client_id, client_secret) - As Basic auth headers
                     responseMessage = basicClient.GetAsync(tokenEndpointUri).Result.Content.ReadAsStringAsync().Result;
                     jToken = JToken.Parse(responseMessage);
-                    Assert.Equal<string>("invalid_client", jToken.SelectToken("error").Value<string>());
+                    Assert.Equal("invalid_client", jToken.SelectToken("error").Value<string>());
 
                     //grant_type=authorization_code - invalid code being sent
                     formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "secret123"), new kvp("grant_type", "authorization_code"), new kvp("code", "InvalidCode"), new kvp("redirect_uri", Client_Redirect_Uri) });
                     responseMessage = httpClient.PostAsync(tokenEndpointUri, formContent).Result.Content.ReadAsStringAsync().Result;
                     jToken = JToken.Parse(responseMessage);
-                    Assert.Equal<string>("invalid_grant", jToken.SelectToken("error").Value<string>());
+                    Assert.Equal("invalid_grant", jToken.SelectToken("error").Value<string>());
 
                     //grant_type=authorization_code - Full scenario
                     requestUri = AuthZ.CreateAuthZUri(applicationUrl, "code", "123", Client_Redirect_Uri, "scope1", "validstate");
                     landingUri = httpClient.GetAsync(requestUri).Result.RequestMessage.RequestUri;
-                    Assert.Equal<string>(Client_Redirect_Uri, landingUri.GetLeftPart(UriPartial.Path));
+                    Assert.Equal(Client_Redirect_Uri, landingUri.GetLeftPart(UriPartial.Path));
                     Assert.NotNull(landingUri.ParseQueryString()["code"]);
-                    Assert.Equal<string>("validstate", landingUri.ParseQueryString()["state"]);
+                    Assert.Equal("validstate", landingUri.ParseQueryString()["state"]);
                     formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "secret123"), new kvp("grant_type", "authorization_code"), new kvp("code", landingUri.ParseQueryString()["code"]), new kvp("redirect_uri", Client_Redirect_Uri) });
                     responseMessage = httpClient.PostAsync(tokenEndpointUri, formContent).Result.Content.ReadAsStringAsync().Result;
                     jToken = JToken.Parse(responseMessage);
                     Assert.NotNull(jToken.SelectToken("access_token").Value<string>());
-                    Assert.Equal<string>("bearer", jToken.SelectToken("token_type").Value<string>());
+                    Assert.Equal("bearer", jToken.SelectToken("token_type").Value<string>());
                     Assert.NotNull(jToken.SelectToken("expires_in").Value<string>());
-                    Assert.Equal<string>("value1", jToken.SelectToken("param1").Value<string>());
-                    Assert.Equal<string>("value2", jToken.SelectToken("param2").Value<string>());
+                    Assert.Equal("value1", jToken.SelectToken("param1").Value<string>());
+                    Assert.Equal("value2", jToken.SelectToken("param2").Value<string>());
                     Assert.NotNull(jToken.SelectToken("refresh_token").Value<string>());
 
                     //grant_type=password -- Resource owner credentials -- Invalid credentials
                     formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "secret123"), new kvp("grant_type", "password"), new kvp("username", "user1"), new kvp("password", "invalid"), new kvp("scope", "scope1 scope2 scope3") });
                     responseMessage = httpClient.PostAsync(tokenEndpointUri, formContent).Result.Content.ReadAsStringAsync().Result;
                     jToken = JToken.Parse(responseMessage);
-                    Assert.Equal<string>("invalid_grant", jToken.SelectToken("error").Value<string>());
+                    Assert.Equal("invalid_grant", jToken.SelectToken("error").Value<string>());
 
                     //grant_type=password -- Resource owner credentials
                     formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "secret123"), new kvp("grant_type", "password"), new kvp("username", "user1"), new kvp("password", "password1"), new kvp("scope", "scope1 scope2 scope3") });
                     responseMessage = httpClient.PostAsync(tokenEndpointUri, formContent).Result.Content.ReadAsStringAsync().Result;
                     jToken = JToken.Parse(responseMessage);
                     Assert.NotNull(jToken.SelectToken("access_token").Value<string>());
-                    Assert.Equal<string>("bearer", jToken.SelectToken("token_type").Value<string>());
+                    Assert.Equal("bearer", jToken.SelectToken("token_type").Value<string>());
                     Assert.NotNull(jToken.SelectToken("expires_in").Value<string>());
-                    Assert.Equal<string>("value1", jToken.SelectToken("param1").Value<string>());
-                    Assert.Equal<string>("value2", jToken.SelectToken("param2").Value<string>());
+                    Assert.Equal("value1", jToken.SelectToken("param1").Value<string>());
+                    Assert.Equal("value2", jToken.SelectToken("param2").Value<string>());
                     Assert.NotNull(jToken.SelectToken("refresh_token").Value<string>());
 
                     //grant_type=refresh_token -- Use the refresh token issued on the previous call
@@ -178,10 +178,10 @@ namespace FunctionalTests.Facts.Security.AuthServer
                     responseMessage = httpClient.PostAsync(tokenEndpointUri, formContent).Result.Content.ReadAsStringAsync().Result;
                     jToken = JToken.Parse(responseMessage);
                     Assert.NotNull(jToken.SelectToken("access_token").Value<string>());
-                    Assert.Equal<string>("bearer", jToken.SelectToken("token_type").Value<string>());
+                    Assert.Equal("bearer", jToken.SelectToken("token_type").Value<string>());
                     Assert.NotNull(jToken.SelectToken("expires_in").Value<string>());
-                    Assert.Equal<string>("value1", jToken.SelectToken("param1").Value<string>());
-                    Assert.Equal<string>("value2", jToken.SelectToken("param2").Value<string>());
+                    Assert.Equal("value1", jToken.SelectToken("param1").Value<string>());
+                    Assert.Equal("value2", jToken.SelectToken("param2").Value<string>());
                     Assert.NotNull(jToken.SelectToken("refresh_token").Value<string>());
 
                     //grant_type=client_credentials - Bug# https://github.com/Katana/katana/issues/562
@@ -189,10 +189,10 @@ namespace FunctionalTests.Facts.Security.AuthServer
                     responseMessage = httpClient.PostAsync(tokenEndpointUri, formContent).Result.Content.ReadAsStringAsync().Result;
                     jToken = JToken.Parse(responseMessage);
                     Assert.NotNull(jToken.SelectToken("access_token").Value<string>());
-                    Assert.Equal<string>("bearer", jToken.SelectToken("token_type").Value<string>());
+                    Assert.Equal("bearer", jToken.SelectToken("token_type").Value<string>());
                     Assert.NotNull(jToken.SelectToken("expires_in").Value<string>());
-                    Assert.Equal<string>("value1", jToken.SelectToken("param1").Value<string>());
-                    Assert.Equal<string>("value2", jToken.SelectToken("param2").Value<string>());
+                    Assert.Equal("value1", jToken.SelectToken("param1").Value<string>());
+                    Assert.Equal("value2", jToken.SelectToken("param2").Value<string>());
                 }
                 finally
                 {
@@ -205,7 +205,7 @@ namespace FunctionalTests.Facts.Security.AuthServer
             }
         }
 
-        public void AuthServerHappyPathConfiguration(IAppBuilder app)
+        internal void AuthServerHappyPathConfiguration(IAppBuilder app)
         {
             app.UseErrorPage();
             app.UseOAuthAuthorizationServer(new OAuthAuthorizationServerOptions
@@ -314,6 +314,7 @@ namespace FunctionalTests.Facts.Security.AuthServer
                         },
                     OnGrantResourceOwnerCredentials = context =>
                         {
+                            // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
                             if (context.UserName == "user1" && context.Password == "password1")
                             {
                                 var scope = context.Scope;

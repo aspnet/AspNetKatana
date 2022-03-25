@@ -40,13 +40,13 @@ namespace FunctionalTests.Facts.Security.Federation
 
                 //Verify if the request is redirected to STS with right parameters
                 var response = httpClient.GetAsync(applicationUrl).Result;
-                Assert.Equal<string>("https://login.windows.net/4afbc689-805b-48cf-a24c-d4aa3248a248/wsfed", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
+                Assert.Equal("https://login.windows.net/4afbc689-805b-48cf-a24c-d4aa3248a248/wsfed", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
                 var queryItems = response.Headers.Location.ParseQueryString();
-                Assert.Equal<string>("http://Automation1", queryItems["wtrealm"]);
+                Assert.Equal("http://Automation1", queryItems["wtrealm"]);
                 Assert.True(queryItems["wctx"].StartsWith("WsFedOwinState="), "wctx does not start with a WsFedOwinState=");
                 Assert.True(queryItems["mystate"].EndsWith("customValue"), "wctx does not end with a &mystate=customValue");
-                Assert.Equal<string>(applicationUrl + "signin-wsfed", queryItems["wreply"]);
-                Assert.Equal<string>("wsignin1.0", queryItems["wa"]);
+                Assert.Equal(applicationUrl + "signin-wsfed", queryItems["wreply"]);
+                Assert.Equal("wsignin1.0", queryItems["wa"]);
 
                 //Send an invalid token and verify that the token is not honored
                 httpClient = new HttpClient();
@@ -57,13 +57,14 @@ namespace FunctionalTests.Facts.Security.Federation
                 response = httpClient.PostAsync(queryItems["wreply"], new FormUrlEncodedContent(kvps)).Result;
 
                 //Did the request end in the actual resource requested for
-                Assert.Equal<string>("AuthenticationFailed", response.Content.ReadAsStringAsync().Result);
+                Assert.Equal("AuthenticationFailed", response.Content.ReadAsStringAsync().Result);
             }
         }
 
         //Store the metadata once and reuse the same
         public static string metadataXml;
-        public void WsFederationAuthenticationConfiguration(IAppBuilder app)
+
+        internal void WsFederationAuthenticationConfiguration(IAppBuilder app)
         {
             app.UseStaticFiles();
 

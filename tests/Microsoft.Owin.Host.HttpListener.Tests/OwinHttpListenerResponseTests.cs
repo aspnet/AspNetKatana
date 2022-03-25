@@ -34,8 +34,8 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 Assert.Equal(2, response.Headers.Count());
                 Assert.False(response.Headers.TransferEncodingChunked.HasValue);
                 Assert.True(response.Headers.Date.HasValue);
-                Assert.Equal(1, response.Headers.Server.Count);
-                Assert.Equal(1, response.Content.Headers.Count()); // Content-Length
+                Assert.Single(response.Headers.Server);
+                Assert.Single(response.Content.Headers); // Content-Length
                 Assert.Equal(0, response.Content.Headers.ContentLength);
                 Assert.Equal(string.Empty, await response.Content.ReadAsStringAsync());
             }
@@ -59,8 +59,8 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 Assert.Equal(2, response.Headers.Count());
                 Assert.False(response.Headers.TransferEncodingChunked.HasValue);
                 Assert.True(response.Headers.Date.HasValue);
-                Assert.Equal(1, response.Headers.Server.Count);
-                Assert.Equal(1, response.Content.Headers.Count()); // Content-Length
+                Assert.Single(response.Headers.Server);
+                Assert.Single(response.Content.Headers); // Content-Length
                 Assert.Equal(0, response.Content.Headers.ContentLength);
                 Assert.Equal(string.Empty, await response.Content.ReadAsStringAsync());
             }
@@ -86,8 +86,8 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 Assert.Equal(2, response.Headers.Count());
                 Assert.False(response.Headers.TransferEncodingChunked.HasValue);
                 Assert.True(response.Headers.Date.HasValue);
-                Assert.Equal(1, response.Headers.Server.Count);
-                Assert.Equal(1, response.Content.Headers.Count()); // Content-Length
+                Assert.Single(response.Headers.Server);
+                Assert.Single(response.Content.Headers); // Content-Length
                 Assert.Equal(10, response.Content.Headers.ContentLength);
                 Assert.Equal(string.Empty, await response.Content.ReadAsStringAsync());
             }
@@ -157,7 +157,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 Assert.Equal(2, response.Headers.GetValues("Custom1").Count());
                 Assert.Equal("value1a", response.Headers.GetValues("Custom1").First());
                 Assert.Equal("value1b", response.Headers.GetValues("Custom1").Skip(1).First());
-                Assert.Equal(1, response.Headers.GetValues("Custom2").Count());
+                Assert.Single(response.Headers.GetValues("Custom2"));
                 Assert.Equal("value2a, value2b", response.Headers.GetValues("Custom2").First());
                 Assert.Equal(2, response.Headers.GetValues("Custom3").Count());
                 Assert.Equal("value3a, value3b", response.Headers.GetValues("Custom3").First());
@@ -445,7 +445,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 Assert.Equal("Switching Protocols", response.ReasonPhrase);
                 Assert.Equal(2, response.Headers.Count()); // Date, Server
                 Assert.True(response.Headers.Date.HasValue);
-                Assert.Equal(1, response.Headers.Server.Count);
+                Assert.Single(response.Headers.Server);
                 Assert.Equal(string.Empty, await response.Content.ReadAsStringAsync());
             }
         }
@@ -475,8 +475,8 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 Assert.Equal("Switching Protocols", response.ReasonPhrase);
                 Assert.Equal(2, response.Headers.Count()); // Date, Server
                 Assert.True(response.Headers.Date.HasValue);
-                Assert.Equal(1, response.Headers.Server.Count);
-                Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
+                Assert.Single(response.Headers.Server);
+                Assert.Empty(await response.Content.ReadAsByteArrayAsync());
             }
         }
 
@@ -510,7 +510,7 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 Assert.Equal("Custom", response.ReasonPhrase);
                 Assert.Equal(3, response.Headers.Count()); // Date, Server
                 Assert.True(response.Headers.Date.HasValue);
-                Assert.Equal(1, response.Headers.Server.Count);
+                Assert.Single(response.Headers.Server);
                 Assert.Equal("customvalue", response.Headers.GetValues("custom-header").First());
                 Assert.Equal(10, (await response.Content.ReadAsByteArrayAsync()).Length);
             }
@@ -548,9 +548,9 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
                 Assert.Equal("Custom1", response.ReasonPhrase);
                 Assert.Equal(3, response.Headers.Count()); // Date, Server
                 Assert.True(response.Headers.Date.HasValue);
-                Assert.Equal(1, response.Headers.Server.Count);
+                Assert.Single(response.Headers.Server);
                 Assert.Equal("customvalue", response.Headers.GetValues("custom-header").First());
-                Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
+                Assert.Empty((await response.Content.ReadAsByteArrayAsync()));
             }
         }
 

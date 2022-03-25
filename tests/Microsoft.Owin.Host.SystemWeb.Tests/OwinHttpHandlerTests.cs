@@ -3,7 +3,7 @@
 
 using System;
 using System.Threading.Tasks;
-using FakeN.Web;
+using Microsoft.Owin.Host.SystemWeb.Tests.FakeN;
 using Shouldly;
 using Xunit;
 

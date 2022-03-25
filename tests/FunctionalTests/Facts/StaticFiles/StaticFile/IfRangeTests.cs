@@ -92,11 +92,11 @@ namespace FunctionalTests.Facts.StaticFiles
                 response = httpClient.GetAsync(@"RequirementFiles/Dir1/RangeRequest.txt").Result;
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.RequestedRangeNotSatisfiable, response.StatusCode);
                 Assert.Equal<long?>(0, response.Content.Headers.ContentLength);
-                Assert.Equal<string>("bytes */2543", response.Content.Headers.ContentRange.ToString());
+                Assert.Equal("bytes */2543", response.Content.Headers.ContentRange.ToString());
             }
         }
 
-        public void ValidIfRangeConfiguration(IAppBuilder app)
+        internal void ValidIfRangeConfiguration(IAppBuilder app)
         {
             app.UseStaticFiles();
         }

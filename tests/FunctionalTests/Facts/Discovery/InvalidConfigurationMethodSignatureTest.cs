@@ -30,7 +30,7 @@ namespace FunctionalTests.Facts.Discovery
             }
         }
 
-        public void Configuration(object app)
+        internal void Configuration(object app)
         {
         }
     }

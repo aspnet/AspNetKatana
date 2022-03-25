@@ -67,7 +67,7 @@ namespace FunctionalTests.Facts.OwinHost
             }
         }
 
-        public void CopyOfConfiguration(IAppBuilder app)
+        internal void CopyOfConfiguration(IAppBuilder app)
         {
             app.Run((context) =>
                 {

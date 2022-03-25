@@ -8,7 +8,8 @@ using System.IO;
 using System.Net.Http;
 using Owin;
 using Xunit;
-using Xunit.Extensions;
+
+#pragma warning disable xUnit1013 // Public method should be marked as test
 
 namespace FunctionalTests.Facts.OwinHost
 {

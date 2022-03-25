@@ -205,7 +205,7 @@ namespace FunctionalTests.Facts.StaticFiles
             }
         }
 
-        public void ValidRangeConfiguration(IAppBuilder app)
+        internal void ValidRangeConfiguration(IAppBuilder app)
         {
             app.UseStaticFiles();
         }

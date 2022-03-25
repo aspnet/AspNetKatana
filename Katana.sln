@@ -1,67 +1,48 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Build", ".Build", "{D425FDFA-90FC-4276-8CBD-2850E8D78656}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solution Items", "{D425FDFA-90FC-4276-8CBD-2850E8D78656}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		azure-pipelines.yml = azure-pipelines.yml
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		global.json = global.json
 		LICENSE.txt = LICENSE.txt
+		NuGet.Config = NuGet.Config
 		README.md = README.md
-		Settings.StyleCop = Settings.StyleCop
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{69D0ABFE-1C8A-4CFD-AF3A-D71445AEE6BF}"
-	ProjectSection(SolutionItems) = preProject
-		build\_apply-net45-changes.shade = build\_apply-net45-changes.shade
-		build.cmd = build.cmd
-		build.sh = build.sh
-		build\CodeAnalysis.ruleset = build\CodeAnalysis.ruleset
-		build\Common.targets = build\Common.targets
-		build\CommonAssemblyInfo.cs = build\CommonAssemblyInfo.cs
-		build\CustomDictionary.xml = build\CustomDictionary.xml
-		build\DevAssemblyInfo.cs = build\DevAssemblyInfo.cs
-		build\Katana.version.targets = build\Katana.version.targets
-		build\Sakefile.shade = build\Sakefile.shade
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Hosting.Tests", "tests\Microsoft.Owin.Hosting.Tests\Microsoft.Owin.Hosting.Tests.csproj", "{D74769C3-CC85-440E-BDB8-9B20BFBFDDAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Hosting.Tests", "tests\Microsoft.Owin.Hosting.Tests\Microsoft.Owin.Hosting.Tests.csproj", "{D74769C3-CC85-440E-BDB8-9B20BFBFDDAE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener.Tests", "tests\Microsoft.Owin.Host.HttpListener.Tests\Microsoft.Owin.Host.HttpListener.Tests.csproj", "{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Host.HttpListener.Tests", "tests\Microsoft.Owin.Host.HttpListener.Tests\Microsoft.Owin.Host.HttpListener.Tests.csproj", "{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{E80B5DAB-7D94-4E26-8A9E-98E5A887A72A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Performance", "Performance", "{923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Host.SystemWeb", "src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.csproj", "{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.ReferenceApp", "tests\Katana.Performance.ReferenceApp\Katana.Performance.ReferenceApp.csproj", "{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Host.HttpListener", "src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191911919}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.ReferenceApp.Tests", "tests\Katana.Performance.ReferenceApp.Tests\Katana.Performance.ReferenceApp.Tests.csproj", "{E38930BA-9F12-4609-B97C-55F08200A392}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Host.SystemWeb.Tests", "tests\Microsoft.Owin.Host.SystemWeb.Tests\Microsoft.Owin.Host.SystemWeb.Tests.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191919191}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb", "src\Microsoft.Owin.Host.SystemWeb\Microsoft.Owin.Host.SystemWeb.csproj", "{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Host.IntegrationTests", "tests\Microsoft.Owin.Host.IntegrationTests\Microsoft.Owin.Host.IntegrationTests.csproj", "{9F0C72D8-E43F-4F01-9DEB-123412341234}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.HttpListener", "src\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191911919}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.SystemWeb.Tests", "tests\Microsoft.Owin.Host.SystemWeb.Tests\Microsoft.Owin.Host.SystemWeb.Tests.csproj", "{9F0C72D8-E43F-4F01-9DEB-919191919191}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Host.IntegrationTests", "tests\Microsoft.Owin.Host.IntegrationTests\Microsoft.Owin.Host.IntegrationTests.csproj", "{9F0C72D8-E43F-4F01-9DEB-123412341234}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CertInstaller", "src\Tools\CertificateInstaller\CertInstaller\CertInstaller.csproj", "{558F65BE-E09D-4A9B-9DA8-C0983445726F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CertInstaller", "src\Tools\CertificateInstaller\CertInstaller\CertInstaller.csproj", "{558F65BE-E09D-4A9B-9DA8-C0983445726F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{47488541-F6D1-4385-AE49-7E3C72042521}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.ReferenceApp.Selfhost", "tests\Katana.Performance.ReferenceApp.Selfhost\Katana.Performance.ReferenceApp.Selfhost.csproj", "{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.StaticFiles", "src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.csproj", "{F31A42DB-2F57-4DAC-B2BC-106F2D6F3C82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.StaticFiles", "src\Microsoft.Owin.StaticFiles\Microsoft.Owin.StaticFiles.csproj", "{F31A42DB-2F57-4DAC-B2BC-106F2D6F3C82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.StaticFiles.Tests", "tests\Microsoft.Owin.StaticFiles.Tests\Microsoft.Owin.StaticFiles.Tests.csproj", "{473F6EEE-455F-4553-953D-5D0736D62D11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.StaticFiles.Tests", "tests\Microsoft.Owin.StaticFiles.Tests\Microsoft.Owin.StaticFiles.Tests.csproj", "{473F6EEE-455F-4553-953D-5D0736D62D11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Testing", "src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.csproj", "{73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Testing", "src\Microsoft.Owin.Testing\Microsoft.Owin.Testing.csproj", "{73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Diagnostics", "src\Microsoft.Owin.Diagnostics\Microsoft.Owin.Diagnostics.csproj", "{670915F7-F111-42FF-B004-39379A9D5951}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Diagnostics", "src\Microsoft.Owin.Diagnostics\Microsoft.Owin.Diagnostics.csproj", "{670915F7-F111-42FF-B004-39379A9D5951}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.FileSystems", "src\Microsoft.Owin.FileSystems\Microsoft.Owin.FileSystems.csproj", "{63988A9B-FA70-4BBA-8C7E-784145384F7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.FileSystems", "src\Microsoft.Owin.FileSystems\Microsoft.Owin.FileSystems.csproj", "{63988A9B-FA70-4BBA-8C7E-784145384F7C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.FileSystems.Tests", "tests\Microsoft.Owin.FileSystems.Tests\Microsoft.Owin.FileSystems.Tests.csproj", "{5737FA14-B873-496B-8141-49D5B273AC3A}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Prerelease", ".Prerelease", "{A7292674-B84F-4D30-9E2D-C4885AF20608}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.FileSystems.Tests", "tests\Microsoft.Owin.FileSystems.Tests\Microsoft.Owin.FileSystems.Tests.csproj", "{5737FA14-B873-496B-8141-49D5B273AC3A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hosting", "Hosting", "{B9AC3489-752E-4C4E-84E4-1C82227435BA}"
 EndProject
@@ -69,76 +50,74 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Development", "Development"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{10A4935F-4C17-44ED-BB00-D044FC7C77B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Cookies", "src\Microsoft.Owin.Security.Cookies\Microsoft.Owin.Security.Cookies.csproj", "{2FB9342F-CA85-4903-8667-45ED64AD25A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Cookies", "src\Microsoft.Owin.Security.Cookies\Microsoft.Owin.Security.Cookies.csproj", "{2FB9342F-CA85-4903-8667-45ED64AD25A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security", "src\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj", "{AAAF8157-1E33-4D6C-8319-3B304D018005}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security", "src\Microsoft.Owin.Security\Microsoft.Owin.Security.csproj", "{AAAF8157-1E33-4D6C-8319-3B304D018005}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Tests", "tests\Microsoft.Owin.Security.Tests\Microsoft.Owin.Security.Tests.csproj", "{E3B9A023-2146-4D9D-A806-1479683078AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Tests", "tests\Microsoft.Owin.Security.Tests\Microsoft.Owin.Security.Tests.csproj", "{E3B9A023-2146-4D9D-A806-1479683078AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Facebook", "src\Microsoft.Owin.Security.Facebook\Microsoft.Owin.Security.Facebook.csproj", "{F6F1D34F-3AF6-41DD-B493-60899F959BBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Facebook", "src\Microsoft.Owin.Security.Facebook\Microsoft.Owin.Security.Facebook.csproj", "{F6F1D34F-3AF6-41DD-B493-60899F959BBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Google", "src\Microsoft.Owin.Security.Google\Microsoft.Owin.Security.Google.csproj", "{1F46BC62-A011-4B63-A5C6-51AEE2EF538D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Google", "src\Microsoft.Owin.Security.Google\Microsoft.Owin.Security.Google.csproj", "{1F46BC62-A011-4B63-A5C6-51AEE2EF538D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.OAuth", "src\Microsoft.Owin.Security.OAuth\Microsoft.Owin.Security.OAuth.csproj", "{F71E48D0-115A-4105-B332-FCCB2139DC23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.OAuth", "src\Microsoft.Owin.Security.OAuth\Microsoft.Owin.Security.OAuth.csproj", "{F71E48D0-115A-4105-B332-FCCB2139DC23}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sandbox", "Sandbox", "{D067FB54-B69D-4502-8E2F-676271AC4B86}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OwinHost", "src\OwinHost\OwinHost.csproj", "{D56B8357-F044-45DE-85E9-41AA7C84751E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sandbox.WebServer", "tests\Katana.Sandbox.WebServer\Katana.Sandbox.WebServer.csproj", "{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OwinHost.Tests", "tests\OwinHost.Tests\OwinHost.Tests.csproj", "{62ACEFEA-39F8-405E-BC25-0633F1770A4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sandbox.WebClient", "tests\Katana.Sandbox.WebClient\Katana.Sandbox.WebClient.csproj", "{3AE67011-EBB1-4ADE-8F42-8E90EB884219}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin", "src\Microsoft.Owin\Microsoft.Owin.csproj", "{0DB69CAE-B0BC-4688-9467-66B4C1023D3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinHost", "src\OwinHost\OwinHost.csproj", "{D56B8357-F044-45DE-85E9-41AA7C84751E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Owin.Loader", "src\Owin.Loader\Owin.Loader.csproj", "{DF967ED4-C320-421C-859C-81034EFF615E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinHost.Tests", "tests\OwinHost.Tests\OwinHost.Tests.csproj", "{62ACEFEA-39F8-405E-BC25-0633F1770A4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Tests", "tests\Microsoft.Owin.Tests\Microsoft.Owin.Tests.csproj", "{0AF835A6-8181-46DB-A17E-C765FA07A5A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin", "src\Microsoft.Owin\Microsoft.Owin.csproj", "{0DB69CAE-B0BC-4688-9467-66B4C1023D3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Owin.Loader.Tests", "tests\Owin.Loader.Tests\Owin.Loader.Tests.csproj", "{13785347-FC73-4D0E-9DCA-300DD87C308E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owin.Loader", "src\Owin.Loader\Owin.Loader.csproj", "{DF967ED4-C320-421C-859C-81034EFF615E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Twitter", "src\Microsoft.Owin.Security.Twitter\Microsoft.Owin.Security.Twitter.csproj", "{BBB663CB-E6A2-4E23-83C9-9C8F52325F44}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Tests", "tests\Microsoft.Owin.Tests\Microsoft.Owin.Tests.csproj", "{0AF835A6-8181-46DB-A17E-C765FA07A5A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.MicrosoftAccount", "src\Microsoft.Owin.Security.MicrosoftAccount\Microsoft.Owin.Security.MicrosoftAccount.csproj", "{52F6930F-FBC0-404B-B135-6B6756F5713A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owin.Loader.Tests", "tests\Owin.Loader.Tests\Owin.Loader.Tests.csproj", "{13785347-FC73-4D0E-9DCA-300DD87C308E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Hosting", "src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj", "{C225EB2F-E7A7-463F-B058-1705F204978E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Twitter", "src\Microsoft.Owin.Security.Twitter\Microsoft.Owin.Security.Twitter.csproj", "{BBB663CB-E6A2-4E23-83C9-9C8F52325F44}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.MicrosoftAccount", "src\Microsoft.Owin.Security.MicrosoftAccount\Microsoft.Owin.Security.MicrosoftAccount.csproj", "{52F6930F-FBC0-404B-B135-6B6756F5713A}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microsoft.Owin.SelfHost", "Microsoft.Owin.SelfHost", "{9298DB20-54F3-4078-8F7F-D95B3CFA1312}"
-	ProjectSection(SolutionItems) = preProject
-		src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.nuspec = src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.nuspec
-		src\Microsoft.Owin.SelfHost\ReadMe.txt = src\Microsoft.Owin.SelfHost\ReadMe.txt
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Hosting", "src\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj", "{C225EB2F-E7A7-463F-B058-1705F204978E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Testing.Tests", "tests\Microsoft.Owin.Testing.Tests\Microsoft.Owin.Testing.Tests.csproj", "{628A8C89-5E59-4747-8D6A-AA22267552ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Testing.Tests", "tests\Microsoft.Owin.Testing.Tests\Microsoft.Owin.Testing.Tests.csproj", "{628A8C89-5E59-4747-8D6A-AA22267552ED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Middleware", "Middleware", "{C5F4B293-90EC-48B8-97FA-CD23C44C9C30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Cors", "src\Microsoft.Owin.Cors\Microsoft.Owin.Cors.csproj", "{CD4593FD-F70C-4485-ACAD-AC69DAD1BBB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Cors", "src\Microsoft.Owin.Cors\Microsoft.Owin.Cors.csproj", "{CD4593FD-F70C-4485-ACAD-AC69DAD1BBB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Cors.Tests", "tests\Microsoft.Owin.Cors.Tests\Microsoft.Owin.Cors.Tests.csproj", "{3DDAC01B-2567-4C0C-88E1-0A716729203E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Cors.Tests", "tests\Microsoft.Owin.Cors.Tests\Microsoft.Owin.Cors.Tests.csproj", "{3DDAC01B-2567-4C0C-88E1-0A716729203E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Performance.ReferenceApp.Client", "tests\Katana.Performance.ReferenceApp.Client\Katana.Performance.ReferenceApp.Client.csproj", "{0D370C5B-7518-4D60-9D47-1AD59794F38F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.Jwt", "src\Microsoft.Owin.Security.Jwt\Microsoft.Owin.Security.Jwt.csproj", "{CC7E3A76-37B0-4C3D-B666-62DC34F04ABC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.Jwt", "src\Microsoft.Owin.Security.Jwt\Microsoft.Owin.Security.Jwt.csproj", "{CC7E3A76-37B0-4C3D-B666-62DC34F04ABC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.ActiveDirectory", "src\Microsoft.Owin.Security.ActiveDirectory\Microsoft.Owin.Security.ActiveDirectory.csproj", "{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.ActiveDirectory", "src\Microsoft.Owin.Security.ActiveDirectory\Microsoft.Owin.Security.ActiveDirectory.csproj", "{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.WsFederation", "src\Microsoft.Owin.Security.WsFederation\Microsoft.Owin.Security.WsFederation.csproj", "{23D90C94-647A-416C-9227-9A0779401EBC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Nuget", ".Nuget", "{5230439B-C2AD-4A08-8927-526BA3BF9BF6}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.WsFederation", "src\Microsoft.Owin.Security.WsFederation\Microsoft.Owin.Security.WsFederation.csproj", "{23D90C94-647A-416C-9227-9A0779401EBC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Owin.Security.OpenIdConnect", "src\Microsoft.Owin.Security.OpenIdConnect\Microsoft.Owin.Security.OpenIdConnect.csproj", "{AA80B4A3-C885-4A7E-AF1A-FC3E89611988}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.Security.OpenIdConnect", "src\Microsoft.Owin.Security.OpenIdConnect\Microsoft.Owin.Security.OpenIdConnect.csproj", "{AA80B4A3-C885-4A7E-AF1A-FC3E89611988}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FunctionalTests", "FunctionalTests", "{DD2E82F1-F3EA-4D1F-B623-9C34440D79D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionalTests", "tests\FunctionalTests\FunctionalTests.csproj", "{4EF3F748-16D0-4112-AE43-AACADB3EF8E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FunctionalTests", "tests\FunctionalTests\FunctionalTests.csproj", "{4EF3F748-16D0-4112-AE43-AACADB3EF8E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sandbox.Selfhost", "tests\Katana.Sandbox.Selfhost\Katana.Sandbox.Selfhost.csproj", "{9F2F31EF-6017-48CC-88D6-EC4FF4FEAAA5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{EFB86EB3-F362-4E30-92DD-5CB9C5084A6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sandbox.Selfhost", "samples\Katana.Sandbox.Selfhost\Katana.Sandbox.Selfhost.csproj", "{9F2F31EF-6017-48CC-88D6-EC4FF4FEAAA5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sandbox.WebClient", "samples\Katana.Sandbox.WebClient\Katana.Sandbox.WebClient.csproj", "{3AE67011-EBB1-4ADE-8F42-8E90EB884219}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Katana.Sandbox.WebServer", "samples\Katana.Sandbox.WebServer\Katana.Sandbox.WebServer.csproj", "{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Owin.SelfHost", "src\Microsoft.Owin.SelfHost\Microsoft.Owin.SelfHost.csproj", "{631EE03C-7887-4F03-A01B-AB669560A061}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{B5567E1E-04AC-42D6-BAAC-E795601C157E}"
+	ProjectSection(SolutionItems) = preProject
+		eng\Build.props = eng\Build.props
+		eng\Publishing.props = eng\Publishing.props
+		eng\Signing.props = eng\Signing.props
+		eng\Version.Details.xml = eng\Version.Details.xml
+		eng\Versions.props = eng\Versions.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -152,14 +131,6 @@ Global
 		{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8FB7DCB-3370-4D2F-B41A-63C89D281A51}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E38930BA-9F12-4609-B97C-55F08200A392}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E38930BA-9F12-4609-B97C-55F08200A392}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E38930BA-9F12-4609-B97C-55F08200A392}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E38930BA-9F12-4609-B97C-55F08200A392}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -179,10 +150,6 @@ Global
 		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{558F65BE-E09D-4A9B-9DA8-C0983445726F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F31A42DB-2F57-4DAC-B2BC-106F2D6F3C82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F31A42DB-2F57-4DAC-B2BC-106F2D6F3C82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F31A42DB-2F57-4DAC-B2BC-106F2D6F3C82}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -231,13 +198,6 @@ Global
 		{F71E48D0-115A-4105-B332-FCCB2139DC23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F71E48D0-115A-4105-B332-FCCB2139DC23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F71E48D0-115A-4105-B332-FCCB2139DC23}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3AE67011-EBB1-4ADE-8F42-8E90EB884219}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3AE67011-EBB1-4ADE-8F42-8E90EB884219}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3AE67011-EBB1-4ADE-8F42-8E90EB884219}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3AE67011-EBB1-4ADE-8F42-8E90EB884219}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D56B8357-F044-45DE-85E9-41AA7C84751E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D56B8357-F044-45DE-85E9-41AA7C84751E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D56B8357-F044-45DE-85E9-41AA7C84751E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -286,10 +246,6 @@ Global
 		{3DDAC01B-2567-4C0C-88E1-0A716729203E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DDAC01B-2567-4C0C-88E1-0A716729203E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DDAC01B-2567-4C0C-88E1-0A716729203E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0D370C5B-7518-4D60-9D47-1AD59794F38F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0D370C5B-7518-4D60-9D47-1AD59794F38F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0D370C5B-7518-4D60-9D47-1AD59794F38F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0D370C5B-7518-4D60-9D47-1AD59794F38F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CC7E3A76-37B0-4C3D-B666-62DC34F04ABC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CC7E3A76-37B0-4C3D-B666-62DC34F04ABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC7E3A76-37B0-4C3D-B666-62DC34F04ABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -314,22 +270,30 @@ Global
 		{9F2F31EF-6017-48CC-88D6-EC4FF4FEAAA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F2F31EF-6017-48CC-88D6-EC4FF4FEAAA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F2F31EF-6017-48CC-88D6-EC4FF4FEAAA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AE67011-EBB1-4ADE-8F42-8E90EB884219}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AE67011-EBB1-4ADE-8F42-8E90EB884219}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AE67011-EBB1-4ADE-8F42-8E90EB884219}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AE67011-EBB1-4ADE-8F42-8E90EB884219}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{631EE03C-7887-4F03-A01B-AB669560A061}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{631EE03C-7887-4F03-A01B-AB669560A061}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{631EE03C-7887-4F03-A01B-AB669560A061}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{631EE03C-7887-4F03-A01B-AB669560A061}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{69D0ABFE-1C8A-4CFD-AF3A-D71445AEE6BF} = {D425FDFA-90FC-4276-8CBD-2850E8D78656}
 		{D74769C3-CC85-440E-BDB8-9B20BFBFDDAE} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 		{A8FB7DCB-3370-4D2F-B41A-63C89D281A51} = {E80B5DAB-7D94-4E26-8A9E-98E5A887A72A}
-		{C232AB29-2F3C-4E18-9234-67B1C70CDAD5} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
-		{E38930BA-9F12-4609-B97C-55F08200A392} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
 		{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E} = {E80B5DAB-7D94-4E26-8A9E-98E5A887A72A}
 		{9F0C72D8-E43F-4F01-9DEB-919191911919} = {E80B5DAB-7D94-4E26-8A9E-98E5A887A72A}
 		{9F0C72D8-E43F-4F01-9DEB-919191919191} = {E80B5DAB-7D94-4E26-8A9E-98E5A887A72A}
 		{9F0C72D8-E43F-4F01-9DEB-123412341234} = {E80B5DAB-7D94-4E26-8A9E-98E5A887A72A}
 		{558F65BE-E09D-4A9B-9DA8-C0983445726F} = {47488541-F6D1-4385-AE49-7E3C72042521}
-		{8AE2E716-258A-4EF3-ADF1-D3B75D677F29} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
 		{F31A42DB-2F57-4DAC-B2BC-106F2D6F3C82} = {C5F4B293-90EC-48B8-97FA-CD23C44C9C30}
 		{473F6EEE-455F-4553-953D-5D0736D62D11} = {C5F4B293-90EC-48B8-97FA-CD23C44C9C30}
 		{73F1A72C-BCDE-4912-8AF7-6BE33D92FCC0} = {E7D2B8A2-4586-4660-BB84-E46A58CD5F7F}
@@ -342,8 +306,6 @@ Global
 		{F6F1D34F-3AF6-41DD-B493-60899F959BBA} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{1F46BC62-A011-4B63-A5C6-51AEE2EF538D} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{F71E48D0-115A-4105-B332-FCCB2139DC23} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
-		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A} = {D067FB54-B69D-4502-8E2F-676271AC4B86}
-		{3AE67011-EBB1-4ADE-8F42-8E90EB884219} = {D067FB54-B69D-4502-8E2F-676271AC4B86}
 		{D56B8357-F044-45DE-85E9-41AA7C84751E} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 		{62ACEFEA-39F8-405E-BC25-0633F1770A4B} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 		{0DB69CAE-B0BC-4688-9467-66B4C1023D3F} = {E7D2B8A2-4586-4660-BB84-E46A58CD5F7F}
@@ -352,17 +314,22 @@ Global
 		{13785347-FC73-4D0E-9DCA-300DD87C308E} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 		{BBB663CB-E6A2-4E23-83C9-9C8F52325F44} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{52F6930F-FBC0-404B-B135-6B6756F5713A} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
-		{9298DB20-54F3-4078-8F7F-D95B3CFA1312} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 		{C225EB2F-E7A7-463F-B058-1705F204978E} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
 		{628A8C89-5E59-4747-8D6A-AA22267552ED} = {E7D2B8A2-4586-4660-BB84-E46A58CD5F7F}
 		{CD4593FD-F70C-4485-ACAD-AC69DAD1BBB1} = {C5F4B293-90EC-48B8-97FA-CD23C44C9C30}
 		{3DDAC01B-2567-4C0C-88E1-0A716729203E} = {C5F4B293-90EC-48B8-97FA-CD23C44C9C30}
-		{0D370C5B-7518-4D60-9D47-1AD59794F38F} = {923FBCC6-ACE8-462C-ACE1-927C3EC8E77B}
 		{CC7E3A76-37B0-4C3D-B666-62DC34F04ABC} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{03F2BF9F-BE6C-4DAE-9615-46A7F05EF842} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{23D90C94-647A-416C-9227-9A0779401EBC} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{AA80B4A3-C885-4A7E-AF1A-FC3E89611988} = {10A4935F-4C17-44ED-BB00-D044FC7C77B8}
 		{4EF3F748-16D0-4112-AE43-AACADB3EF8E9} = {DD2E82F1-F3EA-4D1F-B623-9C34440D79D6}
-		{9F2F31EF-6017-48CC-88D6-EC4FF4FEAAA5} = {D067FB54-B69D-4502-8E2F-676271AC4B86}
+		{9F2F31EF-6017-48CC-88D6-EC4FF4FEAAA5} = {EFB86EB3-F362-4E30-92DD-5CB9C5084A6D}
+		{3AE67011-EBB1-4ADE-8F42-8E90EB884219} = {EFB86EB3-F362-4E30-92DD-5CB9C5084A6D}
+		{1069B86E-F2C1-498B-9DD8-76C7257C6A2A} = {EFB86EB3-F362-4E30-92DD-5CB9C5084A6D}
+		{631EE03C-7887-4F03-A01B-AB669560A061} = {B9AC3489-752E-4C4E-84E4-1C82227435BA}
+		{B5567E1E-04AC-42D6-BAAC-E795601C157E} = {D425FDFA-90FC-4276-8CBD-2850E8D78656}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {02123D4B-8D21-4C7F-88B5-E1B1834302BB}
 	EndGlobalSection
 EndGlobal

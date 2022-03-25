@@ -30,10 +30,10 @@ namespace FunctionalTests.Facts.StaticFiles
                 HttpResponseMessage response;
                 var responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl, out response);
 
-                Assert.Equal<string>("custom/format", response.Content.Headers.ContentType.MediaType);
+                Assert.Equal("custom/format", response.Content.Headers.ContentType.MediaType);
 
                 var lines = responseText.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                Assert.NotEqual<int>(0, lines.Length);
+                Assert.NotEmpty(lines);
                 lines.All(line =>
                 {
                     Trace.WriteLine(line);
@@ -44,7 +44,7 @@ namespace FunctionalTests.Facts.StaticFiles
             }
         }
 
-        public void DirectoryBrowserCustomFormatterConfiguration(IAppBuilder app)
+        internal void DirectoryBrowserCustomFormatterConfiguration(IAppBuilder app)
         {
             app.UseDirectoryBrowser(new DirectoryBrowserOptions() { Formatter = new MyDirectoryInfoFormatter() });
         }

@@ -191,7 +191,6 @@ namespace Microsoft.Owin.Tests
         [InlineData("", "/", false, null)]
         [InlineData(null, "", true, "")]
         [InlineData(null, null, true, "")]
-        [InlineData("", "", true, "")]
         [InlineData("", null, true, "")]
         public void StartsWithPerformsIgnoreCaseLeadingPathMatch(
             string pathValue,

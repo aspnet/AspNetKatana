@@ -9,7 +9,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Owin;
 using Xunit;
-using Xunit.Extensions;
+
+#pragma warning disable xUnit1013 // Public method should be marked as test
 
 namespace Microsoft.Owin.Host.IntegrationTests
 {
@@ -175,6 +176,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
                 https: true);
 
             var handler = new WebRequestHandler();
+            // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
             handler.ClientCertificates.Add(new X509Certificate2(@"SelfSignedClientCert.pfx", "katana"));
             var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);
@@ -202,6 +204,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
                 https: true);
 
             var handler = new WebRequestHandler();
+            // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
             handler.ClientCertificates.Add(new X509Certificate2(@"SelfSignedClientCert.pfx", "katana"));
             var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(5);

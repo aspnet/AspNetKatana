@@ -34,15 +34,15 @@ namespace FunctionalTests.Facts.Security.Google
 
                 // Unauthenticated request - verify Redirect url
                 var response = await httpClient.GetAsync(applicationUrl);
-                Assert.Equal<string>("https://accounts.google.com/o/oauth2/v2/auth", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
+                Assert.Equal("https://accounts.google.com/o/oauth2/v2/auth", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
                 var queryItems = response.Headers.Location.ParseQueryString();
-                Assert.Equal<string>("code", queryItems["response_type"]);
-                Assert.Equal<string>("offline", queryItems["access_type"]);
-                Assert.Equal<string>("581497791735-f9317hcnvcrg9cvl1jfc3tev7teqfump.apps.googleusercontent.com", queryItems["client_id"]);
-                Assert.Equal<string>(applicationUrl + "signin-google", queryItems["redirect_uri"]);
-                Assert.Equal<string>("openid profile email", queryItems["scope"]);
-                Assert.Equal<string>("ValidStateData", queryItems["state"]);
-                Assert.Equal<string>("custom", queryItems["custom_redirect_uri"]);
+                Assert.Equal("code", queryItems["response_type"]);
+                Assert.Equal("offline", queryItems["access_type"]);
+                Assert.Equal("581497791735-f9317hcnvcrg9cvl1jfc3tev7teqfump.apps.googleusercontent.com", queryItems["client_id"]);
+                Assert.Equal(applicationUrl + "signin-google", queryItems["redirect_uri"]);
+                Assert.Equal("openid profile email", queryItems["scope"]);
+                Assert.Equal("ValidStateData", queryItems["state"]);
+                Assert.Equal("custom", queryItems["custom_redirect_uri"]);
 
                 //This is just to generate a correlation cookie. Previous step would generate this cookie, but we have reset the handler now.
                 httpClient = new HttpClient(handler = new HttpClientHandler());
@@ -65,7 +65,7 @@ namespace FunctionalTests.Facts.Security.Google
                 //Valid code & Valid state
                 //handler.CookieContainer.Add(correlationCookie);
                 response = await httpClient.GetAsync(GetMockData(applicationUrl));
-                Assert.Equal<string>("Google", response.Content.ReadAsStringAsync().Result);
+                Assert.Equal("Google", response.Content.ReadAsStringAsync().Result);
                 var cookies = handler.CookieContainer.GetCookies(new Uri(applicationUrl));
                 Assert.NotNull(cookies[".AspNet.Application"]);
                 Assert.Null(handler.CookieContainer.GetCookies(new Uri(applicationUrl))[".AspNet.Correlation.Google"]);
@@ -74,7 +74,7 @@ namespace FunctionalTests.Facts.Security.Google
                 for (int retry = 0; retry < 4; retry++)
                 {
                     response = await httpClient.GetAsync(applicationUrl);
-                    Assert.Equal<string>("Google", await response.Content.ReadAsStringAsync());
+                    Assert.Equal("Google", await response.Content.ReadAsStringAsync());
                 }
 
                 //Valid state, but invalid code
@@ -82,14 +82,14 @@ namespace FunctionalTests.Facts.Security.Google
                 response = await httpClient.GetAsync(applicationUrl);
                 response = await httpClient.GetAsync(GetMockData(applicationUrl, code: "InvalidCode"));
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.InternalServerError, response.StatusCode);
-                Assert.Equal<string>("SignIn_Failed", await response.Content.ReadAsStringAsync());
+                Assert.Equal("SignIn_Failed", await response.Content.ReadAsStringAsync());
 
                 //Valid state, trigger CertValidator
                 httpClient = new HttpClient(handler = new HttpClientHandler());
                 response = await httpClient.GetAsync(applicationUrl);
                 response = await httpClient.GetAsync(GetMockData(applicationUrl, code: "InvalidCert"));
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.InternalServerError, response.StatusCode);
-                Assert.Equal<string>("SignIn_Failed", await response.Content.ReadAsStringAsync());
+                Assert.Equal("SignIn_Failed", await response.Content.ReadAsStringAsync());
             }
         }
 
@@ -110,13 +110,14 @@ namespace FunctionalTests.Facts.Security.Google
             return new UriBuilder(applicationUrl + "signin-google") { Query = string.Join("&", queryParameters.ToArray()) }.Uri.AbsoluteUri;
         }
 
-        public void GoogleOAuth2Configuration(IAppBuilder app)
+        internal void GoogleOAuth2Configuration(IAppBuilder app)
         {
             app.UseAuthSignInCookie();
 
             var option = new GoogleOAuth2AuthenticationOptions()
             {
                 ClientId = "581497791735-f9317hcnvcrg9cvl1jfc3tev7teqfump.apps.googleusercontent.com",
+                // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
                 ClientSecret = "51LHrC4QaudgKrOQbkfEtz9P",
                 AccessType = "offline",
                 Provider = new GoogleOAuth2AuthenticationProvider()
@@ -127,12 +128,12 @@ namespace FunctionalTests.Facts.Security.Google
                             {
                                 if (context.Identity != null)
                                 {
-                                    Assert.Equal<string>("ValidAccessToken", context.AccessToken);
-                                    Assert.Equal<string>("ValidRefreshToken", context.RefreshToken);
-                                    Assert.Equal<string>("owinauthtester2@gmail.com", context.Email);
-                                    Assert.Equal<string>("106790274378320830963", context.Id);
-                                    Assert.Equal<string>("owinauthtester2", context.FamilyName);
-                                    Assert.Equal<string>("owinauthtester2 owinauthtester2", context.Name);
+                                    Assert.Equal("ValidAccessToken", context.AccessToken);
+                                    Assert.Equal("ValidRefreshToken", context.RefreshToken);
+                                    Assert.Equal("owinauthtester2@gmail.com", context.Email);
+                                    Assert.Equal("106790274378320830963", context.Id);
+                                    Assert.Equal("owinauthtester2", context.FamilyName);
+                                    Assert.Equal("owinauthtester2 owinauthtester2", context.Name);
                                     Assert.Equal<TimeSpan>(TimeSpan.FromSeconds(1200), context.ExpiresIn.Value);
                                     Assert.NotNull(context.User);
                                     context.Identity.AddClaim(new Claim("Authenticated", "true"));

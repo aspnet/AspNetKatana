@@ -1,181 +1,26 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{9F0C72D8-E43F-4F01-9DEB-9E8FE0AE179E}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.Owin.Host.SystemWeb</RootNamespace>
-    <AssemblyName>Microsoft.Owin.Host.SystemWeb</AssemblyName>
-    <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <PackagesDir Condition="$(PackagesDir) == '' And '$(OS)' == 'Windows_NT'">$([System.IO.Path]::Combine($(ProjectDir), "..\..\packages"))</PackagesDir>
-    <PackagesDir Condition="$(PackagesDir) == '' And '$(OS)' != 'Windows_NT'">$(ProjectDir)..\..\packages</PackagesDir>
-    <RestorePackages>true</RestorePackages>
-    <StyleCopEnabled Condition=" '$(StyleCopEnabled)' == '' ">true</StyleCopEnabled>
-    <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>..\..\build\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Debug\Microsoft.Owin.Host.SystemWeb.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Release\Microsoft.Owin.Host.SystemWeb.xml</DocumentationFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.IdentityModel" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Configuration" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\Owin.Loader\Constants.cs">
-      <Link>App_Packages\Owin.Loader\Constants.cs</Link>
-    </Compile>
-    <Compile Include="..\Owin.Loader\DefaultLoader.cs">
-      <Link>App_Packages\Owin.Loader\DefaultLoader.cs</Link>
-    </Compile>
-    <Compile Include="..\Owin.Loader\NullLoader.cs">
-      <Link>App_Packages\Owin.Loader\NullLoader.cs</Link>
-    </Compile>
-    <Compile Include="App_Packages\Owin.Loader\LoaderResources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>LoaderResources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="CallEnvironment\TraceTextWriter.cs" />
-    <Compile Include="CallHeaders\AspNetResponseHeaders.cs" />
-    <Compile Include="CallHeaders\SendingHeadersEvent.cs" />
-    <Compile Include="CallStreams\DelegatingStream.cs" />
-    <Compile Include="CallStreams\InputStream.cs" />
-    <Compile Include="CallStreams\OutputStream.cs" />
-    <Compile Include="SystemWebChunkingCookieManager.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="DataProtection\MachineKeyDataProtector.cs" />
-    <Compile Include="DataProtection\MachineKeyDataProtectionProvider.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="HttpContextBaseExtensions.cs" />
-    <Compile Include="HttpContextItemKeys.cs" />
-    <Compile Include="HttpContextExtensions.cs" />
-    <Compile Include="Infrastructure\DefaultTrace.cs" />
-    <Compile Include="Infrastructure\ErrorState.cs" />
-    <Compile Include="Infrastructure\ITrace.cs" />
-    <Compile Include="Infrastructure\ITraceFactory.cs" />
-    <Compile Include="Infrastructure\DefaultTraceFactory.cs" />
-    <Compile Include="Infrastructure\ReferencedAssemblyWrapper.cs" />
-    <Compile Include="Infrastructure\TraceExtensions.cs" />
-    <Compile Include="Infrastructure\TraceFactory.cs" />
-    <Compile Include="IntegratedPipeline\IntegratedPipelineBlueprint.cs" />
-    <Compile Include="IntegratedPipeline\IntegratedPipelineBlueprintStage.cs" />
-    <Compile Include="IntegratedPipeline\IntegratedPipelineContext.cs" />
-    <Compile Include="IntegratedPipeline\IntegratedPipelineContextStage.cs" />
-    <Compile Include="IntegratedPipeline\StageAsyncResult.cs" />
-    <Compile Include="OwinCallContext.Environment.cs" />
-    <Compile Include="OwinAppContext.cs" />
-    <Compile Include="OwinCallContext.WebSockets.cs" />
-    <Compile Include="DictionaryExtensions.cs" />
-    <Compile Include="OwinApplication.cs" />
-    <Compile Include="OwinBuilder.cs" />
-    <Compile Include="OwinCallContext.DisableResponseCompression.cs" />
-    <Compile Include="CallContextAsyncResult.cs" />
-    <Compile Include="CallEnvironment\AspNetDictionary.cs" />
-    <Compile Include="CallEnvironment\AspNetDictionary.Generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AspNetDictionary.Generated.tt</DependentUpon>
-    </Compile>
-    <Compile Include="CallEnvironment\NilDictionary.cs" />
-    <Compile Include="CallHeaders\AspNetRequestHeaders.cs" />
-    <Compile Include="OwinCallContext.cs" />
-    <Compile Include="OwinHttpHandler.cs" />
-    <Compile Include="OwinHttpModule.cs" />
-    <Compile Include="OwinRoute.cs" />
-    <Compile Include="OwinRouteHandler.cs" />
-    <Compile Include="PreApplicationStart.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="RouteCollectionExtensions.cs" />
-    <Compile Include="ShutdownDetector.cs" />
-    <Compile Include="SystemWebCookieManager.cs" />
-    <Compile Include="UnsafeIISMethods.cs" />
-    <Compile Include="Utils.cs" />
-    <Compile Include="WebSockets\OwinWebSocketWrapper.cs" />
-    <Compile Include="WebSockets\WebSocketConstants.cs" />
-    <Compile Include="DisconnectWatcher.cs" />
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="CallEnvironment\AspNetDictionary.Generated.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>AspNetDictionary.Generated.cs</LastGenOutput>
-    </None>
-    <None Include="Microsoft.Owin.Host.SystemWeb.nuspec" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="App_Packages\Owin.Loader\LoaderResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>LoaderResources.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>SharedResourceNamespace</CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj">
-      <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
-      <Name>Microsoft.Owin</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(ProjectDir)..\..\build\Common.targets" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<RootNamespace>Microsoft.Owin.Host.SystemWeb</RootNamespace>
+		<TargetFramework>$(DefaultNetFxTargetFramework)</TargetFramework>
+		<description>OWIN server that enables OWIN-based applications to run on IIS using the ASP.NET request pipeline.</description>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Include="..\Owin.Loader\Constants.cs" Link="Loader\Constants.cs" />
+		<Compile Include="..\Owin.Loader\DefaultLoader.cs" Link="Loader\DefaultLoader.cs" />
+		<Compile Include="..\Owin.Loader\NullLoader.cs" Link="Loader\NullLoader.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<InternalsVisibleTo Include="Microsoft.Owin.Host.SystemWeb.Tests" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Owin" Version="$(OwinVersion)" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Reference Include="System.Configuration" />
+	  <Reference Include="System.Web" />
+	</ItemGroup>
 </Project>

@@ -13,7 +13,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
 {
     public class SystemWebIntegrationTests : TestBase
     {
-        public void ModuleAndHandlerEnvKeys(IAppBuilder app)
+        internal void ModuleAndHandlerEnvKeys(IAppBuilder app)
         {
             app.UseErrorPage();
             app.Use(async (context, next) =>
@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
             return SendRequestAsync(port);
         }
 
-        public void ExpectedKeys(IAppBuilder app)
+        internal void ExpectedKeys(IAppBuilder app)
         {
             app.UseErrorPage();
             app.Use((context, next) =>
@@ -91,7 +91,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
             return SendRequestAsync(port);
         }
 
-        public void ModuleAndHandlerSyncException(IAppBuilder app)
+        internal void ModuleAndHandlerSyncException(IAppBuilder app)
         {
             app.UseErrorPage();
             app.Use(async (context, next) =>
@@ -128,7 +128,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
             return SendRequestAsync(port);
         }
 
-        public void ModuleAndHandlerAsyncException(IAppBuilder app)
+        internal void ModuleAndHandlerAsyncException(IAppBuilder app)
         {
             app.UseErrorPage();
             app.Use(async (context, next) =>
@@ -173,7 +173,8 @@ namespace Microsoft.Owin.Host.IntegrationTests
             var client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(5);
             var response = await client.GetAsync("http://localhost:" + port);
-            Assert.Equal(String.Empty, await response.Content.ReadAsStringAsync());
+            var responseBody = await response.Content.ReadAsStringAsync();
+            Assert.Equal(String.Empty, responseBody);
             response.EnsureSuccessStatusCode();
         }
     }

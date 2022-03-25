@@ -49,7 +49,7 @@ namespace FunctionalTests.Facts.StaticFiles.EmbeddedFileSystem
             }
         }
 
-        public void EmbeddedFileSystemConfiguration(IAppBuilder app)
+        internal void EmbeddedFileSystemConfiguration(IAppBuilder app)
         {
             var options = new StaticFileOptions() { FileSystem = new EmbeddedResourceFileSystem(Assembly.GetExecutingAssembly().GetName().Name) };
             app.UseStaticFiles(options);
@@ -58,7 +58,7 @@ namespace FunctionalTests.Facts.StaticFiles.EmbeddedFileSystem
         private void DownloadAndCompareFiles(HttpClient httpClient, string fileName, string expectedMimeType)
         {
             var response = httpClient.GetAsync(fileName).Result;
-            Assert.Equal<string>(expectedMimeType, response.Content.Headers.ContentType.MediaType);
+            Assert.Equal(expectedMimeType, response.Content.Headers.ContentType.MediaType);
 
             var testAssembly = Assembly.GetExecutingAssembly();
 

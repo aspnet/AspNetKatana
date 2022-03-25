@@ -41,23 +41,23 @@ namespace FunctionalTests.Facts.Security.Jwt
             var receivedTicket = formatter.Unprotect(protectedtext);
 
             var receivedClaims = receivedTicket.Identity.Claims;
-            Assert.Equal<string>("CustomJwt", receivedTicket.Identity.AuthenticationType);
-            Assert.Equal<string>(ClaimsIdentity.DefaultNameClaimType, receivedTicket.Identity.NameClaimType);
-            Assert.Equal<string>(ClaimsIdentity.DefaultRoleClaimType, receivedTicket.Identity.RoleClaimType);
+            Assert.Equal("CustomJwt", receivedTicket.Identity.AuthenticationType);
+            Assert.Equal(ClaimsIdentity.DefaultNameClaimType, receivedTicket.Identity.NameClaimType);
+            Assert.Equal(ClaimsIdentity.DefaultRoleClaimType, receivedTicket.Identity.RoleClaimType);
             Assert.NotNull(receivedTicket.Identity.BootstrapContext);
             Assert.NotNull((receivedTicket.Identity.BootstrapContext) as string);
-            Assert.Equal<string>(issuer, receivedClaims.Where<Claim>(claim => claim.Type == "iss").FirstOrDefault().Value);
-            Assert.Equal<string>(issuer, receivedClaims.Where<Claim>(claim => claim.Type == "aud").FirstOrDefault().Value);
+            Assert.Equal(issuer, receivedClaims.Where<Claim>(claim => claim.Type == "iss").FirstOrDefault().Value);
+            Assert.Equal(issuer, receivedClaims.Where<Claim>(claim => claim.Type == "aud").FirstOrDefault().Value);
             Assert.NotEmpty(receivedClaims.Where<Claim>(claim => claim.Type == "exp").FirstOrDefault().Value);
 
             for (int i = 0; i < 5; i++)
             {
                 sentIdentity.AddClaim(new Claim("ClaimId" + i.ToString(), i.ToString()));
-                Assert.Equal<string>(i.ToString(), receivedClaims.Where<Claim>(claim => claim.Type == "ClaimId" + i.ToString()).FirstOrDefault().Value);
+                Assert.Equal(i.ToString(), receivedClaims.Where<Claim>(claim => claim.Type == "ClaimId" + i.ToString()).FirstOrDefault().Value);
             }
 
-            Assert.Equal<string>("TestUser", receivedClaims.Where<Claim>(claim => claim.Type == ClaimsIdentity.DefaultNameClaimType).FirstOrDefault().Value);
-            Assert.Equal<string>("Administrator", receivedClaims.Where<Claim>(claim => claim.Type == ClaimsIdentity.DefaultRoleClaimType).FirstOrDefault().Value);
+            Assert.Equal("TestUser", receivedClaims.Where<Claim>(claim => claim.Type == ClaimsIdentity.DefaultNameClaimType).FirstOrDefault().Value);
+            Assert.Equal("Administrator", receivedClaims.Where<Claim>(claim => claim.Type == ClaimsIdentity.DefaultRoleClaimType).FirstOrDefault().Value);
             Assert.NotEmpty(receivedClaims.Where<Claim>(claim => claim.Type == "iat").FirstOrDefault().Value);
             Assert.NotEmpty(receivedClaims.Where<Claim>(claim => claim.Type == "jti").FirstOrDefault().Value);
         }

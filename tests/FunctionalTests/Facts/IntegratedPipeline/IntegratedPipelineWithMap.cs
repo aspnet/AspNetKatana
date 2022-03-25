@@ -33,7 +33,7 @@ namespace FunctionalTests.Facts.IntegratedPipeline
             }
         }
 
-        public void WithMapMiddleware(IAppBuilder app)
+        internal void WithMapMiddleware(IAppBuilder app)
         {
             app.Use((context, next) =>
             {

@@ -48,20 +48,20 @@ namespace FunctionalTests.Facts.Security
                 Assert.NotNull(applicationCookie);
                 Assert.NotNull(temporaryCookie);
 
-                Assert.Equal(applicationCookie.HttpOnly, true);
-                Assert.Equal(applicationCookie.Path, "/");
-                Assert.Equal(temporaryCookie.HttpOnly, false);
+                Assert.True(applicationCookie.HttpOnly);
+                Assert.Equal("/", applicationCookie.Path);
+                Assert.False(temporaryCookie.HttpOnly);
                 Assert.Equal(temporaryCookie.Path, new Uri(applicationUrl).AbsolutePath + "Auth");
-                Assert.Equal<string>(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
+                Assert.Equal(applicationUrl, response.RequestMessage.RequestUri.AbsoluteUri);
 
                 //Logout the client
                 response = httpClient.GetAsync(logoutPath).Result;
                 Assert.True(handler.CookieContainer.Count == 0, "Cookie is not cleared on logout");
-                Assert.Equal<string>(homePath, response.RequestMessage.RequestUri.AbsoluteUri);
+                Assert.Equal(homePath, response.RequestMessage.RequestUri.AbsoluteUri);
             }
         }
 
-        public void HttpCookieOnlyAndCookiePathConfiguration(IAppBuilder app)
+        internal void HttpCookieOnlyAndCookiePathConfiguration(IAppBuilder app)
         {
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {

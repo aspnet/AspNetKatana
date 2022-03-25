@@ -13,6 +13,8 @@ using Owin;
 using Xunit;
 using kvp = System.Collections.Generic.KeyValuePair<string, string>;
 
+#pragma warning disable xUnit1013 // Public method should be marked as test
+
 namespace FunctionalTests.Facts.Testing
 {
     public class TestServerFacts
@@ -32,7 +34,7 @@ namespace FunctionalTests.Facts.Testing
             using (var server = TestServer.Create(configuration))
             {
                 var response = server.CreateRequest("/").SendAsync("GET").Result.Content.ReadAsStringAsync().Result;
-                Assert.Equal<string>(expectedResponseText, response);
+                Assert.Equal(expectedResponseText, response);
             }
         }
 
@@ -47,7 +49,7 @@ namespace FunctionalTests.Facts.Testing
                     .SendAsync("POST").Result;
 
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.Unauthorized, response.StatusCode);
-                Assert.Equal<string>("TestServer_ConfigurationThroughConstructor_Result", response.Content.ReadAsStringAsync().Result);
+                Assert.Equal("TestServer_ConfigurationThroughConstructor_Result", response.Content.ReadAsStringAsync().Result);
             }
         }
 
@@ -113,7 +115,7 @@ namespace FunctionalTests.Facts.Testing
                 }))
             {
                 var response = server.CreateRequest("/").AddHeader("header1", "headervalue1").SendAsync("GET").Result.Content.ReadAsStringAsync().Result;
-                Assert.Equal<string>(expectedResponseText, response);
+                Assert.Equal(expectedResponseText, response);
             }
         }
 

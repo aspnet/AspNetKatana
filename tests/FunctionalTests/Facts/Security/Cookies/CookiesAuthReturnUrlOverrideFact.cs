@@ -41,11 +41,11 @@ namespace FunctionalTests.Facts.Security
                 Assert.False(handler.CookieContainer.Count != 1, "Forms auth cookie not received automatically after successful login");
                 Cookie loginCookie = handler.CookieContainer.GetCookies(new Uri(secureServerUri))[0];
 
-                Assert.Equal(loginCookie.Secure, true);
+                Assert.True(loginCookie.Secure);
             }
         }
 
-        public void ReturnUrlAndSecureCookieConfiguration(IAppBuilder app)
+        internal void ReturnUrlAndSecureCookieConfiguration(IAppBuilder app)
         {
             app.UseCookieAuthentication(new CookieAuthenticationOptions() { LoginPath = new PathString("/Auth/CookiesLogin"), ReturnUrlParameter = "MyRedirectUrl", CookieSecure = CookieSecureOption.Always });
             app.UseProtectedResource();

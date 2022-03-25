@@ -21,15 +21,15 @@ namespace FunctionalTests.Facts.StaticFiles
                 var applicationUrl = deployer.Deploy(hostType, BlockedFiles_Configuration);
 
                 var response = HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "TextFile.txt");
-                Assert.Equal<string>(@"BlockedFiles\TextFile", response);
+                Assert.Equal(@"BlockedFiles\TextFile", response);
 
                 //Clock$ should not be served. This is the only file among the list of blocked files, I can create on the disk.
                 response = HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "clock$.txt");
-                Assert.Equal<string>("FallThrough", response);
+                Assert.Equal("FallThrough", response);
             }
         }
 
-        public void BlockedFiles_Configuration(IAppBuilder app)
+        internal void BlockedFiles_Configuration(IAppBuilder app)
         {
             app.UseStaticFiles(new StaticFileOptions() { FileSystem = new PhysicalFileSystem(@"RequirementFiles\BlockedFiles") });
             app.Run(context => context.Response.WriteAsync("FallThrough"));

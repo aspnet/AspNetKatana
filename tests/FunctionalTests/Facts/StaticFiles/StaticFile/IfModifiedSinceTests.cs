@@ -50,7 +50,7 @@ namespace FunctionalTests.Facts.StaticFiles
             }
         }
 
-        public void ValidModifiedSinceConfiguration(IAppBuilder app)
+        internal void ValidModifiedSinceConfiguration(IAppBuilder app)
         {
             app.UseStaticFiles();
         }

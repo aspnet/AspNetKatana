@@ -8,7 +8,8 @@ using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.StaticFiles;
 using Owin;
 using Xunit;
-using Xunit.Extensions;
+
+#pragma warning disable xUnit1013 // Public method should be marked as test
 
 namespace FunctionalTests.Facts.StaticFiles.EmbeddedFileSystem
 {
@@ -27,7 +28,7 @@ namespace FunctionalTests.Facts.StaticFiles.EmbeddedFileSystem
                 var responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl, out response);
                 Assert.True(!string.IsNullOrWhiteSpace(responseText), "Received empty response");
                 Assert.True((response.Content).Headers.ContentType.ToString() == "text/html");
-                Assert.True(responseText.Contains("SampleHTM"));
+                Assert.Contains("SampleHTM", responseText);
             }
         }
 

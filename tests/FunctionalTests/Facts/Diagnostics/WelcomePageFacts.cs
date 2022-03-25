@@ -21,12 +21,12 @@ namespace FunctionalTests.Facts.Diagnostics
                 string applicationUrl = deployer.Deploy(hostType, WelcomePageConfiguration);
 
                 HttpResponseMessage response;
-                Assert.True(HttpClientUtility.GetResponseTextFromUrl(applicationUrl, out response).ToLower().Contains("your owin application has been successfully started"));
+                Assert.Contains("your owin application has been successfully started", HttpClientUtility.GetResponseTextFromUrl(applicationUrl, out response).ToLower());
                 Assert.Equal("text/html", response.Content.Headers.ContentType.MediaType.ToLower());
             }
         }
 
-        public static void WelcomePageConfiguration(IAppBuilder app)
+        internal static void WelcomePageConfiguration(IAppBuilder app)
         {
             app.UseWelcomePage();
         }

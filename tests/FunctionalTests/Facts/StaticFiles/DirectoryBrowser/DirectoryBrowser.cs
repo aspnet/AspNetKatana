@@ -31,7 +31,7 @@ namespace FunctionalTests.Facts.StaticFiles
                 var responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl, out response);
                 Assert.True(!string.IsNullOrWhiteSpace(responseText), "Received empty response");
                 Assert.True((response.Content).Headers.ContentType.ToString() == "text/html; charset=utf-8");
-                Assert.True(responseText.Contains("RequirementFiles/"));
+                Assert.Contains("RequirementFiles/", responseText);
 
                 //2. Check directory browsing @RequirementFiles with a ending '/'
                 responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "RequirementFiles/", out response);
@@ -47,7 +47,7 @@ namespace FunctionalTests.Facts.StaticFiles
             }
         }
 
-        public void DirectoryBrowserDefaultsConfiguration(IAppBuilder app)
+        internal void DirectoryBrowserDefaultsConfiguration(IAppBuilder app)
         {
             app.UseDirectoryBrowser();
         }
@@ -66,12 +66,12 @@ namespace FunctionalTests.Facts.StaticFiles
                 var responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl, out response);
                 Assert.True(!string.IsNullOrWhiteSpace(responseText), "Received empty response");
                 Assert.True((response.Content).Headers.ContentType.ToString() == "text/html; charset=utf-8");
-                Assert.True(responseText.Contains("Default.html"));
-                Assert.True(responseText.Contains("EmptyFile.txt"));
+                Assert.Contains("Default.html", responseText);
+                Assert.Contains("EmptyFile.txt", responseText);
             }
         }
 
-        public void DirectoryMiddlewareMappedToDifferentDirectoryConfiguration(IAppBuilder app)
+        internal void DirectoryMiddlewareMappedToDifferentDirectoryConfiguration(IAppBuilder app)
         {
             app.UseDirectoryBrowser(new DirectoryBrowserOptions() { FileSystem = new PhysicalFileSystem(@"RequirementFiles\Dir1") });
         }
@@ -91,41 +91,41 @@ namespace FunctionalTests.Facts.StaticFiles
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
                 Assert.True(!string.IsNullOrWhiteSpace(responseText), "Received empty response");
                 Assert.True((response.Content).Headers.ContentType.ToString() == "text/html; charset=utf-8");
-                Assert.True(responseText.Contains("Unknown.Unknown"));
-                Assert.True(responseText.Contains("Default.html"));
+                Assert.Contains("Unknown.Unknown", responseText);
+                Assert.Contains("Default.html", responseText);
 
                 //Directory with a default file - case request path ending with a '/' + Head request. A local directory referred by relative path
                 responseText = HttpClientUtility.HeadResponseTextFromUrl(applicationUrl + "customrequestPath/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<string>(string.Empty, responseText);
+                Assert.Equal(string.Empty, responseText);
 
                 //Directory with a default file - case request path ending with a '/'. A local directory referred by absolute path
                 responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "customrequestFullPath/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.True(responseText.Contains("TextFile2.txt"));
-                Assert.True(responseText.Contains("Unknown.Unknown"));
+                Assert.Contains("TextFile2.txt", responseText);
+                Assert.Contains("Unknown.Unknown", responseText);
 
                 //Directory with a default file - case request path ending with a '/' + Head request. A local directory referred by absolute path
                 responseText = HttpClientUtility.HeadResponseTextFromUrl(applicationUrl + "customrequestFullPath/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<string>(string.Empty, responseText);
+                Assert.Equal(string.Empty, responseText);
 
                 //Directory with a default file - case request path ending with a '/'. Mapped to a UNC path.
                 responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "customrequestUNCPath/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.True(responseText.Contains("Dir31"));
-                Assert.True(responseText.Contains("Dir32"));
-                Assert.True(responseText.Contains("TextFile3.txt"));
-                Assert.True(responseText.Contains("TextFile4.txt"));
+                Assert.Contains("Dir31", responseText);
+                Assert.Contains("Dir32", responseText);
+                Assert.Contains("TextFile3.txt", responseText);
+                Assert.Contains("TextFile4.txt", responseText);
 
                 //Directory with a default file - case request path ending with a '/' + Head request. Mapped to a UNC path.
                 responseText = HttpClientUtility.HeadResponseTextFromUrl(applicationUrl + "customrequestUNCPath/", out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<string>(string.Empty, responseText);
+                Assert.Equal(string.Empty, responseText);
             }
         }
 
-        public void DirectoryCustomRequestPathToPhysicalPathMappingConfiguration(IAppBuilder app)
+        internal void DirectoryCustomRequestPathToPhysicalPathMappingConfiguration(IAppBuilder app)
         {
             app.UseDirectoryBrowser(new DirectoryBrowserOptions()
             {

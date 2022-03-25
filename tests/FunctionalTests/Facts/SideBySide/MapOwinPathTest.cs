@@ -23,9 +23,9 @@ namespace FunctionalTests.Facts.SideBySide
                 ((WebDeployer)deployer.Application).Application.Deploy("Default.aspx", File.ReadAllText("RequirementFiles\\Default.aspx"));
 
                 Assert.True(HttpClientUtility.GetResponseTextFromUrl(url + "/Default.aspx").Contains("Asp.net Test page"), "Default.aspx page not returned successfully in SxS mode");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(url + "/prefix1"), "prefix1");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(url + "/prefix1Append"), "prefix1Append");
-                Assert.Equal(HttpClientUtility.GetResponseTextFromUrl(url + "/prefix2"), "prefix2");
+                Assert.Equal("prefix1", HttpClientUtility.GetResponseTextFromUrl(url + "/prefix1"));
+                Assert.Equal("prefix1Append", HttpClientUtility.GetResponseTextFromUrl(url + "/prefix1Append"));
+                Assert.Equal("prefix2", HttpClientUtility.GetResponseTextFromUrl(url + "/prefix2"));
             }
         }
 
@@ -34,7 +34,7 @@ namespace FunctionalTests.Facts.SideBySide
         /// if all different route paths are different. 
         /// </summary>
         /// <param name="app"></param>
-        public void MapOwinPathConfiguration(IAppBuilder app)
+        internal void MapOwinPathConfiguration(IAppBuilder app)
         {
             RouteTable.Routes.MapOwinPath("/prefix1", builder => { builder.Use(typeof(Application), "prefix1"); });
             RouteTable.Routes.MapOwinPath("/prefix1Append", builder => { builder.Use(typeof(Application), "prefix1Append"); });

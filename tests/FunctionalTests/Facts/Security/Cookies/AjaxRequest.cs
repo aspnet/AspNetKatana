@@ -35,13 +35,13 @@ namespace FunctionalTests.Facts.Security.Cookies
                 Assert.NotEmpty(string.Join(",", response.Headers.GetValues("X-Responded-JSON")));
                 var ajaxResponseObject = JsonConvert.DeserializeObject<AjaxResponse>(string.Join(",", response.Headers.GetValues("X-Responded-JSON")));
                 Assert.Equal<int>(401, ajaxResponseObject.status);
-                Assert.Equal<int>(1, ajaxResponseObject.headers.Count);
-                Assert.True(new Uri(ajaxResponseObject.headers["location"]).AbsolutePath.EndsWith("/Auth/CookiesLogin"));
-                Assert.Equal<string>(new Uri(ajaxResponseObject.headers["location"]).ParseQueryString()["ReturnUrl"], new Uri(applicationUrl).AbsolutePath);
+                Assert.Single(ajaxResponseObject.headers);
+                Assert.EndsWith("/Auth/CookiesLogin", new Uri(ajaxResponseObject.headers["location"]).AbsolutePath);
+                Assert.Equal(new Uri(ajaxResponseObject.headers["location"]).ParseQueryString()["ReturnUrl"], new Uri(applicationUrl).AbsolutePath);
             }
         }
 
-        public void SimulateAjaxRequestConfiguration(IAppBuilder app)
+        internal void SimulateAjaxRequestConfiguration(IAppBuilder app)
         {
             app.UseCookieAuthentication(new CookieAuthenticationOptions()
             {

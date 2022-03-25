@@ -42,7 +42,7 @@ namespace FunctionalTests.Facts.Security.ActiveDirectory
             }
         }
 
-        public void WaadAuthenticationWithProviderConfiguration(IAppBuilder app)
+        internal void WaadAuthenticationWithProviderConfiguration(IAppBuilder app)
         {
             app.UseWindowsAzureActiveDirectoryBearerAuthentication(new WindowsAzureActiveDirectoryBearerAuthenticationOptions
                 {

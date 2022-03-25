@@ -1,142 +1,17 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AAAF8157-1E33-4D6C-8319-3B304D018005}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.Owin.Security</RootNamespace>
-    <AssemblyName>Microsoft.Owin.Security</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <BaseIntermediateOutputPath>obj\net45\</BaseIntermediateOutputPath>
-    <OutputPath>bin\net45\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;NET45</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>
-    </DocumentationFile>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>..\..\build\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <BaseIntermediateOutputPath>obj\net45\</BaseIntermediateOutputPath>
-    <OutputPath>bin\net45\Release\</OutputPath>
-    <DefineConstants>TRACE;NET45</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Release\Microsoft.Owin.Security.XML</DocumentationFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Security" />
-    <Reference Include="System.Web" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\..\build\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="AppBuilderSecurityExtensions.cs" />
-    <Compile Include="AuthenticationMode.cs" />
-    <Compile Include="AuthenticationOptions.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="DataHandler\PropertiesDataFormat.cs" />
-    <Compile Include="DataHandler\TicketDataFormat.cs" />
-    <Compile Include="DataProtection\AppBuilderExtensions.cs" />
-    <Compile Include="DataProtection\DpapiDataProtector.cs" />
-    <Compile Include="DataProtection\IDataProtector.cs" />
-    <Compile Include="DataHandler\Serializer\DataSerializers.cs" />
-    <Compile Include="DataHandler\Serializer\PropertiesSerializer.cs" />
-    <Compile Include="DataHandler\Serializer\IDataSerializer.cs" />
-    <Compile Include="DataHandler\Serializer\TicketSerializer.cs" />
-    <Compile Include="Infrastructure\AuthenticationTokenReceiveContext.cs" />
-    <Compile Include="Infrastructure\IAuthenticationTokenProvider.cs" />
-    <Compile Include="Infrastructure\AuthenticationTokenProvider.cs" />
-    <Compile Include="Infrastructure\AuthenticationTokenCreateContext.cs" />
-    <Compile Include="Infrastructure\Constants.cs" />
-    <Compile Include="Infrastructure\AuthenticationHandler`1.cs" />
-    <Compile Include="Infrastructure\OwinRequestExtensions.cs" />
-    <Compile Include="AuthenticationTicket.cs" />
-    <Compile Include="Infrastructure\AuthenticationHandler.cs" />
-    <Compile Include="Infrastructure\AuthenticationMiddleware.cs" />
-    <Compile Include="DataHandler\ISecureDataFormat.cs" />
-    <Compile Include="DataProtection\IDataProtectionProvider.cs" />
-    <Compile Include="ICertificateValidator.cs" />
-    <Compile Include="CertificateThumbprintValidator.cs" />
-    <Compile Include="Notifications\AuthenticationFailedNotification.cs" />
-    <Compile Include="Notifications\BaseNotification`1.cs" />
-    <Compile Include="Notifications\MessageReceivedNotification.cs" />
-    <Compile Include="Notifications\NotificationResultState.cs" />
-    <Compile Include="Notifications\RedirectToIdentityProviderNotification.cs" />
-    <Compile Include="Notifications\SecurityTokenReceivedNotification.cs" />
-    <Compile Include="Notifications\SecurityTokenValidatedNotification.cs" />
-    <Compile Include="Provider\BaseContext.cs" />
-    <Compile Include="DataHandler\SecureDataFormat.cs" />
-    <Compile Include="DataHandler\Encoder\Base64TextEncoder.cs" />
-    <Compile Include="DataHandler\Encoder\Base64UrlTextEncoder.cs" />
-    <Compile Include="DataHandler\Encoder\ITextEncoder.cs" />
-    <Compile Include="DataHandler\Encoder\TextEncodings.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DataProtection\DpapiDataProtectionProvider.cs" />
-    <Compile Include="Infrastructure\SecurityHelper.cs" />
-    <Compile Include="Provider\BaseContext`1.cs" />
-    <Compile Include="Provider\EndpointContext`1.cs" />
-    <Compile Include="Provider\EndpointContext.cs" />
-    <Compile Include="Provider\ReturnEndpointContext.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="CertificateSubjectKeyIdentifierValidator.cs" />
-    <Compile Include="SubjectPublicKeyInfoAlgorithm.cs" />
-    <Compile Include="CertificateSubjectPublicKeyInfoValidator.cs" />
-    <Compile Include="Win32.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Microsoft.Owin.Security.nuspec" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj">
-      <Project>{0db69cae-b0bc-4688-9467-66b4c1023d3f}</Project>
-      <Name>Microsoft.Owin</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <Import Project="$(ProjectDir)..\..\build\Common.targets" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<RootNamespace>Microsoft.Owin.Security</RootNamespace>
+		<TargetFramework>$(DefaultNetFxTargetFramework)</TargetFramework>
+		<description>Common types which are shared by the various authentication middleware components.</description>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Owin" Version="$(OwinVersion)" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Reference Include="System.Security" />
+	</ItemGroup>
 </Project>

@@ -24,11 +24,11 @@ namespace FunctionalTests.Facts.Security.Cookies
 
                 // Unauthenticated request
                 var response = httpClient.GetAsync(applicationUrl).Result;
-                Assert.Equal<string>("custom", response.RequestMessage.RequestUri.ParseQueryString()["custom_redirect_uri"]);
+                Assert.Equal("custom", response.RequestMessage.RequestUri.ParseQueryString()["custom_redirect_uri"]);
             }
         }
 
-        public void CookieApplyRedirectConfiguration(IAppBuilder app)
+        internal void CookieApplyRedirectConfiguration(IAppBuilder app)
         {
             app.UseCookieAuthentication(new CookieAuthenticationOptions()
             {

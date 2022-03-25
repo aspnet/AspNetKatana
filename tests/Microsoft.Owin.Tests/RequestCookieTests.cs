@@ -2,9 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Linq;
 using Xunit;
-using Xunit.Extensions;
 
 namespace Microsoft.Owin.Tests
 {
@@ -23,8 +21,8 @@ namespace Microsoft.Owin.Tests
             context.Headers["Cookie"] = input;
             var cookies = context.Cookies;
 
-            Assert.Equal(1, cookies.Count());
-            Assert.Equal(Uri.EscapeDataString(expectedKey), cookies.Single().Key);
+            var cookie = Assert.Single(cookies);
+            Assert.Equal(Uri.EscapeDataString(expectedKey), cookie.Key);
             Assert.Equal(expectedValue, cookies[expectedKey]);
         }
     }

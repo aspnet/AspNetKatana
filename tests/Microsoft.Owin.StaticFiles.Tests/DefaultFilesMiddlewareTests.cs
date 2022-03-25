@@ -85,8 +85,6 @@ namespace Microsoft.Owin.StaticFiles.Tests
         [InlineData("", @".", "/SubFolder", "")]
         [InlineData("", @".\", "/SubFolder", "")]
         [InlineData("", @".\", "/SubFolder", "?a=b")]
-        [InlineData("", @".\", "/SubFolder", "?a=b")]
-        [InlineData("", @".\", "/SubFolder", "?a=b")]
         public async Task NearMatch_RedirectAddSlash(string baseUrl, string baseDir, string requestUrl, string queryString)
         {
             TestServer server = TestServer.Create(app => app.UseDefaultFiles(new DefaultFilesOptions()
@@ -98,7 +96,7 @@ namespace Microsoft.Owin.StaticFiles.Tests
             
             Assert.Equal(HttpStatusCode.Moved, response.StatusCode);
             Assert.Equal(requestUrl + "/" + queryString, response.Headers.Location.ToString());
-            Assert.Equal(0, (await response.Content.ReadAsByteArrayAsync()).Length);
+            Assert.Empty(await response.Content.ReadAsByteArrayAsync());
         }
 
         [Theory]

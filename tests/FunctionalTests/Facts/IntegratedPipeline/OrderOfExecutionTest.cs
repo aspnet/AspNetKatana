@@ -30,7 +30,7 @@ namespace FunctionalTests.Facts.IntegratedPipeline
             }
         }
 
-        public void OrderOfExecutionConfiguration(IAppBuilder app)
+        internal void OrderOfExecutionConfiguration(IAppBuilder app)
         {
             app.Use((context, next) =>
             {

@@ -13,7 +13,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
 {
     public class RequestBodyTests : TestBase
     {
-        public void ReadBodyTwiceViaSeekApp(IAppBuilder app)
+        internal void ReadBodyTwiceViaSeekApp(IAppBuilder app)
         {
             app.Run(context =>
             {
@@ -41,7 +41,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
             Assert.Equal("Hello WorldHello World", await response.Content.ReadAsStringAsync());
         }
 
-        public void ReadBodyTwiceViaPositionApp(IAppBuilder app)
+        internal void ReadBodyTwiceViaPositionApp(IAppBuilder app)
         {
             app.Run(context =>
             {
@@ -69,7 +69,7 @@ namespace Microsoft.Owin.Host.IntegrationTests
             Assert.Equal("Hello WorldHello World", await response.Content.ReadAsStringAsync());
         }
 
-        public void DisableRequestBufferingApp(IAppBuilder app)
+        internal void DisableRequestBufferingApp(IAppBuilder app)
         {
             app.Run(context =>
             {

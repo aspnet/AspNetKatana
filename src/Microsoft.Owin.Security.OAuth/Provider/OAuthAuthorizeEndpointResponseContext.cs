@@ -17,10 +17,6 @@ namespace Microsoft.Owin.Security.OAuth
         /// <summary>
         /// Initializes a new instance of the <see cref="OAuthAuthorizationEndpointResponseContext"/> class
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="options"></param>
-        /// <param name="ticket"></param>
-        /// <param name="tokenEndpointRequest"></param>
         public OAuthAuthorizationEndpointResponseContext(
             IOwinContext context,
             OAuthAuthorizationServerOptions options,

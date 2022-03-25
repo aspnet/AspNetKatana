@@ -30,7 +30,7 @@ namespace FunctionalTests.Facts.IntegratedPipeline
             }
         }
 
-        public void MiddlewaresAtDifferentStagesConfiguration(IAppBuilder app)
+        internal void MiddlewaresAtDifferentStagesConfiguration(IAppBuilder app)
         {
             app.Use((context, next) =>
             {

@@ -20,3 +20,5 @@ node_modules
 .nuget/NuGet.exe
 docs/build
 .vs
+.dotnet
+.packages

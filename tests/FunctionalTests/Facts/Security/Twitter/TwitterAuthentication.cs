@@ -40,9 +40,9 @@ namespace FunctionalTests.Facts.Security.Twitter
 
                 // Unauthenticated request - verify Redirect url
                 var response = await httpClient.GetAsync(applicationUrl);
-                Assert.Equal<string>("https://api.twitter.com/oauth/authenticate", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
+                Assert.Equal("https://api.twitter.com/oauth/authenticate", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
                 var queryItems = response.Headers.Location.ParseQueryString();
-                Assert.Equal<string>("custom", queryItems["custom_redirect_uri"]);
+                Assert.Equal("custom", queryItems["custom_redirect_uri"]);
                 Assert.NotNull(queryItems["oauth_token"]);
                 Assert.NotNull(handler.CookieContainer.GetCookies(new Uri(applicationUrl))["__TwitterState"]);
 
@@ -53,30 +53,30 @@ namespace FunctionalTests.Facts.Security.Twitter
                 //Both oauth_token & oauth_verifier verifier missing - Expect an internal error
                 response = await httpClient.GetAsync(GetTwitterSignInMockData(applicationUrl, oauth_token: null, oauth_verifier: null));
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.InternalServerError, response.StatusCode);
-                Assert.Equal<string>("SignIn_Failed", await response.Content.ReadAsStringAsync());
+                Assert.Equal("SignIn_Failed", await response.Content.ReadAsStringAsync());
 
                 //Invalid oauth_token
                 response = await httpClient.GetAsync(GetTwitterSignInMockData(applicationUrl, oauth_token: "invalid_oauth_token", oauth_verifier: "valid_oauth_verifier"));
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.InternalServerError, response.StatusCode);
-                Assert.Equal<string>("SignIn_Failed", await response.Content.ReadAsStringAsync());
+                Assert.Equal("SignIn_Failed", await response.Content.ReadAsStringAsync());
 
                 //Valid oauth_token & invalid oauth_verifier
                 response = await httpClient.GetAsync(GetTwitterSignInMockData(applicationUrl, oauth_verifier: "invalid_oauth_verifier"));
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.InternalServerError, response.StatusCode);
-                Assert.Equal<string>("SignIn_Failed", await response.Content.ReadAsStringAsync());
+                Assert.Equal("SignIn_Failed", await response.Content.ReadAsStringAsync());
 
                 //Valid oauth_token & valid oauth_verifier
                 response = await httpClient.GetAsync(GetTwitterSignInMockData(applicationUrl));
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<string>(response.RequestMessage.RequestUri.AbsoluteUri, applicationUrl);
-                Assert.Equal<string>("Twitter", await response.Content.ReadAsStringAsync());
+                Assert.Equal(response.RequestMessage.RequestUri.AbsoluteUri, applicationUrl);
+                Assert.Equal("Twitter", await response.Content.ReadAsStringAsync());
                 Assert.NotNull(handler.CookieContainer.GetCookies(new Uri(applicationUrl))[".AspNet.Application"]);
 
                 //Retry multiple times with valid cookie to test sliding expiration
                 for (int retryCount = 0; retryCount < 3; retryCount++)
                 {
                     response = await httpClient.GetAsync(applicationUrl);
-                    Assert.Equal<string>(response.RequestMessage.RequestUri.AbsoluteUri, applicationUrl);
+                    Assert.Equal(response.RequestMessage.RequestUri.AbsoluteUri, applicationUrl);
                 }
 
                 //Trigger cert validation error
@@ -84,7 +84,7 @@ namespace FunctionalTests.Facts.Security.Twitter
                 response = await httpClient.GetAsync(applicationUrl);
                 response = await httpClient.GetAsync(GetTwitterSignInMockData(applicationUrl, oauth_verifier: "InvalidCert"));
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.InternalServerError, response.StatusCode);
-                Assert.Equal<string>("SignIn_Failed", await response.Content.ReadAsStringAsync());
+                Assert.Equal("SignIn_Failed", await response.Content.ReadAsStringAsync());
             }
         }
 
@@ -104,13 +104,15 @@ namespace FunctionalTests.Facts.Security.Twitter
             return new UriBuilder(applicationUrl + "signin-twitter") { Query = string.Join("&", queryParameters.ToArray()) }.Uri.AbsoluteUri;
         }
 
-        public void TwitterAuthenticationWithProviderConfiguration(IAppBuilder app)
+        internal void TwitterAuthenticationWithProviderConfiguration(IAppBuilder app)
         {
             app.UseAuthSignInCookie();
 
             app.UseTwitterAuthentication(new TwitterAuthenticationOptions()
                 {
+                    // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
                     ConsumerKey = "sgdtlH5fVziF5rAsivNZA",
+                    // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
                     ConsumerSecret = "lZLT7gEDcBgMrS9lIVzzPUdg61PoJVwfrOlMngaOhg",
                     Provider = new TwitterAuthenticationProvider()
                     {
@@ -118,10 +120,10 @@ namespace FunctionalTests.Facts.Security.Twitter
                         {
                             await Task.Run(() =>
                                 {
-                                    Assert.Equal<string>("valid_user_id", context.UserId);
-                                    Assert.Equal<string>("valid_screen_name", context.ScreenName);
-                                    Assert.Equal<string>("valid_oauth_token", context.AccessToken);
-                                    Assert.Equal<string>("valid_oauth_token_secret", context.AccessTokenSecret);
+                                    Assert.Equal("valid_user_id", context.UserId);
+                                    Assert.Equal("valid_screen_name", context.ScreenName);
+                                    Assert.Equal("valid_oauth_token", context.AccessToken);
+                                    Assert.Equal("valid_oauth_token_secret", context.AccessTokenSecret);
                                     context.Identity.AddClaim(new Claim("Authenticated", "true"));
                                 });
                         },

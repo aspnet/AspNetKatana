@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Cors.Tests
             app(request.Environment).Wait();
 
             var response = new OwinResponse(request.Environment);
-            Assert.Equal(false, wasCalled);
+            Assert.False(wasCalled);
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace Microsoft.Owin.Cors.Tests
             app(request.Environment).Wait();
 
             var response = new OwinResponse(request.Environment);
-            Assert.Equal(true, wasCalled);
+            Assert.True(wasCalled);
         }
         
         [Fact]
@@ -298,7 +298,7 @@ namespace Microsoft.Owin.Cors.Tests
             string origin = response.Headers.Get(CorsConstants.AccessControlAllowOrigin);
 
             Assert.Equal(400, response.StatusCode);
-            Assert.Equal(null, origin);
+            Assert.Null(origin);
         }
 
         [Fact]
@@ -329,7 +329,7 @@ namespace Microsoft.Owin.Cors.Tests
             string origin = response.Headers.Get(CorsConstants.AccessControlAllowOrigin);
 
             Assert.Equal(400, response.StatusCode);
-            Assert.Equal(null, origin);
+            Assert.Null(origin);
         }
 
         [Fact]
@@ -361,7 +361,7 @@ namespace Microsoft.Owin.Cors.Tests
             string origin = response.Headers.Get(CorsConstants.AccessControlAllowOrigin);
 
             Assert.Equal(400, response.StatusCode);
-            Assert.Equal(null, origin);
+            Assert.Null(origin);
         }
 
         private IOwinRequest CreateRequest(string url)

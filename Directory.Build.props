@@ -1,0 +1,25 @@
+<Project>
+  <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+
+  <PropertyGroup>
+    <Copyright>$(CopyrightMicrosoft)</Copyright>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <LangVersion>Latest</LangVersion>
+    <IsShipping>true</IsShipping>
+    <PackageTags>Microsoft OWIN Katana</PackageTags>
+    <DefaultNetFxTargetFramework>net4.5</DefaultNetFxTargetFramework>
+    <DefaultNetFxTestTargetFramework>net4.5.2</DefaultNetFxTestTargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(DotNetBuildOffline)' == 'true'">
+    <!--
+      Arcade has a special version prop for CodeAnalysis.CSharp in GenFacades
+      to try to match the version loaded by msbuild.  In the offline build, this
+      is simply the source-built version.
+    -->
+    <MsbuildTaskMicrosoftCodeAnalysisCSharpVersion>$(MicrosoftCodeAnalysisCSharpVersion)</MsbuildTaskMicrosoftCodeAnalysisCSharpVersion>
+  </PropertyGroup>
+</Project>

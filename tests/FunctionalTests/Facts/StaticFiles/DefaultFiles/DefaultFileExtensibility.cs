@@ -27,16 +27,16 @@ namespace FunctionalTests.Facts.StaticFiles
                 //Directory with a default file - case request path ending with a '/'
                 var responseText = HttpClientUtility.GetResponseTextFromUrl(applicationUrl, out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<bool>(true, responseText.Contains(@"Dir1\Textfile1.txt"));
+                Assert.Contains(@"Dir1\Textfile1.txt", responseText);
 
                 //Directory with a default file - case request path ending with a '/' + Head request
                 responseText = HttpClientUtility.HeadResponseTextFromUrl(applicationUrl, out response);
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal<string>(string.Empty, responseText);
+                Assert.Equal(string.Empty, responseText);
             }
         }
 
-        public void CustomDefaultFileConfiguration(IAppBuilder app)
+        internal void CustomDefaultFileConfiguration(IAppBuilder app)
         {
             var options = new DefaultFilesOptions() { DefaultFileNames = new string[] { "TextFile1.txt" }, FileSystem = new PhysicalFileSystem(@"RequirementFiles\Dir1") };
             app.UseDefaultFiles(options);

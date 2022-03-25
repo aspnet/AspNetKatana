@@ -10,7 +10,8 @@ using Microsoft.Owin;
 using Microsoft.Owin.Logging;
 using Owin;
 using Xunit;
-using Xunit.Extensions;
+
+#pragma warning disable xUnit1013 // Public method should be marked as test
 
 namespace FunctionalTests.Facts.Tracing
 {

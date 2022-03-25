@@ -23,14 +23,14 @@ namespace FunctionalTests.Facts.General
                 HttpResponseMessage httpResponseMessage = null;
 
                 HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "/BadRequestPath", out httpResponseMessage);
-                Assert.Equal(httpResponseMessage.StatusCode, HttpStatusCode.BadRequest);
+                Assert.Equal(HttpStatusCode.BadRequest, httpResponseMessage.StatusCode);
 
                 HttpClientUtility.GetResponseTextFromUrl(applicationUrl + "/GoodRequestPath", out httpResponseMessage);
-                Assert.Equal(httpResponseMessage.StatusCode, HttpStatusCode.OK);
+                Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
             }
         }
 
-        public void ConfigurationTest(IAppBuilder appBuilder)
+        internal void ConfigurationTest(IAppBuilder appBuilder)
         {
             appBuilder.Run(context =>
             {

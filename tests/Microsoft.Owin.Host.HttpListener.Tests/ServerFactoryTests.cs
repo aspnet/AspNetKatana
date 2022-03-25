@@ -27,8 +27,8 @@ namespace Microsoft.Owin.Host.HttpListener.Tests
             OwinServerFactory.Initialize(properties);
 
             Assert.Equal("1.0", properties["owin.Version"]);
-            Assert.IsType(typeof(OwinHttpListener), properties["Microsoft.Owin.Host.HttpListener.OwinHttpListener"]);
-            Assert.IsType(typeof(System.Net.HttpListener), properties["System.Net.HttpListener"]);
+            Assert.IsType<OwinHttpListener>(properties["Microsoft.Owin.Host.HttpListener.OwinHttpListener"]);
+            Assert.IsType<System.Net.HttpListener>(properties["System.Net.HttpListener"]);
         }
 
         [Fact]

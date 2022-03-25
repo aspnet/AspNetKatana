@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <!-- This repo version -->
+    <VersionPrefix>4.2.1</VersionPrefix>
+    <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
+    <PreReleaseVersionIteration>1</PreReleaseVersionIteration>
+    <!-- Opt-out repo features -->
+    <UsingToolXliff>false</UsingToolXliff>
+    <!-- Libs -->
+    <OwinVersion>1.0.0</OwinVersion>
+    <ShouldlyVersion>1.1.1.1</ShouldlyVersion>
+    <NewtonsoftJsonVersion>10.0.3</NewtonsoftJsonVersion>
+    <IdentityModelVersion>5.3.0</IdentityModelVersion>
+  </PropertyGroup>
+</Project>

@@ -46,14 +46,14 @@ namespace FunctionalTests.Facts.Security.MicrosoftAccount
 
                 // Unauthenticated request - verify Redirect url
                 var response = await httpClient.GetAsync(applicationUrl);
-                Assert.Equal<string>("https://login.microsoftonline.com/common/oauth2/v2.0/authorize", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
+                Assert.Equal("https://login.microsoftonline.com/common/oauth2/v2.0/authorize", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
                 var queryItems = response.Headers.Location.ParseQueryString();
-                Assert.Equal<string>("code", queryItems["response_type"]);
-                Assert.Equal<string>("000000004C0F442C", queryItems["client_id"]);
-                Assert.Equal<string>(applicationUrl + "signin-microsoft", queryItems["redirect_uri"]);
-                Assert.Equal<string>("https://graph.microsoft.com/user.read", queryItems["scope"]);
-                Assert.Equal<string>("ValidStateData", queryItems["state"]);
-                Assert.Equal<string>("custom", queryItems["custom_redirect_uri"]);
+                Assert.Equal("code", queryItems["response_type"]);
+                Assert.Equal("000000004C0F442C", queryItems["client_id"]);
+                Assert.Equal(applicationUrl + "signin-microsoft", queryItems["redirect_uri"]);
+                Assert.Equal("https://graph.microsoft.com/user.read", queryItems["scope"]);
+                Assert.Equal("ValidStateData", queryItems["state"]);
+                Assert.Equal("custom", queryItems["custom_redirect_uri"]);
 
                 //This is just to generate a correlation cookie. Previous step would generate this cookie, but we have reset the handler now.
                 httpClient = new HttpClient(handler = new HttpClientHandler());
@@ -71,13 +71,13 @@ namespace FunctionalTests.Facts.Security.MicrosoftAccount
                 handler.CookieContainer.Add(correlationCookie);
                 response = await httpClient.GetAsync(GetMicrosoftSignInMockData(applicationUrl, code: null));
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.InternalServerError, response.StatusCode);
-                Assert.Equal<string>("SignIn_Failed", await response.Content.ReadAsStringAsync());
+                Assert.Equal("SignIn_Failed", await response.Content.ReadAsStringAsync());
                 Assert.Null(handler.CookieContainer.GetCookies(new Uri(applicationUrl))[".AspNet.Correlation.Microsoft"]);
 
                 //Valid code & Valid state
                 handler.CookieContainer.Add(correlationCookie);
                 response = await httpClient.GetAsync(GetMicrosoftSignInMockData(applicationUrl));
-                Assert.Equal<string>("Microsoft", await response.Content.ReadAsStringAsync());
+                Assert.Equal("Microsoft", await response.Content.ReadAsStringAsync());
                 var cookies = handler.CookieContainer.GetCookies(new Uri(applicationUrl));
                 Assert.NotNull(cookies[".AspNet.Application"]);
                 Assert.Null(handler.CookieContainer.GetCookies(new Uri(applicationUrl))[".AspNet.Correlation.Microsoft"]);
@@ -86,7 +86,7 @@ namespace FunctionalTests.Facts.Security.MicrosoftAccount
                 for (int retry = 0; retry < 4; retry++)
                 {
                     response = await httpClient.GetAsync(applicationUrl);
-                    Assert.Equal<string>("Microsoft", await response.Content.ReadAsStringAsync());
+                    Assert.Equal("Microsoft", await response.Content.ReadAsStringAsync());
                 }
 
                 //Valid state, but invalid code
@@ -94,14 +94,14 @@ namespace FunctionalTests.Facts.Security.MicrosoftAccount
                 response = await httpClient.GetAsync(applicationUrl);
                 response = await httpClient.GetAsync(GetMicrosoftSignInMockData(applicationUrl, code: "InvalidCode"));
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.InternalServerError, response.StatusCode);
-                Assert.Equal<string>("SignIn_Failed", await response.Content.ReadAsStringAsync());
+                Assert.Equal("SignIn_Failed", await response.Content.ReadAsStringAsync());
 
                 //Valid state, trigger CertValidator
                 httpClient = new HttpClient(handler = new HttpClientHandler());
                 response = await httpClient.GetAsync(applicationUrl);
                 response = await httpClient.GetAsync(GetMicrosoftSignInMockData(applicationUrl, code: "InvalidCert"));
                 Assert.Equal<HttpStatusCode>(HttpStatusCode.InternalServerError, response.StatusCode);
-                Assert.Equal<string>("SignIn_Failed", await response.Content.ReadAsStringAsync());
+                Assert.Equal("SignIn_Failed", await response.Content.ReadAsStringAsync());
             }
         }
 
@@ -122,13 +122,14 @@ namespace FunctionalTests.Facts.Security.MicrosoftAccount
             return new UriBuilder(applicationUrl + "signin-microsoft") { Query = string.Join("&", queryParameters.ToArray()) }.Uri.AbsoluteUri;
         }
 
-        public void MicrosoftAuthenticationWithProviderConfiguration(IAppBuilder app)
+        internal void MicrosoftAuthenticationWithProviderConfiguration(IAppBuilder app)
         {
             app.UseAuthSignInCookie();
 
             var option = new MicrosoftAccountAuthenticationOptions()
             {
                 ClientId = "000000004C0F442C",
+                // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
                 ClientSecret = "EkXbW-Vr6Rqzi6pugl1jWIBsDotKLmqR",
                 Provider = new MicrosoftAccountAuthenticationProvider()
                 {
@@ -136,14 +137,14 @@ namespace FunctionalTests.Facts.Security.MicrosoftAccount
                     {
                         await Task.Run(() =>
                             {
-                                Assert.Equal<string>("ValidAccessToken", context.AccessToken);
-                                Assert.Equal<string>("ValidRefreshToken", context.RefreshToken);
-                                Assert.Equal<string>("Owinauthtester", context.FirstName);
-                                Assert.Equal<string>("fccf9a24999f4f4f", context.Id);
-                                Assert.Equal<string>("Owinauthtester", context.LastName);
-                                Assert.Equal<string>("Owinauthtester Owinauthtester", context.Name);
+                                Assert.Equal("ValidAccessToken", context.AccessToken);
+                                Assert.Equal("ValidRefreshToken", context.RefreshToken);
+                                Assert.Equal("Owinauthtester", context.FirstName);
+                                Assert.Equal("fccf9a24999f4f4f", context.Id);
+                                Assert.Equal("Owinauthtester", context.LastName);
+                                Assert.Equal("Owinauthtester Owinauthtester", context.Name);
                                 Assert.NotNull(context.User);
-                                Assert.Equal<string>(context.Id, context.User.SelectToken("id").ToString());
+                                Assert.Equal(context.Id, context.User.SelectToken("id").ToString());
                                 context.Identity.AddClaim(new Claim("Authenticated", "true"));
                             });
                     },

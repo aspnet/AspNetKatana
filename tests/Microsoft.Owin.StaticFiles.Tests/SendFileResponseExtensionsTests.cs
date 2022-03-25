@@ -22,10 +22,10 @@ namespace Microsoft.Owin.StaticFiles.Tests
         }
 
         [Fact]
-        public void SendFileWhenNotSupported()
+        public async Task SendFileWhenNotSupported()
         {
             IOwinResponse response = new OwinResponse();
-            Assert.Throws<NotSupportedException>(() => response.SendFileAsync("foo"));
+            await Assert.ThrowsAsync<NotSupportedException>(() => response.SendFileAsync("foo"));
         }
 
         [Fact]
