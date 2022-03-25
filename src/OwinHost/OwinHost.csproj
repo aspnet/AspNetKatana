@@ -16,9 +16,9 @@
 		<Reference Include="System" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj" />
-	  <ProjectReference Include="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj" />
-	  <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj" />
+		<ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj" />
+		<ProjectReference Include="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj" />
+		<ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="Package\**" Pack="true" PackagePath="\" />

@@ -12,12 +12,12 @@
 		<PackageReference Include="Owin" Version="$(OwinVersion)" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\Microsoft.Owin.Diagnostics\Microsoft.Owin.Diagnostics.csproj" />
-	  <ProjectReference Include="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj" />
-	  <ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj" />
-	  <ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj" />
+		<ProjectReference Include="..\Microsoft.Owin.Diagnostics\Microsoft.Owin.Diagnostics.csproj" />
+		<ProjectReference Include="..\Microsoft.Owin.Host.HttpListener\Microsoft.Owin.Host.HttpListener.csproj" />
+		<ProjectReference Include="..\Microsoft.Owin.Hosting\Microsoft.Owin.Hosting.csproj" />
+		<ProjectReference Include="..\Microsoft.Owin\Microsoft.Owin.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 </Project>

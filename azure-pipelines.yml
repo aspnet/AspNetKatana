@@ -122,4 +122,4 @@ stages:
         -TsaRepositoryName "AspNetKatana"
         -TsaCodebaseName "AspNetKatana"
         -TsaPublish $True
-        -PoliCheckAdditionalRunConfigParams @("UserExclusionPath < $(Build.SourcesDirectory)/eng/PoliCheckExclusions.xml")'
+        '
