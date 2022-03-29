@@ -27,11 +27,15 @@ namespace Microsoft.Owin.Security.Tests.OpenIdConnect
         {
             var options = new OpenIdConnectAuthenticationOptions()
                           {
-                              Authority = "https://demo.identityserver.io",
+                              Authority = "https://authserver/",
                               ClientId = "Test Client Id",
                               ClientSecret = "Test Client Secret",
                               UsePkce = include,
-                              ResponseType = OpenIdConnectResponseType.Code
+                              ResponseType = OpenIdConnectResponseType.Code,
+                              Configuration = new OpenIdConnectConfiguration()
+                              {
+                                  AuthorizationEndpoint = "https://authserver/auth"
+                              }
             };
             var server = CreateServer(
                 app => app.UseOpenIdConnectAuthentication(options),
@@ -67,11 +71,15 @@ namespace Microsoft.Owin.Security.Tests.OpenIdConnect
         {
             var options = new OpenIdConnectAuthenticationOptions()
                           {
-                              Authority = "https://demo.identityserver.io",
+                              Authority = "https://authserver/",
                               ClientId = "Test Client Id",
                               ClientSecret = "Test Client Secret",
                               UsePkce = true,
-                              ResponseType = responseType
+                              ResponseType = responseType,
+                              Configuration = new OpenIdConnectConfiguration()
+                              {
+                                  AuthorizationEndpoint = "https://authserver/auth"
+                              }
                           };
             var server = CreateServer(
                 app => app.UseOpenIdConnectAuthentication(options),
