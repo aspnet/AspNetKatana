@@ -12,7 +12,10 @@ Documentation is available in the [Wiki](https://github.com/aspnet/AspNetKatana/
 ## Source Code
 To build and run the tests from a command prompt, run `build.cmd` (found in the root directory). Note: As part of building you may need to obtain NuGet packages from the NuGet.org public feed.
 
-See Katana.sln in the root directory to open the solution in Visual Studio.
+See startvs.cmd in the root directory to open the solution in Visual Studio.
+
+## Signed Rolling Builds
+Rolling builds are available via an alternate NuGet feed. Rolling builds are meant for developers to try out new features or bug fixes ahead of an official prerelease or final build. Rolling builds are not supported for production use. The packages are available at: https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-libraries/nuget/v3/index.json
 
 ## Contribute
 There are lots of ways to [contribute](https://github.com/aspnet/Home/blob/master/CONTRIBUTING.md) to the project, and we appreciate our contributors.
