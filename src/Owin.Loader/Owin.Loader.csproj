@@ -4,6 +4,7 @@
     <RootNamespace>Owin.Loader</RootNamespace>
     <TargetFramework>$(DefaultNetFxTargetFramework)</TargetFramework>
 	<IsShipping>false</IsShipping>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Owin" Version="$(OwinVersion)" />
