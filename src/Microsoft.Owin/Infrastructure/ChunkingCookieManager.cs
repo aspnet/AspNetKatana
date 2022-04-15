@@ -73,7 +73,7 @@ namespace Microsoft.Owin.Infrastructure
             if (chunksCount > 0)
             {
                 bool quoted = false;
-                string[] chunks = new string[chunksCount];
+                var chunks = new List<string>(10); // chunksCount may be wrong, don't trust it.
                 for (int chunkId = 1; chunkId <= chunksCount; chunkId++)
                 {
                     string chunk = requestCookies[key + "C" + chunkId.ToString(CultureInfo.InvariantCulture)];
@@ -98,7 +98,8 @@ namespace Microsoft.Owin.Infrastructure
                         quoted = true;
                         chunk = RemoveQuotes(chunk);
                     }
-                    chunks[chunkId - 1] = chunk;
+
+                    chunks.Add(chunk);
                 }
                 string merged = string.Join(string.Empty, chunks);
                 if (quoted)
@@ -236,13 +237,22 @@ namespace Microsoft.Owin.Infrastructure
             List<string> keys = new List<string>();
             keys.Add(escapedKey + "=");
 
-            string requestCookie = context.Request.Cookies[key];
-            int chunks = ParseChunksCount(requestCookie);
+            var requestCookies = context.Request.Cookies;
+            var requestCookie = requestCookies[key];
+            long chunks = ParseChunksCount(requestCookie);
             if (chunks > 0)
             {
                 for (int i = 1; i <= chunks + 1; i++)
                 {
                     string subkey = escapedKey + "C" + i.ToString(CultureInfo.InvariantCulture);
+
+                    // Only delete cookies we received. We received the chunk count cookie so we should have received the others too.
+                    if (string.IsNullOrEmpty(requestCookies[subkey]))
+                    {
+                        chunks = i - 1;
+                        break;
+                    }
+
                     keys.Add(subkey + "=");
                 }
             }
