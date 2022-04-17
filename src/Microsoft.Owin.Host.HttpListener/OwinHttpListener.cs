@@ -161,12 +161,6 @@ namespace Microsoft.Owin.Host.HttpListener
                 string port = address.Get<string>("port") ?? "5000";
                 string path = address.Get<string>("path") ?? string.Empty;
 
-                // if port is present, add delimiter to value before concatenation
-                if (!string.IsNullOrWhiteSpace(port))
-                {
-                    port = ":" + port;
-                }
-
                 // Assume http(s)://+:9090/BasePath/, including the first path slash.  May be empty. Must end with a slash.
                 if (!path.EndsWith("/", StringComparison.Ordinal))
                 {
@@ -176,7 +170,7 @@ namespace Microsoft.Owin.Host.HttpListener
                 _basePaths.Add(path);
 
                 // add a server for each url
-                string url = scheme + "://" + host + port + path;
+                string url = scheme + "://" + host ":" + port + path;
                 _listener.Prefixes.Add(url);
             }
 
