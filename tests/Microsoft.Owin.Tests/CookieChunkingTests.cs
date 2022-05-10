@@ -146,7 +146,7 @@ namespace Microsoft.Owin.Tests
         public void DeleteChunkedCookieWithOptions_AllDeleted()
         {
             IOwinContext context = new OwinContext();
-            context.Request.Headers.AppendValues("Cookie", "TestCookie=chunks:7");
+            context.Request.Headers.AppendValues("Cookie", "TestCookie=chunks:7;TestCookieC1=1;TestCookieC2=2;TestCookieC3=3;TestCookieC4=4;TestCookieC5=5;TestCookieC6=6;TestCookieC7=7");
 
             new ChunkingCookieManager().DeleteCookie(context, "TestCookie", new CookieOptions() { Domain = "foo.com" });
             var cookies = context.Response.Headers.GetValues("Set-Cookie");
@@ -161,6 +161,39 @@ namespace Microsoft.Owin.Tests
                 "TestCookieC5=; domain=foo.com; path=/; expires=Thu, 01-Jan-1970 00:00:00 GMT",
                 "TestCookieC6=; domain=foo.com; path=/; expires=Thu, 01-Jan-1970 00:00:00 GMT",
                 "TestCookieC7=; domain=foo.com; path=/; expires=Thu, 01-Jan-1970 00:00:00 GMT",
+            }, cookies);
+        }
+
+        [Fact]
+        public void DeleteChunkedCookieWithMissingRequestCookies_OnlyPresentCookiesDeleted()
+        {
+            IOwinContext context = new OwinContext();
+            context.Request.Headers.Append("Cookie", "TestCookie=chunks:7;TestCookieC1=1;TestCookieC2=2");
+            new ChunkingCookieManager().DeleteCookie(context, "TestCookie", new CookieOptions() { Domain = "foo.com", Secure = true });
+            var cookies = context.Response.Headers.GetValues("Set-Cookie");
+            Assert.Equal(3, cookies.Count);
+            Assert.Equal(new[]
+            {
+                "TestCookie=; domain=foo.com; path=/; expires=Thu, 01-Jan-1970 00:00:00 GMT; secure",
+                "TestCookieC1=; domain=foo.com; path=/; expires=Thu, 01-Jan-1970 00:00:00 GMT; secure",
+                "TestCookieC2=; domain=foo.com; path=/; expires=Thu, 01-Jan-1970 00:00:00 GMT; secure",
+            }, cookies);
+        }
+
+        [Fact]
+        public void DeleteChunkedCookieWithMissingRequestCookies_StopsAtMissingChunk()
+        {
+            IOwinContext context = new OwinContext();
+            // C3 is missing so we don't try to delete C4 either.
+            context.Request.Headers.Append("Cookie", "TestCookie=chunks:7;TestCookieC1=1;TestCookieC2=2;TestCookieC4=4");
+            new ChunkingCookieManager().DeleteCookie(context, "TestCookie", new CookieOptions() { Domain = "foo.com", Secure = true });
+            var cookies = context.Response.Headers.GetValues("Set-Cookie");
+            Assert.Equal(3, cookies.Count);
+            Assert.Equal(new[]
+            {
+                "TestCookie=; domain=foo.com; path=/; expires=Thu, 01-Jan-1970 00:00:00 GMT; secure",
+                "TestCookieC1=; domain=foo.com; path=/; expires=Thu, 01-Jan-1970 00:00:00 GMT; secure",
+                "TestCookieC2=; domain=foo.com; path=/; expires=Thu, 01-Jan-1970 00:00:00 GMT; secure",
             }, cookies);
         }
     }
