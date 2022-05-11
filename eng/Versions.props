@@ -1,9 +1,9 @@
 <Project>
   <PropertyGroup>
     <!-- This repo version -->
-    <VersionPrefix>4.2.2</VersionPrefix>
-    <PreReleaseVersionLabel>rtw</PreReleaseVersionLabel>
-    <PreReleaseVersionIteration></PreReleaseVersionIteration>
+    <VersionPrefix>4.2.3</VersionPrefix>
+    <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
+    <PreReleaseVersionIteration>1</PreReleaseVersionIteration>
     <DotNetFinalVersionKind Condition="'$(PreReleaseVersionLabel)' == 'rtw'">release</DotNetFinalVersionKind>
     <!-- Opt-out repo features -->
     <UsingToolXliff>false</UsingToolXliff>
