@@ -257,8 +257,13 @@ namespace Microsoft.Owin.Security.Twitter
             request.Headers.Add("Authorization", authorizationHeaderBuilder.ToString());
 
             HttpResponseMessage response = await _httpClient.SendAsync(request, Request.CallCancelled);
-            response.EnsureSuccessStatusCode();
             string responseText = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.WriteError("RequestToken request failed: " + responseText);
+                response.EnsureSuccessStatusCode(); // throw
+            }
 
             IFormCollection responseParameters = WebHelpers.ParseForm(responseText);
             if (string.Equals(responseParameters["oauth_callback_confirmed"], "true", StringComparison.InvariantCulture))
@@ -327,14 +332,13 @@ namespace Microsoft.Owin.Security.Twitter
             request.Content = new FormUrlEncodedContent(formPairs);
 
             HttpResponseMessage response = await _httpClient.SendAsync(request, Request.CallCancelled);
+            string responseText = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.WriteError("AccessToken request failed with a status code of " + response.StatusCode);
+                _logger.WriteError("AccessToken request failed: " + responseText);
                 response.EnsureSuccessStatusCode(); // throw
             }
-
-            string responseText = await response.Content.ReadAsStringAsync();
 
             IFormCollection responseParameters = WebHelpers.ParseForm(responseText);
 
