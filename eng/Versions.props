@@ -10,7 +10,7 @@
     <!-- Libs -->
     <OwinVersion>1.0.0</OwinVersion>
     <ShouldlyVersion>1.1.1.1</ShouldlyVersion>
-    <NewtonsoftJsonVersion>10.0.3</NewtonsoftJsonVersion>
+    <NewtonsoftJsonVersion>13.0.1</NewtonsoftJsonVersion>
     <IdentityModelVersion>5.3.0</IdentityModelVersion>
   </PropertyGroup>
 </Project>
