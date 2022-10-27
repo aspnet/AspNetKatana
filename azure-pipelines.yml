@@ -2,6 +2,24 @@
 # See https://docs.microsoft.com/azure/devops/pipelines/yaml-schema for details
 #
 
+schedules:
+- cron: 0 9 * * 1
+  displayName: "Run CodeQL3000 weekly, Monday at 2:00 AM PDT"
+  branches:
+    include:
+    - main
+  always: true
+
+parameters:
+# Parameter below is ignored in public builds.
+#
+# Choose whether to run the CodeQL3000 tasks.
+# Manual builds align w/ official builds unless this parameter is true.
+- name: runCodeQL3000
+  default: false
+  displayName: Run CodeQL3000 tasks
+  type: boolean
+
 variables:
   - name: _TeamName
     value: AspNetCore
@@ -11,6 +29,8 @@ variables:
     value: true
   - name: _BuildConfig
     value: Release
+  - name: runCodeQL3000
+    value: ${{ and(ne(variables['System.TeamProject'], 'public'), or(eq(variables['Build.Reason'], 'Schedule'), and(eq(variables['Build.Reason'], 'Manual'), eq(parameters.runCodeQL3000, 'true')))) }}
 
     # used for post-build phases, internal builds only
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
@@ -37,10 +57,10 @@ stages:
   jobs:
   - template: /eng/common/templates/jobs/jobs.yml
     parameters:
-      enableMicrobuild: true
+      enableMicrobuild: ${{ ne(variables.runCodeQL3000, 'true') }}
       enablePublishBuildArtifacts: true
-      enablePublishTestResults: true
-      enablePublishBuildAssets: true
+      enablePublishTestResults: ${{ ne(variables.runCodeQL3000, 'true') }}
+      enablePublishBuildAssets: ${{ ne(variables.runCodeQL3000, 'true') }}
       enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
       enableTelemetry: true
       mergeTestResults: true
@@ -53,9 +73,11 @@ stages:
           ${{ if ne(variables['System.TeamProject'], 'public') }}:
             name: NetCore1ESPool-Internal
             demands: ImageOverride -equals Build.Windows.10.Amd64.VS2019.Pre
+        ${{ if eq(variables.runCodeQL3000, 'true') }}:
+          # Component governance and SBOM creation are not needed here. Disable what Arcade would inject.
+          disableComponentGovernance: true
+          enableSbom: false
         variables:
-
-
         # Only enable publishing in official builds.
         - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
           # Publish-Build-Assets provides: MaestroAccessToken, BotAccount-dotnet-maestro-bot-PAT
@@ -73,31 +95,53 @@ stages:
             value: ''
           - name: _SignType
             value: test
+        # Rely on task Arcade injects, not auto-injected build step.
+        - skipComponentGovernanceDetection: true
+        - ${{ if eq(variables.runCodeQL3000, 'true') }}:
+          - Codeql.SourceRoot: src
+          - _AdditionalBuildArgs: /p:Test=false /p:Sign=false /p:Pack=false /p:Publish=false /p:UseSharedCompilation=false
+          # Security analysis is included in normal runs. Disable its auto-injection.
+          - skipNugetSecurityAnalysis: true
+          # Do not let CodeQL3000 Extension gate scan frequency.
+          - Codeql.Cadence: 0
+          # Enable CodeQL3000 unconditionally so it may be run on any branch.
+          - Codeql.Enabled: true
+          # CodeQL3000 needs this plumbed along as a variable to enable TSA.
+          - Codeql.TSAEnabled: ${{ eq(variables['Build.Reason'], 'Schedule') }}
 
         steps:
         - checkout: self
           clean: true
-        - script: eng\common\cibuild.cmd -configuration $(_BuildConfig) -prepareMachine $(_OfficialBuildArgs)
+        - ${{ if eq(variables.runCodeQL3000, 'true') }}:
+          - script: "echo ##vso[build.addbuildtag]CodeQL3000"
+            displayName: 'Set CI CodeQL3000 tag'
+          - task: CodeQL3000Init@0
+            displayName: CodeQL Initialize
+        - script: eng\common\cibuild.cmd -configuration $(_BuildConfig) -prepareMachine $(_OfficialBuildArgs) $(_AdditionalBuildArgs)
           displayName: Build and Publish
-        - task: PublishBuildArtifacts@1
-          displayName: Upload TestResults
-          condition: always()
-          continueOnError: true
-          inputs:
-            pathtoPublish: artifacts/TestResults/$(_BuildConfig)/
-            artifactName: $(Agent.Os)_$(Agent.JobName) TestResults
-            artifactType: Container
-            parallel: true
-        - task: PublishBuildArtifacts@1
-          displayName: Upload package artifacts
-          condition: and(succeeded(), eq(variables['system.pullrequest.isfork'], false), eq(variables['_BuildConfig'], 'Release'))
-          inputs:
-            pathtoPublish: artifacts/packages/
-            artifactName: artifacts
-            artifactType: Container
-            parallel: true
+        - ${{ if eq(variables.runCodeQL3000, 'true') }}:
+          - task: CodeQL3000Finalize@0
+            displayName: CodeQL Finalize
+        - ${{ else }}:
+          - task: PublishBuildArtifacts@1
+            displayName: Upload TestResults
+            condition: always()
+            continueOnError: true
+            inputs:
+              pathtoPublish: artifacts/TestResults/$(_BuildConfig)/
+              artifactName: $(Agent.Os)_$(Agent.JobName) TestResults
+              artifactType: Container
+              parallel: true
+          - task: PublishBuildArtifacts@1
+            displayName: Upload package artifacts
+            condition: and(succeeded(), eq(variables['system.pullrequest.isfork'], false), eq(variables['_BuildConfig'], 'Release'))
+            inputs:
+              pathtoPublish: artifacts/packages/
+              artifactName: artifacts
+              artifactType: Container
+              parallel: true
 
-- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest'), ne(variables.runCodeQL3000, 'true')) }}:
   - template: eng\common\templates\post-build\post-build.yml
     parameters:
       publishingInfraVersion: 3
