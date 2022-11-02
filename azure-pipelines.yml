@@ -108,6 +108,8 @@ stages:
           - Codeql.Enabled: true
           # CodeQL3000 needs this plumbed along as a variable to enable TSA.
           - Codeql.TSAEnabled: ${{ eq(variables['Build.Reason'], 'Schedule') }}
+          # Default expects tsaoptions.json under SourceRoot.
+          - Codeql.TSAOptionsPath: '$(Build.SourcesDirectory)/.config/tsaoptions.json'
 
         steps:
         - checkout: self
