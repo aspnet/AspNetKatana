@@ -108,15 +108,18 @@ stages:
           - Codeql.Enabled: true
           # CodeQL3000 needs this plumbed along as a variable to enable TSA.
           - Codeql.TSAEnabled: ${{ eq(variables['Build.Reason'], 'Schedule') }}
+          # Default expects tsaoptions.json under SourceRoot.
+          - Codeql.TSAOptionsPath: '$(Build.SourcesDirectory)/.config/tsaoptions.json'
 
         steps:
         - checkout: self
           clean: true
         - ${{ if eq(variables.runCodeQL3000, 'true') }}:
-          - script: "echo ##vso[build.addbuildtag]CodeQL3000"
-            displayName: 'Set CI CodeQL3000 tag'
           - task: CodeQL3000Init@0
             displayName: CodeQL Initialize
+          - script: "echo ##vso[build.addbuildtag]CodeQL3000"
+            displayName: 'Set CI CodeQL3000 tag'
+            condition: ne(variables.CODEQL_DIST,'')
         - script: eng\common\cibuild.cmd -configuration $(_BuildConfig) -prepareMachine $(_OfficialBuildArgs) $(_AdditionalBuildArgs)
           displayName: Build and Publish
         - ${{ if eq(variables.runCodeQL3000, 'true') }}:

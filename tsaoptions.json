@@ -1,0 +1,12 @@
+{
+  "areaPath": "DevDiv\\ASP.NET OOB\\Katana",
+  "codebaseName": "AspNetKatana",
+  "instanceUrl": "https://devdiv.visualstudio.com/",
+  "iterationPath": "DevDiv",
+  "notificationAliases": [
+    "aspnetcore-build@microsoft.com"
+  ],
+  "projectName": "DEVDIV",
+  "repositoryName": "AspNetKatana",
+  "template": "TFSDEVDIV"
+}
