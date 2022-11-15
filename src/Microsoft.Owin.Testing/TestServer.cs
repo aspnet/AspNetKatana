@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Testing
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed by caller.")]
         public HttpClient HttpClient
         {
-            get { return new HttpClient(Handler) { BaseAddress = BaseAddress }; }
+            get { return new HttpClient(Handler) { BaseAddress = BaseAddress }; } // CodeQL [SM02185] This handler does not do TLS, only in-memory.
         }
 
         /// <summary>

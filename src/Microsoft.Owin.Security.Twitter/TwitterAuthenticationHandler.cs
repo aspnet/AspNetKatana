@@ -359,7 +359,7 @@ namespace Microsoft.Owin.Security.Twitter
 
         private static string ComputeSignature(string consumerSecret, string tokenSecret, string signatureData)
         {
-            using (var algorithm = new HMACSHA1())
+            using (var algorithm = new HMACSHA1()) // CodeQL [SM02200] Required by protocol.
             {
                 algorithm.Key = Encoding.ASCII.GetBytes(
                     string.Format(CultureInfo.InvariantCulture,

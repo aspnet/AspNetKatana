@@ -45,7 +45,7 @@ namespace Microsoft.Owin.Security.ActiveDirectory
                 {
                     throw new InvalidOperationException(Properties.Resources.Exception_ValidatorHandlerMismatch);
                 }
-                webRequestHandler.ServerCertificateValidationCallback = backchannelCertificateValidator.Validate;
+                webRequestHandler.ServerCertificateValidationCallback = backchannelCertificateValidator.Validate; // CodeQL [SM03786] False positive, not disabled by default. Used for testing and extensibility.
             }
 
             RetrieveMetadata();

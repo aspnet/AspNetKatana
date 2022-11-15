@@ -193,7 +193,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             // Normal cookie
             if (!ChunkSize.HasValue || ChunkSize.Value > prefix.Length + escapedValue.Length + suffix.Length + (quoted ? 2 : 0))
             {
-                var cookie = new HttpCookie(escapedKey, escapedValue);
+                var cookie = new HttpCookie(escapedKey, escapedValue); // CodeQL [SM03822] False positive, this is an abstraction and the values are determined elsewhere.
                 SetOptions(cookie, options, domainHasValue, pathHasValue, expiresHasValue);
 
                 webContext.Response.AppendCookie(cookie);

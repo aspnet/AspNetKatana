@@ -71,7 +71,7 @@ namespace Microsoft.Owin.Security.WsFederation
                 }
                 else
                 {
-                    HttpClient httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
+                    HttpClient httpClient = new HttpClient(ResolveHttpMessageHandler(Options)); // CodeQL [SM02185] Enabling certificate revocation would be a breaking change. Customers can enable it.
                     httpClient.Timeout = Options.BackchannelTimeout;
                     httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
                     Options.ConfigurationManager = new ConfigurationManager<WsFederationConfiguration>(Options.MetadataAddress,
@@ -103,7 +103,7 @@ namespace Microsoft.Owin.Security.WsFederation
                 {
                     throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
                 }
-                webRequestHandler.ServerCertificateValidationCallback = options.BackchannelCertificateValidator.Validate;
+                webRequestHandler.ServerCertificateValidationCallback = options.BackchannelCertificateValidator.Validate; // CodeQL [SM03786] False positive, not disabled by default. Used for testing and extensibility.
             }
 
             return handler;

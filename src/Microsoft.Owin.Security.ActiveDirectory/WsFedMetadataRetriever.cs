@@ -20,7 +20,7 @@ namespace Microsoft.Owin.Security.ActiveDirectory
 
         public static IssuerSigningKeys GetSigningKeys(string metadataEndpoint, TimeSpan backchannelTimeout, HttpMessageHandler backchannelHttpHandler)
         {
-            using (var metadataRequest = new HttpClient(backchannelHttpHandler, false))
+            using (var metadataRequest = new HttpClient(backchannelHttpHandler, false))// CodeQL [SM02185] Enabling certificate revocation would be a breaking change. Customers can enable it.
             {
                 metadataRequest.Timeout = backchannelTimeout;
                 using (HttpResponseMessage metadataResponse = metadataRequest.GetAsync(metadataEndpoint).Result)
