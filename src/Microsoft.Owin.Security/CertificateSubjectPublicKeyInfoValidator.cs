@@ -129,7 +129,7 @@ namespace Microsoft.Owin.Security
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Caller is responsible for disposal.")]
         private HashAlgorithm CreateHashAlgorithm()
         {
-            return _algorithm == SubjectPublicKeyInfoAlgorithm.Sha1 ? (HashAlgorithm)new SHA1CryptoServiceProvider() : new SHA256CryptoServiceProvider();
+            return _algorithm == SubjectPublicKeyInfoAlgorithm.Sha1 ? (HashAlgorithm)new SHA1CryptoServiceProvider() : new SHA256CryptoServiceProvider(); // CodeQL [SM02196] Only used to validate hashes.
         }
     }
 }

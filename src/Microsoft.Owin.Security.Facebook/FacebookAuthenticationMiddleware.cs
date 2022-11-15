@@ -61,7 +61,7 @@ namespace Microsoft.Owin.Security.Facebook
                 Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();
             }
 
-            _httpClient = new HttpClient(ResolveHttpMessageHandler(Options));
+            _httpClient = new HttpClient(ResolveHttpMessageHandler(Options)); // CodeQL [SM02185] Enabling certificate revocation would be a breaking change. Customers can enable it.
             _httpClient.Timeout = Options.BackchannelTimeout;
             _httpClient.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
         }
@@ -89,7 +89,7 @@ namespace Microsoft.Owin.Security.Facebook
                 {
                     throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
                 }
-                webRequestHandler.ServerCertificateValidationCallback = options.BackchannelCertificateValidator.Validate;
+                webRequestHandler.ServerCertificateValidationCallback = options.BackchannelCertificateValidator.Validate; // CodeQL [SM03786] False positive, not disabled by default. Used for testing and extensibility.
             }
 
             return handler;
