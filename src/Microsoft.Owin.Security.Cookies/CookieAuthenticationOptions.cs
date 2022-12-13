@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Owin.Infrastructure;
+using Owin;
 
 namespace Microsoft.Owin.Security.Cookies
 {
@@ -142,9 +143,11 @@ namespace Microsoft.Owin.Security.Cookies
 
         /// <summary>
         /// The component used to get cookies from the request or set them on the response.
-        ///
-        /// ChunkingCookieManager will be used by default.
         /// </summary>
+        /// <remarks>
+        /// The instance returned by <see cref="AppBuilderCookieExtensions.GetDefaultChunkingCookieManager(IAppBuilder)"/>
+        /// is used by default if no value is explicitly set.
+        /// </remarks>
         public ICookieManager CookieManager { get; set; }
 
         /// <summary>

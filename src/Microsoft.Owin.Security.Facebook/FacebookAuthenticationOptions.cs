@@ -31,7 +31,6 @@ namespace Microsoft.Owin.Security.Facebook
             BackchannelTimeout = TimeSpan.FromSeconds(60);
             SendAppSecretProof = true;
             _fields = new HashSet<string>();
-            CookieManager = new CookieManager();
 
             AuthorizationEndpoint = Constants.AuthorizationEndpoint;
             TokenEndpoint = Constants.TokenEndpoint;

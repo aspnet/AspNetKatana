@@ -70,7 +70,6 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             RequireHttpsMetadata = true;
             TokenValidationParameters = new TokenValidationParameters();
             UseTokenLifetime = true;
-            CookieManager = new CookieManager();
             RedeemCode = false;
             UsePkce = true;
         }

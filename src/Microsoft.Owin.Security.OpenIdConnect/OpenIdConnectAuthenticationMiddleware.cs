@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
@@ -37,6 +38,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             {
                 Options.TokenValidationParameters.AuthenticationType = app.GetDefaultSignInAsAuthenticationType();
             }
+
+            Options.CookieManager ??= app.GetDefaultCookieManager();
 
             if (Options.StateDataFormat == null)
             {
