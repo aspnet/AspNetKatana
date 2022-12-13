@@ -21,7 +21,6 @@ namespace Microsoft.Owin.Infrastructure
         public ChunkingCookieManager()
         {
             ChunkSize = 4090;
-            ThrowForPartialCookies = true;
         }
 
         /// <summary>

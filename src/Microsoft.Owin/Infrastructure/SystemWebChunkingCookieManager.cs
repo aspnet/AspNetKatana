@@ -21,7 +21,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         public SystemWebChunkingCookieManager()
         {
             ChunkSize = 4090;
-            ThrowForPartialCookies = true;
             Fallback = new ChunkingCookieManager();
         }
 
