@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
+using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.Twitter.Messages;
 
@@ -26,7 +27,7 @@ namespace Microsoft.Owin.Security.Twitter
             CallbackPath = new PathString("/signin-twitter");
             AuthenticationMode = AuthenticationMode.Passive;
             BackchannelTimeout = TimeSpan.FromSeconds(60);
-            CookieManager = new CookieManager();
+            CookieManager = new SystemWebCookieManager();
         }
 
         /// <summary>

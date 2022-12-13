@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
+using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin.Security.Facebook
@@ -31,7 +32,7 @@ namespace Microsoft.Owin.Security.Facebook
             BackchannelTimeout = TimeSpan.FromSeconds(60);
             SendAppSecretProof = true;
             _fields = new HashSet<string>();
-            CookieManager = new CookieManager();
+            CookieManager = new SystemWebCookieManager();
 
             AuthorizationEndpoint = Constants.AuthorizationEndpoint;
             TokenEndpoint = Constants.TokenEndpoint;

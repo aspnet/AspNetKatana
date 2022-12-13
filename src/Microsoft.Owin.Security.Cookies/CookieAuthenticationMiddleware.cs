@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
@@ -48,7 +49,7 @@ namespace Microsoft.Owin.Security.Cookies
             }
             if (Options.CookieManager == null)
             {
-                Options.CookieManager = new ChunkingCookieManager();
+                Options.CookieManager = new SystemWebChunkingCookieManager();
             }
         }
 

@@ -8,6 +8,7 @@ using System.Net.Http;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin.Security.OpenIdConnect
@@ -70,7 +71,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
             RequireHttpsMetadata = true;
             TokenValidationParameters = new TokenValidationParameters();
             UseTokenLifetime = true;
-            CookieManager = new CookieManager();
+            CookieManager = new SystemWebCookieManager();
             RedeemCode = false;
             UsePkce = true;
         }

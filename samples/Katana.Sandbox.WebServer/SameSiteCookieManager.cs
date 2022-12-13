@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Microsoft.Owin;
+using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Infrastructure;
 
 namespace Katana.Sandbox.WebServer
@@ -11,7 +12,7 @@ namespace Katana.Sandbox.WebServer
     {
         private readonly ICookieManager _innerManager;
 
-        public SameSiteCookieManager() : this(new CookieManager())
+        public SameSiteCookieManager() : this(new SystemWebCookieManager())
         {
         }
 

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Infrastructure;
 
 namespace Microsoft.Owin.Security.Google
@@ -29,7 +30,7 @@ namespace Microsoft.Owin.Security.Google
             AuthenticationMode = AuthenticationMode.Passive;
             Scope = new List<string>();
             BackchannelTimeout = TimeSpan.FromSeconds(60);
-            CookieManager = new CookieManager();
+            CookieManager = new SystemWebCookieManager();
 
             AuthorizationEndpoint = Constants.AuthorizationEndpoint;
             TokenEndpoint = Constants.TokenEndpoint;
