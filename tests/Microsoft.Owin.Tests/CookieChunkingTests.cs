@@ -120,7 +120,7 @@ namespace Microsoft.Owin.Tests
                 "TestCookieC6=JKLMNOPQR",
                 "TestCookieC7=STUVWXYZ");
 
-            Assert.Throws<FormatException>(() => new ChunkingCookieManager().GetRequestCookie(context, "TestCookie"));
+            Assert.Throws<FormatException>(() => new ChunkingCookieManager { ThrowForPartialCookies = true }.GetRequestCookie(context, "TestCookie"));
         }
 
         [Fact]
