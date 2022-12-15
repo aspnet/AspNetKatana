@@ -3,7 +3,7 @@
 		<OutputType>Library</OutputType>
 		<RootNamespace>Microsoft.Owin.Security.Twitter</RootNamespace>
 		<TargetFramework>$(DefaultNetFxTargetFramework)</TargetFramework>
-		<description>Middleware that enables an application to support Twitter's OAuth 2.0 authentication workflow.</description>
+		<description>Middleware that enables an application to support Twitter's OAuth 1.0 authentication workflow.</description>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" />
