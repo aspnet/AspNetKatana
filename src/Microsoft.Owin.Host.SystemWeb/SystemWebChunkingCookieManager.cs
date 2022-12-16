@@ -21,7 +21,6 @@ namespace Microsoft.Owin.Host.SystemWeb
         public SystemWebChunkingCookieManager()
         {
             ChunkSize = 4090;
-            ThrowForPartialCookies = true;
             Fallback = new ChunkingCookieManager();
         }
 
@@ -42,6 +41,11 @@ namespace Microsoft.Owin.Host.SystemWeb
         /// <summary>
         /// Throw if not all chunks of a cookie are available on a request for re-assembly.
         /// </summary>
+        /// <remarks>
+        /// By default, this property is set to <see langword="false"/>. In this case,
+        /// <see cref="GetRequestCookie(IOwinContext, string)"/> returns "chunks:[number of chunks]"
+        /// instead of causing a <see cref="FormatException"/> if one of the chunks is missing.
+        /// </remarks>
         public bool ThrowForPartialCookies { get; set; }
 
         // Parse the "chunks:XX" to determine how many chunks there should be.
