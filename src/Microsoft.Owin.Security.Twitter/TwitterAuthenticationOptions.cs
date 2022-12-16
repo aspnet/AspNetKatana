@@ -26,7 +26,6 @@ namespace Microsoft.Owin.Security.Twitter
             CallbackPath = new PathString("/signin-twitter");
             AuthenticationMode = AuthenticationMode.Passive;
             BackchannelTimeout = TimeSpan.FromSeconds(60);
-            CookieManager = new CookieManager();
         }
 
         /// <summary>

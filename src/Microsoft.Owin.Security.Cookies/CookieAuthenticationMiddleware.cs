@@ -27,6 +27,8 @@ namespace Microsoft.Owin.Security.Cookies
         public CookieAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, CookieAuthenticationOptions options)
             : base(next, options)
         {
+            Options.CookieManager ??= app.GetDefaultChunkingCookieManager();
+
             if (Options.Provider == null)
             {
                 Options.Provider = new CookieAuthenticationProvider();
@@ -45,10 +47,6 @@ namespace Microsoft.Owin.Security.Cookies
                     Options.AuthenticationType, "v1");
 
                 Options.TicketDataFormat = new TicketDataFormat(dataProtector);
-            }
-            if (Options.CookieManager == null)
-            {
-                Options.CookieManager = new ChunkingCookieManager();
             }
         }
 

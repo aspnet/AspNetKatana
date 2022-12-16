@@ -59,6 +59,8 @@ namespace Microsoft.Owin.Host.SystemWeb
             builder.Properties[Constants.HostReferencedAssemblies] = new ReferencedAssembliesWrapper();
             builder.Properties[Constants.ServerCapabilitiesKey] = Capabilities;
             builder.Properties[Constants.SecurityDataProtectionProvider] = new MachineKeyDataProtectionProvider().ToOwinFunction();
+            builder.SetDefaultCookieManager(new SystemWebCookieManager());
+            builder.SetDefaultChunkingCookieManager(new SystemWebChunkingCookieManager());
             builder.SetLoggerFactory(new DiagnosticsLoggerFactory());
 
             Capabilities[Constants.SendFileVersionKey] = Constants.SendFileVersion;

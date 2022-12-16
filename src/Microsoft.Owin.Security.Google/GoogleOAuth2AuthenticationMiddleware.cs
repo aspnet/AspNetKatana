@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net.Http;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
@@ -46,6 +47,8 @@ namespace Microsoft.Owin.Security.Google
             }
 
             _logger = app.CreateLogger<GoogleOAuth2AuthenticationMiddleware>();
+
+            Options.CookieManager ??= app.GetDefaultCookieManager();
 
             if (Options.Provider == null)
             {
