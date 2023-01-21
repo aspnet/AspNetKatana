@@ -191,6 +191,20 @@ namespace Microsoft.Owin.Security.WsFederation
             {
                 Request.Context.Authentication.SignIn(ticket.Properties, ticket.Identity);
             }
+            var preRedirectNotification = new PreRedirectReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>(Context, Options)
+            {
+                AuthenticationTicket = ticket
+            };
+            // Allows to hook custom redirection.
+            // Helpful in case the request is a post request where the values get lost on redirecting to Identity provider.
+            // This hook allows you to rehydrate the post request and handle it in the application.            
+            await Options.Notifications.PreRedirectReceived(preRedirectNotification);
+
+            if (ticket.Properties.Dictionary.TryGetValue("HandledRedirect", out value) && value == "true")
+            {
+                // Assumes that the redirection has been handled in the application and hence stops default redirection.
+                return true;
+            }
             // Redirect back to the original secured resource, if any.
             if (!string.IsNullOrWhiteSpace(ticket.Properties.RedirectUri))
             {

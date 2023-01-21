@@ -24,6 +24,7 @@ namespace Microsoft.Owin.Security.WsFederation
             SecurityTokenReceived = notification => Task.FromResult(0);
             SecurityTokenValidated = notification => Task.FromResult(0);
             RedirectToIdentityProvider = notification => Task.FromResult(0);
+            PreRedirectReceived = notification => Task.FromResult(0);
         }
 
         /// <summary>
@@ -50,5 +51,10 @@ namespace Microsoft.Owin.Security.WsFederation
         /// Invoked after the security token has passed validation and a ClaimsIdentity has been generated.
         /// </summary>
         public Func<SecurityTokenValidatedNotification<WsFederationMessage, WsFederationAuthenticationOptions>, Task> SecurityTokenValidated { get; set; }
+
+        /// <summary>
+        /// Invoked before redirection to hook custom redirection.
+        /// </summary>
+        public Func<PreRedirectReceivedNotification<WsFederationMessage, WsFederationAuthenticationOptions>, Task> PreRedirectReceived { get; set; }
     }
 }
