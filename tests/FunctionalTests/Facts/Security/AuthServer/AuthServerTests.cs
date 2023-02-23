@@ -135,7 +135,7 @@ namespace FunctionalTests.Facts.Security.AuthServer
                     Assert.Equal("invalid_client", jToken.SelectToken("error").Value<string>());
 
                     //grant_type=authorization_code - invalid code being sent
-                    formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "secret123"), new kvp("grant_type", "authorization_code"), new kvp("code", "InvalidCode"), new kvp("redirect_uri", Client_Redirect_Uri) });
+                    formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "Placeholder"), new kvp("grant_type", "authorization_code"), new kvp("code", "InvalidCode"), new kvp("redirect_uri", Client_Redirect_Uri) });
                     responseMessage = httpClient.PostAsync(tokenEndpointUri, formContent).Result.Content.ReadAsStringAsync().Result;
                     jToken = JToken.Parse(responseMessage);
                     Assert.Equal("invalid_grant", jToken.SelectToken("error").Value<string>());
@@ -146,7 +146,7 @@ namespace FunctionalTests.Facts.Security.AuthServer
                     Assert.Equal(Client_Redirect_Uri, landingUri.GetLeftPart(UriPartial.Path));
                     Assert.NotNull(landingUri.ParseQueryString()["code"]);
                     Assert.Equal("validstate", landingUri.ParseQueryString()["state"]);
-                    formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "secret123"), new kvp("grant_type", "authorization_code"), new kvp("code", landingUri.ParseQueryString()["code"]), new kvp("redirect_uri", Client_Redirect_Uri) });
+                    formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "Placeholder"), new kvp("grant_type", "authorization_code"), new kvp("code", landingUri.ParseQueryString()["code"]), new kvp("redirect_uri", Client_Redirect_Uri) });
                     responseMessage = httpClient.PostAsync(tokenEndpointUri, formContent).Result.Content.ReadAsStringAsync().Result;
                     jToken = JToken.Parse(responseMessage);
                     Assert.NotNull(jToken.SelectToken("access_token").Value<string>());
@@ -157,13 +157,13 @@ namespace FunctionalTests.Facts.Security.AuthServer
                     Assert.NotNull(jToken.SelectToken("refresh_token").Value<string>());
 
                     //grant_type=password -- Resource owner credentials -- Invalid credentials
-                    formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "secret123"), new kvp("grant_type", "password"), new kvp("username", "user1"), new kvp("password", "invalid"), new kvp("scope", "scope1 scope2 scope3") });
+                    formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "Placeholder"), new kvp("grant_type", "password"), new kvp("username", "user1"), new kvp("password", "invalid"), new kvp("scope", "scope1 scope2 scope3") });
                     responseMessage = httpClient.PostAsync(tokenEndpointUri, formContent).Result.Content.ReadAsStringAsync().Result;
                     jToken = JToken.Parse(responseMessage);
                     Assert.Equal("invalid_grant", jToken.SelectToken("error").Value<string>());
 
                     //grant_type=password -- Resource owner credentials
-                    formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "secret123"), new kvp("grant_type", "password"), new kvp("username", "user1"), new kvp("password", "password1"), new kvp("scope", "scope1 scope2 scope3") });
+                    formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "Placeholder"), new kvp("grant_type", "password"), new kvp("username", "user1"), new kvp("password", "password1"), new kvp("scope", "scope1 scope2 scope3") });
                     responseMessage = httpClient.PostAsync(tokenEndpointUri, formContent).Result.Content.ReadAsStringAsync().Result;
                     jToken = JToken.Parse(responseMessage);
                     Assert.NotNull(jToken.SelectToken("access_token").Value<string>());
@@ -174,7 +174,7 @@ namespace FunctionalTests.Facts.Security.AuthServer
                     Assert.NotNull(jToken.SelectToken("refresh_token").Value<string>());
 
                     //grant_type=refresh_token -- Use the refresh token issued on the previous call
-                    formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "secret123"), new kvp("grant_type", "refresh_token"), new kvp("refresh_token", jToken.SelectToken("refresh_token").Value<string>()), new kvp("scope", "scope1 scope2") });
+                    formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "Placeholder"), new kvp("grant_type", "refresh_token"), new kvp("refresh_token", jToken.SelectToken("refresh_token").Value<string>()), new kvp("scope", "scope1 scope2") });
                     responseMessage = httpClient.PostAsync(tokenEndpointUri, formContent).Result.Content.ReadAsStringAsync().Result;
                     jToken = JToken.Parse(responseMessage);
                     Assert.NotNull(jToken.SelectToken("access_token").Value<string>());
@@ -185,7 +185,7 @@ namespace FunctionalTests.Facts.Security.AuthServer
                     Assert.NotNull(jToken.SelectToken("refresh_token").Value<string>());
 
                     //grant_type=client_credentials - Bug# https://github.com/Katana/katana/issues/562
-                    formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "secret123"), new kvp("grant_type", "client_credentials"), new kvp("scope", "scope1 scope2 scope3") });
+                    formContent = AuthZ.CreateTokenEndpointContent(new[] { new kvp("client_id", "123"), new kvp("client_secret", "Placeholder"), new kvp("grant_type", "client_credentials"), new kvp("scope", "scope1 scope2 scope3") });
                     responseMessage = httpClient.PostAsync(tokenEndpointUri, formContent).Result.Content.ReadAsStringAsync().Result;
                     jToken = JToken.Parse(responseMessage);
                     Assert.NotNull(jToken.SelectToken("access_token").Value<string>());
