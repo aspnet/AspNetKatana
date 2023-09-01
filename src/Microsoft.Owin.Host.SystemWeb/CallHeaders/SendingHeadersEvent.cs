@@ -31,7 +31,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
             for (int index = 0; index != count; ++index)
             {
                 Tuple<Action<object>, object> tuple = callbacks[count - index - 1];
-                tuple.Item1(tuple.Item2);
+                tuple?.Item1(tuple.Item2);
             }
         }
     }
