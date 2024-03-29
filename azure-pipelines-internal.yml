@@ -52,18 +52,15 @@ extends:
       jobs:
       - template: /eng/templates/default-build.yml@self
     - ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
-      - stage: post-build
-        displayName: Post-build
-        jobs:
-        - template: /eng/common/templates-official/post-build/post-build.yml@self
-          parameters:
-            publishingInfraVersion: 3
-            # Symbol validation isn't being very reliable lately. This should be enabled back
-            # once this issue is resolved: https://github.com/dotnet/arcade/issues/2871
-            enableSymbolValidation: false
-            # It's a private repo in github so this won't pass until we create an internal mirror
-            enableSourceLinkValidation: false
-            enableSigningValidation: false
-            enableNugetValidation: false
-            SDLValidationParameters:
-              enable: false
+      - template: /eng/common/templates-official/post-build/post-build.yml@self
+        parameters:
+          publishingInfraVersion: 3
+          # Symbol validation isn't being very reliable lately. This should be enabled back
+          # once this issue is resolved: https://github.com/dotnet/arcade/issues/2871
+          enableSymbolValidation: false
+          # It's a private repo in github so this won't pass until we create an internal mirror
+          enableSourceLinkValidation: false
+          enableSigningValidation: false
+          enableNugetValidation: false
+          SDLValidationParameters:
+            enable: false
