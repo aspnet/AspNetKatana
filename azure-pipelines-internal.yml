@@ -1,0 +1,69 @@
+#
+# See https://docs.microsoft.com/azure/devops/pipelines/yaml-schema for details
+#
+
+variables:
+  - name: _TeamName
+    value: AspNetCore
+  - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
+    value: true
+  - name: _PublishUsingPipelines
+    value: true
+  - name: _BuildConfig
+    value: Release
+
+    # used for post-build phases, internal builds only
+  - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+    - group: AspNetKatana-SDLValidation-Params
+
+# CI and PR triggers
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+    - release/*
+    - internal/release/*
+
+pr:
+  autoCancel: false
+  branches:
+    include:
+    - '*'
+
+resources:
+  repositories:
+  # Repo: 1ESPipelineTemplates/1ESPipelineTemplates
+  - repository: 1esPipelines
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
+
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
+  parameters:
+    pool:
+      name: NetCore1ESPool-Svc-Internal
+      image: 1es-windows-2019-pt
+      os: windows
+    stages:
+    - stage: build
+      displayName: Build
+      jobs:
+      - template: /eng/templates/default-build.yml@self
+    - ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
+      - stage: post-build
+        displayName: Post-build
+        jobs:
+        - template: /eng/common/templates-official/post-build/post-build.yml@
+          parameters:
+            publishingInfraVersion: 3
+            # Symbol validation isn't being very reliable lately. This should be enabled back
+            # once this issue is resolved: https://github.com/dotnet/arcade/issues/2871
+            enableSymbolValidation: false
+            # It's a private repo in github so this won't pass until we create an internal mirror
+            enableSourceLinkValidation: false
+            enableSigningValidation: false
+            enableNugetValidation: false
+            SDLValidationParameters:
+              enable: false
