@@ -38,12 +38,12 @@ jobs:
         - task: 1ES.PublishPipelineArtifact@1
           inputs:
             path: $(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)/
-            artifact: drop
+            artifact: $(Agent.Os)_$(Agent.JobName) TestResults
         - task: 1ES.PublishPipelineArtifact@1
           condition: and(succeeded(), eq(variables['system.pullrequest.isfork'], false), eq(variables['_BuildConfig'], 'Release'))
           inputs:
             path: $(Build.SourcesDirectory)/artifacts/packages
-            artifact: drop
+            artifact: artifacts
 
 - ${{ if ne(variables['System.TeamProject'], 'internal') }}: 
   - template: /eng/common/templates/jobs/jobs.yml
