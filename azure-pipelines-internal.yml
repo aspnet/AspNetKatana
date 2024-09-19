@@ -44,7 +44,7 @@ extends:
   parameters:
     pool:
       name: NetCore1ESPool-Svc-Internal
-      image: 1es-windows-2019-pt
+      image: 1es-windows-2019
       os: windows
     stages:
     - stage: build
