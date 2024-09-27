@@ -42,6 +42,11 @@ resources:
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
   parameters:
+    sdl:
+      policheck:
+        enabled: true
+      tsa:
+        enabled: true
     pool:
       name: NetCore1ESPool-Svc-Internal
       image: 1es-windows-2019
