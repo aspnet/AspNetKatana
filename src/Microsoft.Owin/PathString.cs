@@ -81,8 +81,7 @@ namespace Microsoft.Owin
 
             while (i < _value.Length)
             {
-                var isPercentEncodedChar = PathStringHelper.IsPercentEncodedChar(_value, i);
-                if (PathStringHelper.IsValidPathChar(_value[i]) || isPercentEncodedChar)
+                if (PathStringHelper.IsValidPathChar(_value[i]))
                 {
                     if (requiresEscaping)
                     {
@@ -99,16 +98,8 @@ namespace Microsoft.Owin
                         count = 0;
                     }
 
-                    if (isPercentEncodedChar)
-                    {
-                        count += 3;
-                        i += 3;
-                    }
-                    else
-                    {
-                        count++;
-                        i++;
-                    }
+                    count++;
+                    i++;
                 }
                 else
                 {
