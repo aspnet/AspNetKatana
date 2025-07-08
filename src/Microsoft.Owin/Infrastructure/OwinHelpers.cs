@@ -515,7 +515,7 @@ namespace Microsoft.Owin.Infrastructure
             }
         };
 
-        private static readonly char[] SemicolonAndComma = new[] { ';', ',' };
+        private static readonly char[] Semicolon = new[] { ';' };
 
         internal static IDictionary<string, string> GetCookies(IOwinRequest request)
         {
@@ -530,7 +530,7 @@ namespace Microsoft.Owin.Infrastructure
             if (request.Get<string>("Microsoft.Owin.Cookies#text") != text)
             {
                 cookies.Clear();
-                ParseDelimited(text, SemicolonAndComma, AddCookieCallback, decodePlus: false, decodeKey: false, state: cookies);
+                ParseDelimited(text, Semicolon, AddCookieCallback, decodePlus: false, decodeKey: false, state: cookies);
                 request.Set("Microsoft.Owin.Cookies#text", text);
             }
             return cookies;
@@ -587,7 +587,9 @@ namespace Microsoft.Owin.Infrastructure
         public static string GetHeader(IDictionary<string, string[]> headers, string key)
         {
             string[] values = GetHeaderUnmodified(headers, key);
-            return values == null ? null : string.Join(",", values);
+            return values == null ? null
+                : string.Equals("cookie", key, StringComparison.OrdinalIgnoreCase)
+                    ? string.Join(";", values) : string.Join(",", values);
         }
 
         public static IEnumerable<string> GetHeaderSplit(IDictionary<string, string[]> headers, string key)
