@@ -170,11 +170,11 @@ namespace Microsoft.Owin.Tests
             singleEscapedPath.Value.ShouldBe("/one%2Ftwo");
 
             var doubleEscapedString = singleEscapedPath.ToUriComponent();
-            doubleEscapedString.ShouldBe("/one%2Ftwo");
+            doubleEscapedString.ShouldBe("/one%252Ftwo");
 
             var recreatedPath = PathString.FromUriComponent(doubleEscapedString);
-            recreatedPath.Value.ShouldBe("/one/two");
-            recreatedPath.ToUriComponent().ShouldBe("/one/two");
+            recreatedPath.Value.ShouldBe("/one%2Ftwo");
+            recreatedPath.ToUriComponent().ShouldBe("/one%252Ftwo");
         }
 
         [Theory]
