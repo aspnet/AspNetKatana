@@ -59,7 +59,7 @@ jobs:
       - job: Windows
         pool:
           name: NetCore-Svc-Public
-          image: 1es-windows-2019
+          image: 1es-windows-2022
         variables:
         - name: _OfficialBuildArgs
           value: ''
