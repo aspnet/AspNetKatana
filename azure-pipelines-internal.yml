@@ -49,7 +49,7 @@ extends:
         enabled: true
     pool:
       name: NetCore1ESPool-Svc-Internal
-      image: 1es-windows-2019
+      image: 1es-windows-2022
       os: windows
     stages:
     - stage: build
