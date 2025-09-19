@@ -3,7 +3,8 @@
     <!-- This repo version -->
     <VersionPrefix>4.2.3</VersionPrefix>
     <PreReleaseVersionLabel>rtw</PreReleaseVersionLabel>
-    <PreReleaseVersionIteration></PreReleaseVersionIteration>
+    <PreReleaseVersionIteration>
+    </PreReleaseVersionIteration>
     <DotNetFinalVersionKind Condition="'$(PreReleaseVersionLabel)' == 'rtw'">release</DotNetFinalVersionKind>
     <!-- Opt-out repo features -->
     <UsingToolXliff>false</UsingToolXliff>
