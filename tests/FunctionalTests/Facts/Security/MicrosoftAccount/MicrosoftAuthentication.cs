@@ -177,6 +177,148 @@ namespace FunctionalTests.Facts.Security.MicrosoftAccount
             app.UseMicrosoftAccountAuthentication(option);
             app.UseExternalApplication("Microsoft");
         }
+
+        [Theory, Trait("FunctionalTests", "Security")]
+        [InlineData(HostType.HttpListener)]
+        public async Task Security_MicrosoftAuthenticationWithSubApplication(HostType hostType)
+        {
+            using (ApplicationDeployer deployer = new ApplicationDeployer("katanatesting.com"))
+            {
+                //Edit the hosts file at c:\Windows\System32\drivers\etc\hosts and append this at the end before running the test
+                //#My entries
+                //127.0.0.1 katanatesting.com
+                var hostsFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), @"drivers\etc\hosts");
+                if (!File.ReadAllText(hostsFilePath).Contains("127.0.0.1 katanatesting.com"))
+                {
+                    File.AppendAllText(hostsFilePath, "127.0.0.1 katanatesting.com");
+                }
+
+                string applicationUrl = deployer.Deploy(hostType, MicrosoftAuthenticationWithSubApplicationConfiguration);
+                //Fix application Url hostname
+                applicationUrl = new UriBuilder(applicationUrl) { Host = "katanatesting.com" }.Uri.AbsoluteUri;
+
+                var handler = new HttpClientHandler() { AllowAutoRedirect = false };
+                var httpClient = new HttpClient(handler);
+
+                // Unauthenticated request - verify Redirect url
+                var response = await httpClient.GetAsync(applicationUrl + "subapp/");
+                Assert.Equal("https://login.microsoftonline.com/common/oauth2/v2.0/authorize", response.Headers.Location.AbsoluteUri.Replace(response.Headers.Location.Query, string.Empty));
+                var queryItems = response.Headers.Location.ParseQueryString();
+                Assert.Equal("code", queryItems["response_type"]);
+                Assert.Equal("000000004C0F442C", queryItems["client_id"]);
+                Assert.Equal(applicationUrl + "subapp/signin-microsoft", queryItems["redirect_uri"]);
+                Assert.Equal("https://graph.microsoft.com/user.read", queryItems["scope"]);
+                Assert.Equal("ValidStateData", queryItems["state"]);
+                Assert.Equal("custom", queryItems["custom_redirect_uri"]);
+
+                //This is just to generate a correlation cookie. Previous step would generate this cookie, but we have reset the handler now.
+                httpClient = new HttpClient(handler = new HttpClientHandler());
+                response = await httpClient.GetAsync(applicationUrl + "subapp/");
+                var correlationCookie = handler.CookieContainer.GetCookies(new Uri(applicationUrl))[".AspNet.Correlation.Microsoft"];
+                Assert.NotNull(correlationCookie);
+
+                //Invalid state, but valid code
+                response = await httpClient.GetAsync(GetMicrosoftSignInMockData(applicationUrl + "subapp/", state: "InvalidStateData"));
+                Assert.Equal<HttpStatusCode>(HttpStatusCode.InternalServerError, response.StatusCode);
+                Assert.Null(handler.CookieContainer.GetCookies(new Uri(applicationUrl))[".AspNet.Application"]);
+                Assert.NotNull(handler.CookieContainer.GetCookies(new Uri(applicationUrl))[".AspNet.Correlation.Microsoft"]);
+
+                //Valid state, but missing code
+                handler.CookieContainer.Add(correlationCookie);
+                response = await httpClient.GetAsync(GetMicrosoftSignInMockData(applicationUrl + "subapp/", code: null));
+                Assert.Equal<HttpStatusCode>(HttpStatusCode.InternalServerError, response.StatusCode);
+                Assert.Equal("SignIn_Failed", await response.Content.ReadAsStringAsync());
+                Assert.Null(handler.CookieContainer.GetCookies(new Uri(applicationUrl))[".AspNet.Correlation.Microsoft"]);
+
+                //Valid code & Valid state
+                handler.CookieContainer.Add(correlationCookie);
+                response = await httpClient.GetAsync(GetMicrosoftSignInMockData(applicationUrl + "subapp/"));
+                Assert.Equal("Microsoft", await response.Content.ReadAsStringAsync());
+                var cookies = handler.CookieContainer.GetCookies(new Uri(applicationUrl));
+                Assert.NotNull(cookies[".AspNet.Application"]);
+                Assert.Null(handler.CookieContainer.GetCookies(new Uri(applicationUrl))[".AspNet.Correlation.Microsoft"]);
+
+                //Retry with valid credentials for a few times
+                for (int retry = 0; retry < 4; retry++)
+                {
+                    response = await httpClient.GetAsync(applicationUrl + "subapp/");
+                    Assert.Equal("Microsoft", await response.Content.ReadAsStringAsync());
+                }
+
+                //Valid state, but invalid code
+                httpClient = new HttpClient(handler = new HttpClientHandler());
+                response = await httpClient.GetAsync(applicationUrl + "subapp/");
+                response = await httpClient.GetAsync(GetMicrosoftSignInMockData(applicationUrl + "subapp/", code: "InvalidCode"));
+                Assert.Equal<HttpStatusCode>(HttpStatusCode.InternalServerError, response.StatusCode);
+                Assert.Equal("SignIn_Failed", await response.Content.ReadAsStringAsync());
+
+                //Valid state, trigger CertValidator
+                httpClient = new HttpClient(handler = new HttpClientHandler());
+                response = await httpClient.GetAsync(applicationUrl + "subapp/");
+                response = await httpClient.GetAsync(GetMicrosoftSignInMockData(applicationUrl + "subapp/", code: "InvalidCert"));
+                Assert.Equal<HttpStatusCode>(HttpStatusCode.InternalServerError, response.StatusCode);
+                Assert.Equal("SignIn_Failed", await response.Content.ReadAsStringAsync());
+            }
+        }
+
+        internal void MicrosoftAuthenticationWithSubApplicationConfiguration(IAppBuilder app)
+        {
+            app.Map("/subapp", subApp =>
+            {
+                subApp.UseAuthSignInCookie();
+
+                var option = new MicrosoftAccountAuthenticationOptions()
+                {
+                    ClientId = "000000004C0F442C",
+                    // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="Unit test dummy credentials.")]
+                    ClientSecret = "EkXbW-Vr6Rqzi6pugl1jWIBsDotKLmqR",
+                    Provider = new MicrosoftAccountAuthenticationProvider()
+                    {
+                        OnAuthenticated = async context =>
+                        {
+                            await Task.Run(() =>
+                                {
+                                    Assert.Equal("ValidAccessToken", context.AccessToken);
+                                    Assert.Equal("ValidRefreshToken", context.RefreshToken);
+                                    Assert.Equal("Owinauthtester", context.FirstName);
+                                    Assert.Equal("fccf9a24999f4f4f", context.Id);
+                                    Assert.Equal("Owinauthtester", context.LastName);
+                                    Assert.Equal("Owinauthtester Owinauthtester", context.Name);
+                                    Assert.NotNull(context.User);
+                                    Assert.Equal(context.Id, context.User.SelectToken("id").ToString());
+                                    context.Identity.AddClaim(new Claim("Authenticated", "true"));
+                                });
+                        },
+                        OnReturnEndpoint = async context =>
+                        {
+                            await Task.Run(() =>
+                                {
+                                    if (context.Identity != null && context.SignInAsAuthenticationType == "Application")
+                                    {
+                                        context.Identity.AddClaim(new Claim("ReturnEndpoint", "true"));
+                                        context.Identity.AddClaim(new Claim(context.Identity.RoleClaimType, "Guest", ClaimValueTypes.String));
+                                    }
+                                    else if (context.Identity == null)
+                                    {
+                                        context.Identity = new ClaimsIdentity("Microsoft", "Name_Failed", "Role_Failed");
+                                        context.SignInAsAuthenticationType = "Application";
+                                    }
+                                });
+                        },
+                        OnApplyRedirect = context =>
+                            {
+                                context.Response.Redirect(context.RedirectUri + "&custom_redirect_uri=custom");
+                            }
+                    },
+                    BackchannelHttpHandler = new MicrosoftChannelHttpHandler(),
+                    BackchannelCertificateValidator = new CustomCertificateValidator(),
+                    StateDataFormat = new CustomStateDataFormat(),
+                };
+
+                subApp.UseMicrosoftAccountAuthentication(option);
+                subApp.UseExternalApplication("Microsoft");
+            });
+        }
     }
 
     public class MicrosoftChannelHttpHandler : WebRequestHandler

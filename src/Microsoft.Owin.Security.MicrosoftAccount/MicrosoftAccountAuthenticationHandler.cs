@@ -232,7 +232,7 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         {
             string requestPrefix = Request.Scheme + "://" + Request.Host;
 
-            string redirectUri = requestPrefix + RequestPathBase + Options.CallbackPath; // + "?state=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(state));            
+            string redirectUri = requestPrefix + Request.PathBase + Options.CallbackPath; // + "?state=" + Uri.EscapeDataString(Options.StateDataFormat.Protect(state));            
             return redirectUri;
         }
     }

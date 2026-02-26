@@ -63,7 +63,12 @@ namespace Microsoft.Owin.Security.MicrosoftAccount
         /// <param name="context">Contains redirect URI and <see cref="AuthenticationProperties"/> of the challenge </param>
         public virtual void ApplyRedirect(MicrosoftAccountApplyRedirectContext context)
         {
-            OnApplyRedirect(context);
+            var redirectUri = context.RedirectUri;
+            if (!string.IsNullOrEmpty(context.Request.PathBase))
+            {
+                redirectUri = context.Request.PathBase + redirectUri;
+            }
+            context.Response.Redirect(redirectUri);
         }
     }
 }
