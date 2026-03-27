@@ -80,9 +80,9 @@ namespace Microsoft.Owin.Testing
                         registration.Dispose();
                         state.Dispose();
                     }
-                });
+                }, CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
 
-            return await state.ResponseTask;
+            return await state.ResponseTask.ConfigureAwait(false);
         }
 
         private class RequestState : IDisposable
