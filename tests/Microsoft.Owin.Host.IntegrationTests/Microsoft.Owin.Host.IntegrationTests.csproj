@@ -17,6 +17,7 @@
 		<ProjectReference Include="..\..\src\Microsoft.Owin\Microsoft.Owin.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+		<Reference Include="System.Net.Http" />
 		<Reference Include="System.Net.Http.WebRequest" />
 		<Reference Include="System.Web" />
 	</ItemGroup>
