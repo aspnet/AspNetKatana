@@ -6,6 +6,6 @@
     "dotnet": "8.0.420"
   },
   "msbuild-sdks": {
-    "Microsoft.DotNet.Arcade.Sdk": "6.0.0-beta.25468.4"
+    "Microsoft.DotNet.Arcade.Sdk": "8.0.0-beta.26224.3"
   }
 }
