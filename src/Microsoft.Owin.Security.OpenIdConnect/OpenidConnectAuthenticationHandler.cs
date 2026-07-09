@@ -468,6 +468,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
 
                         // no need to validate signature when token is received using "code flow" as per spec
                         // [http://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation].
+                        // codeql[SM04387] - the ID token is fetched  directly from the token endpoint over a TLS-protected back-channel, so no need to validate as per per OIDC Core 1.0 §3.1.3.7.
                         validationParameters.RequireSignedTokens = false;
 
                         // At least a cursory validation is required on the new IdToken, even if we've already validated the one from the authorization response.
