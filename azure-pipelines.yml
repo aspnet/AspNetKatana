@@ -31,6 +31,14 @@ pr:
     include:
     - '*'
 
+schedules:
+- cron: "0 9 1,15 * *"
+  displayName: "Twice-monthly official build"
+  branches:
+    include:
+    - main
+  always: true
+
 stages:
 - stage: build
   displayName: Build
